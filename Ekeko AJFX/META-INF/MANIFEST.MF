@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Ekeko_AJFX
+Bundle-SymbolicName: Ekeko_AJFX
+Bundle-Version: 0.1.0
+Bundle-Activator: ekeko_ajfx.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ damp.ekeko.plugin;bundle-version="1.0.3",
+ org.eclipse.jdt.core;bundle-version="3.8.1"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Eclipse-RegisterBuddy: damp.ekeko.plugin
+Bundle-ClassPath: lib/clojure-1.5.1.jar,
+ lib/core.logic-0.8.3.jar,
+ .
+
