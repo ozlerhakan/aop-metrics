@@ -146,7 +146,7 @@
  (inspect (count (ekeko [?c ?f] (count-fields-in ?c ?f)))) 
  
  (comment 
- ;#### jsoot/soot-class-field function still does not get some fields in a project!!!!
+ ;#### jsoot/soot-class-field function still does not get some fields in a project!!
  (inspect  (ekeko [?c ?f]
                 (jsoot/soot-class-field ?c ?f)
                 (equals false (or  
@@ -233,12 +233,11 @@
                                    (or (.isCflow (.getKind ?adv)) (.isPerEntry (.getKind ?adv)))
                                    (= "softener" (.getName (.getKind ?adv)))))));exclude perThis, perTarget , perCflow, Cflow, CflowBelow, softener, and Checker(warning)!!
 
-(inspect (ekeko [?a ?adv] (NOFA-in-aspects ?a ?adv)));
+(inspect (ekeko [?a ?adv] (NOFA-in-aspects ?a ?adv)))
+(count (ekeko [?a ?adv] (NOFA-in-aspects ?a ?adv)))
 (inspect (ekeko [?softener] (w/declare|soft ?softener)));in order to delete softener parts from the NOFA-in-aspects , use this query!
 
 (inspect (ekeko [?dec] (w/declare|warning  ?dec)))
-
- ;(count (ekeko [?adv] (NOFA-in-aspects ?adv)))
  
  ;GET THE ADVICES that have EMPTY POINTCUTS
  (inspect (ekeko [?as ?ad]
@@ -259,10 +258,26 @@
                          (NOFA-in-aspects ?aspect ?adv);I am using this function or I can also use ajdt/advice function to get the proper declarded advice in a project and to avoid the errors!
                          (ajsoot/advice-soot|method ?adv ?soot|advicemethod)
                          (succeeds (.hasActiveBody ?soot|advicemethod))
-                         (equals ?units (.getUnits (.getActiveBody ?soot|advicemethod)))
-                         (equals true (=  "org.contract4j5.debug.ReportThrows" (.getName (.getDeclaringClass ?soot|advicemethod))))))
+                         (equals ?units (.getUnits (.getActiveBody ?soot|advicemethod)))))
+                         ;(equals true (=  "org.contract4j5.debug.ReportThrows" (.getName (.getDeclaringClass ?soot|advicemethod))))))
 
  (inspect (ekeko [?soot|advicemethod ?units] (get-advices-soot|methods ?soot|advicemethod ?units)))
+ 
+ (defn get-signature-advice|method [?signature]
+               (l/fresh [?adv ?aspect ?soot]
+                         (NOFA-in-aspects ?aspect ?adv)
+                         (ajsoot/advice-soot|method2 ?adv ?signature)
+                         (jsoot/soot-method-signature ?soot ?signature)))
+  
+ (inspect (ekeko [?s] (get-signature-advice|method ?s)))
+ 
+ ;get the all transforming by a given part of a class name
+ (inspect (ekeko [?model ?scne ?class] 
+                 (l/fresh [?classes ]
+                 (jsoot/soot-model-scene ?model ?scne)
+                 (equals ?classes (.getClasses ?scne))
+                 (contains ?classes ?class)
+                 (succeeds (IndexOfText (.getName ?class) "org.contract4j5.debug")))))
 
 ;################################## WORKING!! (I hope so) ####################################
  (defn NOMethodCalls-perAdvice [?advices ?calledmethods ?soot|method]; ?method : class soot.SootMethod
@@ -285,20 +300,20 @@
             (equals false
                     (and
                       (.startsWith (.toString (.getInvokeExpr ?calledmethods)) "staticinvoke")
-                      (IndexOfText (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "$")
-                      (.containsInvokeExpr (.getFirstNonIdentityStmt (.getActiveBody (.getMethod (.getValue (.getInvokeExprBox ?calledmethods))))))
+                      (IndexOfText (.getName  (.getMethod (.getInvokeExpr ?calledmethods))) "$")
+                      (.containsInvokeExpr    (.getFirstNonIdentityStmt (.getActiveBody (.getMethod (.getValue (.getInvokeExprBox ?calledmethods))))))
                       (or
                         (.startsWith (.name (.getMethodRef (.getValue (.getInvokeExprBox (.getFirstNonIdentityStmt (.getActiveBody (.getMethod (.getValue (.getInvokeExprBox ?calledmethods))))))))) "ajc$set")
                         (.startsWith (.name (.getMethodRef (.getValue (.getInvokeExprBox (.getFirstNonIdentityStmt (.getActiveBody (.getMethod (.getValue (.getInvokeExprBox ?calledmethods))))))))) "ajc$get"))))
 	         (equals false
-                (and
-                  (or
-                    (.startsWith (.toString (.getInvokeExpr ?calledmethods)) "staticinvoke")
-                    (.startsWith (.toString (.getInvokeExpr ?calledmethods)) "virtualinvoke"))
-                  (and (or
-                         (lastIndexOfText (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "$advice")
-                         (.startsWith (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$around$"))
-                       (false? (lastIndexOfText (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "proceed")))));counting proceed() method as a basic method call
+		                (and
+		                  (or
+		                    (.startsWith (.toString (.getInvokeExpr ?calledmethods)) "staticinvoke")
+		                    (.startsWith (.toString (.getInvokeExpr ?calledmethods)) "virtualinvoke"))
+		                  (and (or
+		                         (lastIndexOfText (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "$advice")
+		                         (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$around$"))
+		                  (false? (lastIndexOfText (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "proceed")))));counting proceed() method as a basic method call
 	         (equals false
                 (or
                   (= "aspectOf" (.getName (.getMethod (.getValue (.getInvokeExprBox ?calledmethods)))))
@@ -306,10 +321,9 @@
 	          ;(equals true (= "org.contract4j5.aspects.MethodBoundaryConditions" (.getName (.getDeclaringClass ?soot|method))))))
 
  (inspect (ekeko [?soot|method ?advices ?calledmethods] (NOMethodCalls-perAdvice ?advices ?calledmethods ?soot|method)))
-;COUNT
+ ;COUNT
  ;(count (ekeko [?advices ?calledmethods] (NOMethodCalls-perAdvice ?advices ?calledmethods)))
 
- ;(equals false (or (= "PrintStream" ?shortname) (= "StringBuilder" ?shortname) )))))
  ;soot|value|invocation-soot|method
  ;soot.jimple.internal.JAssignStmt
  ;soot.jimple.internal.JInvokeStmt
@@ -352,7 +366,14 @@
  ;(inspect (ekeko [?shadow ?class] (w/shadow-ancestor|class ?shadow ?class))) 
  ;(inspect (ekeko [?shadow ?aspect] (w/shadow-ancestor|aspect ?shadow ?aspect)))
  ;(inspect (ekeko [?shadow ?advice] (w/shadow-ancestor|advice ?shadow ?advice)))
-;)
+
+ ;##########################################################################
+ 
+ (inspect (ekeko [?c ?aspect] (ajdt/compilationunit-aspect ?c ?aspect)))
+ 
+ 
+ 
+ ;)
 
  (defn- 
    soot|unit-getDeclarationClassname  
