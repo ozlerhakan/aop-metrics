@@ -26,6 +26,7 @@
     [soot.jimple.internal JimpleLocal]
     [soot.jimple ThisRef ParameterRef]
     [org.aspectj.lang Signature]
+    [java.lang Integer]
     [org.eclipse.jdt.core IJavaElement ITypeHierarchy IType IPackageFragment IClassFile ICompilationUnit
      IJavaProject WorkingCopyOwner IMethod]
     [org.eclipse.jdt.core.dom Expression IVariableBinding ASTParser AST IBinding Type TypeDeclaration 
@@ -126,10 +127,10 @@
  ;get a specific class and its fields in terms of a package name
  (inspect (ekeko [?t ?f] 
                  (w/type-fields ?t ?f)
-                 (succeeds (IndexOfText (.toString ?t) "org.contract4j5.interpreter.groovy.GroovyExpressionInterpreter"))))
+                 (succeeds (IndexOfText (.toString ?t) "InvariantTypeConditions"))))
  
 ;count-fields-in both CLASSES and ASPECTS except their subclasses' or sub-aspects' fields!!
-(defn count-fields-in [?c ?f]
+(defn count-fields-in-modules [?c ?f]
          (l/fresh []
                      (w/type-field ?c ?f)
                      ;(succeeds (or (.isClass ?c) (.isAspect ?c)))
@@ -142,8 +143,8 @@
                                      (.startsWith (.getName ?f) "this")
                                      (IndexOfText (.getName ?f) "$")))))
                      
- (inspect (ekeko [?c ?f] (count-fields-in ?c ?f)))
- (inspect (count (ekeko [?c ?f] (count-fields-in ?c ?f)))) 
+ (inspect (ekeko [?c ?f] (count-fields-in-modules ?c ?f)))
+ (inspect (count (ekeko [?c ?f] (count-fields-in-modules ?c ?f)))) 
  
  (comment 
  ;#### jsoot/soot-class-field function still does not get some fields in a project!!
@@ -235,8 +236,8 @@
 
 (inspect (ekeko [?a ?adv] (NOFA-in-aspects ?a ?adv)))
 (count (ekeko [?a ?adv] (NOFA-in-aspects ?a ?adv)))
-(inspect (ekeko [?softener] (w/declare|soft ?softener)));in order to delete softener parts from the NOFA-in-aspects , use this query!
 
+(inspect (ekeko [?softener] (w/declare|soft ?softener)))
 (inspect (ekeko [?dec] (w/declare|warning  ?dec)))
  
  ;GET THE ADVICES that have EMPTY POINTCUTS
@@ -273,11 +274,11 @@
  
  ;get the all transforming by a given part of a class name
  (inspect (ekeko [?model ?scne ?class] 
-                 (l/fresh [?classes ]
-                 (jsoot/soot-model-scene ?model ?scne)
-                 (equals ?classes (.getClasses ?scne))
-                 (contains ?classes ?class)
-                 (succeeds (IndexOfText (.getName ?class) "org.contract4j5.debug")))))
+             (l/fresh [?classes ]
+                      (jsoot/soot-model-scene ?model ?scne)
+                      (equals ?classes (.getClasses ?scne))
+                      (contains ?classes ?class)
+                      (succeeds (IndexOfText (.getName ?class) "org.contract4j5.debug")))))
 
 ;################################## WORKING!! (I hope so) ####################################
  (defn NOMethodCalls-perAdvice [?advices ?calledmethods ?soot|method]; ?method : class soot.SootMethod
@@ -336,36 +337,50 @@
 
  ;(inspect (ekeko [?caller ?callee ?call ?receiver]  ( method-methodCalls ?caller ?callee ?call ?receiver)))
  ;(inspect (ekeko [?advice ?unit] (advice-soot|unit ?advice ?unit)))
-
+ 
+ ;####################### Attribute-Class dependence Measure (AtC) #########################
+ ;Definition : if a class is the type of an field of an aspect
+  (defn getField [?aspect ?fieldName ?fieldType ?signature] 
+         (l/fresh [?field]
+                 (w/type-field ?aspect ?field)
+                 (succeeds (.isAspect ?aspect))            
+                 (equals ?fieldType (.getClassName (.getType ?field)))                 
+                 (equals ?signature (.getSignature (.getType ?field)))
+                 (equals false (.isPrimitiveType (.getType ?field))); I ignore primitive types such as boolean, int , void ,double, and so on.
+                 (equals false (or (.startsWith (.getName ?field) "ajc") (.startsWith (.getName ?field) "this")))  
+                 (equals ?fieldName (str "Field :" (.getName ?field)))))
+                 ;(succeeds (IndexOfText (.toString ?type) "InvariantTypeConditions"))))
+ 
+ (inspect (ekeko [?t ?typef ?f ?sig] (getField ?t ?f ?typef ?sig)))
+ 
  ;################################## NOPointcuts ##################################
-
- ;aspect or class and its pointcut definitions
- ;(inspect (ekeko [?type ?pointdef] (w/type-pointcutdefinition ?type ?pointdef )))
+ ;aspect or class and its pointcut definitions
+ (inspect (ekeko [?type ?pointdef] (w/type-pointcutdefinition ?type ?pointdef )))
  ;count aspects and its poincuts' definitions
- ;(inspect (ekeko [?aspects ?pointcuts] (w/aspect-pointcutdefinition ?aspects ?pointcuts )))
+ (inspect (ekeko [?aspects ?pointcuts] (w/aspect-pointcutdefinition ?aspects ?pointcuts )))
 
  ;get the all poincuts even the anoymous poincuts
- ;(inspect(ekeko [?point] (w/pointcut ?point)))
+ (inspect(ekeko [?point] (w/pointcut ?point)))
 
  ;just count the number of poincuts declared  properly in aspects 
- ;(inspect (ekeko [?point] (w/pointcutdefinition ?point)))
+ (inspect (ekeko [?point] (w/pointcutdefinition ?point)))
 
  ;pointcut and its primitive pointcuts; if there is no primitive pointcuts of a pointcut , the pointcut wont show
- ;(inspect (ekeko [?pointdef ?point] (w/pointcutdefinition-pointcut ?pointdef ?point)))
+ (inspect (ekeko [?pointdef ?point] (w/pointcutdefinition-pointcut ?pointdef ?point)))
 
- ;(inspect (ekeko [?point] (ajdt/pointcut ?point)))
+ (inspect (ekeko [?point] (ajdt/pointcut ?point)))
 
  ;advice & the definition of its pointcuts
  ;if it is not pointcut definion of the advice, the advice will not show off
- ;(inspect (ekeko [?advice ?pointdef] (w/advice-pointcutdefinition ?advice ?pointdef)))
+ (inspect (ekeko [?advice ?pointdef] (w/advice-pointcutdefinition ?advice ?pointdef)))
 
 ;################################# SHADOWS #################################
 
- ;(inspect (ekeko [?shadow ?type] (w/shadow-ancestor|type ?shadow ?type)))
+ (inspect (ekeko [?shadow ?type] (w/shadow-ancestor|type ?shadow ?type)))
 
- ;(inspect (ekeko [?shadow ?class] (w/shadow-ancestor|class ?shadow ?class))) 
- ;(inspect (ekeko [?shadow ?aspect] (w/shadow-ancestor|aspect ?shadow ?aspect)))
- ;(inspect (ekeko [?shadow ?advice] (w/shadow-ancestor|advice ?shadow ?advice)))
+ (inspect (ekeko [?shadow ?class] (w/shadow-ancestor|class ?shadow ?class))) 
+ (inspect (ekeko [?shadow ?aspect] (w/shadow-ancestor|aspect ?shadow ?aspect)))
+ (inspect (ekeko [?shadow ?advice] (w/shadow-ancestor|advice ?shadow ?advice)))
 
  ;##########################################################################
  
@@ -373,7 +388,7 @@
  
  
  
- ;)
+;)
 
  (defn- 
    soot|unit-getDeclarationClassname  
