@@ -272,11 +272,12 @@
                       (succeeds (IndexOfText (.getName ?class) "org.contract4j5.debug")))))
 
 ;################################## WORKING!! (I hope so) ####################################
- (defn NOMethodCalls-perAdvice [?advices ?calledmethods ?soot|method]; ?method : class soot.SootMethod
-          (l/fresh [?aspect ?units ?sootMDeclass]
+ (defn NOMethodCalls-perAdvice [?aspectName ?calledmethods ?soot|method]; ?method : class soot.SootMethod
+          (l/fresh [?aspect ?advices ?units ?sootMDeclass]
             (NOFA-in-aspects ?aspect ?advices)
 	          (ajsoot/advice-soot|method ?advices ?soot|method)
             (succeeds (.hasActiveBody ?soot|method))
+            (soot|unit-getDeclarationClassname ?soot|method ?aspectName)
             (equals ?units (.getUnits (.getActiveBody ?soot|method)))
             (contains ?units ?calledmethods)
             ;(jsoot/soot|method-soot|unit ?soot|method ?calledmethods)
@@ -302,17 +303,16 @@
 		                  (or
 		                    (.startsWith (.toString (.getInvokeExpr ?calledmethods)) "staticinvoke")
 		                    (.startsWith (.toString (.getInvokeExpr ?calledmethods)) "virtualinvoke"))
-		                  (and (or
-		                         (lastIndexOfText (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "$advice")
-		                         (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$around$"))
-		                  (false? (lastIndexOfText (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "proceed")))));counting proceed() method as a basic method call
+		                  (or
+		                    (lastIndexOfText (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "$advice")
+		                    (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$around$"))))
 	         (equals false
                 (or
                   (= "aspectOf" (.getName (.getMethod (.getValue (.getInvokeExprBox ?calledmethods)))))
-                  (= "makeJP" (.getName (.getMethod (.getValue (.getInvokeExprBox ?calledmethods)))))))))
-	          ;(equals true (= "org.contract4j5.aspects.MethodBoundaryConditions" (.getName (.getDeclaringClass ?soot|method))))))
+                  (= "makeJP" (.getName (.getMethod (.getValue (.getInvokeExprBox ?calledmethods)))))))
+	          (equals true (= "org.jhotdraw.ccconcerns.commands.UndoableCommand" (.getName (.getDeclaringClass ?soot|method))))))
 
- (inspect (ekeko [?soot|method ?advices ?calledmethods] (NOMethodCalls-perAdvice ?advices ?calledmethods ?soot|method)))
+ (inspect (ekeko [?advices ?soot|method ?calledmethods] (NOMethodCalls-perAdvice ?advices ?calledmethods ?soot|method)))
  ;COUNT
  ;(count (ekeko [?advices ?calledmethods] (NOMethodCalls-perAdvice ?advices ?calledmethods)))
 
@@ -383,7 +383,7 @@
  (defn- 
    soot|unit-getDeclarationClassname  
    [?method ?decName]  
-   (.getName (.getDeclaringClass ?method)))
+   (equals ?decName (.getName (.getDeclaringClass ?method))))
 
  (defn- 
    soot|unit-getInvokeExprBoxMethod
