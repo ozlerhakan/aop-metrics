@@ -129,21 +129,19 @@
                  (w/type-fields ?t ?f)
                  (succeeds (IndexOfText (.toString ?t) "InvariantTypeConditions"))))
  
-;count-fields-in both CLASSES and ASPECTS except their subclasses' or sub-aspects' fields!!
+;count-fields-in both CLASSES and ASPECTS except their sub-classes' fields!!
 (defn count-fields-in-modules [?c ?f]
          (l/fresh []
                      (w/type-field ?c ?f)
-                     ;(succeeds (or (.isClass ?c) (.isAspect ?c)))
                      (equals false (.isEnum ?c))
-                     (equals false (IndexOfText  (.getName ?c) "$"))
+                     (equals false (and (.isClass ?c) (IndexOfText  (.getName ?c) "$")))
                      (succeeds (empty? (filter #(re-matches #"\S+\$[1-9]+" %)  [(.getName ?c)])))
                      (equals false (or 
                                      (.startsWith (.getName ?f) "ajc")
-                                     ;(.startsWith (.getName ?f) "$")
                                      (.startsWith (.getName ?f) "this")
                                      (IndexOfText (.getName ?f) "$")))))
                      
- (inspect (ekeko [?c ?f] (count-fields-in-modules ?c ?f)))
+ (inspect (ekeko [?c ?f] (count-fields-in-modules ?c ?f )))
  (inspect (count (ekeko [?c ?f] (count-fields-in-modules ?c ?f)))) 
  
  (comment 
@@ -203,15 +201,15 @@
  (defn aspects-intertyped-methods [?methods]
                 (l/fresh [?types]
                          (w/type-method ?types ?methods)
-                          (equals false  (or 
-                                            (= "STATIC_INITIALIZATION" (.toString (.getKind ?methods))) 
-                                            (= "CONSTRUCTOR" (.toString (.getKind ?methods)))))
+                          ;(equals false  (or 
+                          ;                  (= "STATIC_INITIALIZATION" (.toString (.getKind ?methods))) 
+                          ;                  (= "CONSTRUCTOR" (.toString (.getKind ?methods)))))
                           (succeeds   (.isAspect ?types))
-                          (equals false  (.isAjSynthetic ?methods)) 
-                          (equals false  (or 
-                                           (= "hasAspect" (.getName ?methods)) 
-                                           (= "<init>" (.getName ?methods))))
-                          (equals false  (.isInterface ?methods))
+                          ;(equals false  (.isAjSynthetic ?methods)) 
+                          ;(equals false  (or 
+                          ;                 (= "hasAspect" (.getName ?methods)) 
+                          ;                 (= "<init>" (.getName ?methods))))
+                          ;(equals false  (.isInterface ?methods))
                           (succeeds   (.startsWith (.getName ?methods) "ajc$interMethod$"))));$AFTER,$BEFORE, so on...
 
  (inspect (ekeko [?get] (aspects-intertyped-methods ?get)))
@@ -272,9 +270,9 @@
   
  (inspect (ekeko [?s] (get-signature-advice|method ?s)))
  
- ;get the all transforming by a given part of a class name
- (inspect (ekeko [?model ?scne ?class] 
-             (l/fresh [?classes ]
+ ;get the all transforming classes with a given part of a class name
+ (inspect (ekeko [?model ?scne ?class]
+             (l/fresh [?classes]
                       (jsoot/soot-model-scene ?model ?scne)
                       (equals ?classes (.getClasses ?scne))
                       (contains ?classes ?class)
@@ -348,11 +346,10 @@
                  (equals ?signature (.getSignature (.getType ?field)))
                  (equals false (.isPrimitiveType (.getType ?field))); I ignore primitive types such as boolean, int , void ,double, and so on.
                  (equals false (or (.startsWith (.getName ?field) "ajc") (.startsWith (.getName ?field) "this")))  
-                 (equals ?fieldName (str "Field :" (.getName ?field)))))
+                 (equals ?fieldName (str "<Field : " (.getName ?field) " >"))))
                  ;(succeeds (IndexOfText (.toString ?type) "InvariantTypeConditions"))))
  
- (inspect (ekeko [?t ?typef ?f ?sig] (getField ?t ?f ?typef ?sig)))
- 
+ (inspect (ekeko [?t ?typef ?f ?sig] (getField ?t ?f ?typef ?sig))) 
  ;################################## NOPointcuts ##################################
  ;aspect or class and its pointcut definitions
  (inspect (ekeko [?type ?pointdef] (w/type-pointcutdefinition ?type ?pointdef )))
