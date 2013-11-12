@@ -198,22 +198,15 @@
 
  ;METHODS: only intertyped method declarations in aspect
  ;1 Aspect
- (defn aspects-intertyped-methods [?methods]
+ (defn aspects-intertyped-methods [?decAspect ?methods]
                 (l/fresh [?types]
                          (w/type-method ?types ?methods)
-                          ;(equals false  (or 
-                          ;                  (= "STATIC_INITIALIZATION" (.toString (.getKind ?methods))) 
-                          ;                  (= "CONSTRUCTOR" (.toString (.getKind ?methods)))))
                           (succeeds   (.isAspect ?types))
-                          ;(equals false  (.isAjSynthetic ?methods)) 
-                          ;(equals false  (or 
-                          ;                 (= "hasAspect" (.getName ?methods)) 
-                          ;                 (= "<init>" (.getName ?methods))))
-                          ;(equals false  (.isInterface ?methods))
+                          (equals ?decAspect (.getName (.getDeclaringType ?methods)))
                           (succeeds   (.startsWith (.getName ?methods) "ajc$interMethod$"))));$AFTER,$BEFORE, so on...
 
- (inspect (ekeko [?get] (aspects-intertyped-methods ?get)))
- (inspect (count (ekeko [?get] (aspects-intertyped-methods ?get))))
+ (inspect (ekeko [?methods ?decAspect] (aspects-intertyped-methods ?methods ?decAspect)))
+ (inspect (count (ekeko [?get ?decAspect] (aspects-intertyped-methods ?get ?decAspect))))
  
  (inspect (count (ekeko [?intertype] (w/intertype|method ?intertype)))) 
  (inspect  (ekeko [?method-aspect] (ajdt/method ?method-aspect)))
