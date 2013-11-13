@@ -305,14 +305,16 @@
 		                    (.startsWith (.toString (.getInvokeExpr ?calledmethods)) "virtualinvoke"))
 		                  (or
 		                    (lastIndexOfText (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "$advice")
-		                    (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$around$"))))
+                        (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$")
+		                    ;(.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$around$")
+                        (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "access$"))))
 	         (equals false
                 (or
                   (= "aspectOf" (.getName (.getMethod (.getValue (.getInvokeExprBox ?calledmethods)))))
-                  (= "makeJP" (.getName (.getMethod (.getValue (.getInvokeExprBox ?calledmethods)))))))
-	          (equals true (= "org.jhotdraw.ccconcerns.commands.UndoableCommand" (.getName (.getDeclaringClass ?soot|method))))))
+                  (= "makeJP" (.getName (.getMethod (.getValue (.getInvokeExprBox ?calledmethods)))))))))
+	          ;(equals true (= "spacewar.Display$DisplayAspect" (.getName (.getDeclaringClass ?soot|method))))))
 
- (inspect (ekeko [?advices ?soot|method ?calledmethods] (NOMethodCalls-perAdvice ?advices ?calledmethods ?soot|method)))
+ (inspect (ekeko [?aspect ?soot|method ?calledmethods] (NOMethodCalls-perAdvice ?aspect ?calledmethods ?soot|method)))
  ;COUNT
  ;(count (ekeko [?advices ?calledmethods] (NOMethodCalls-perAdvice ?advices ?calledmethods)))
 
