@@ -333,7 +333,6 @@
  
  ;####################### Attribute-Class dependence Measure (AtC) #########################
  ;Definition : if a class is the type of an field of an aspect
- 
  ;Filtering primitive types and interface that could be the type of a field!
   (defn getField-AtC [?aspect ?fieldName ?fieldType ?signature] 
          (l/fresh [?field ?tcname ?isSameInterface]
@@ -344,11 +343,43 @@
                  (equals false       (.isPrimitiveType (.getType ?field))); I ignore primitive types such as boolean, int , void ,double, and so on.
                  (equals false       (or (.startsWith (.getName ?field) "ajc") (.startsWith (.getName ?field) "this")))
                  (equals ?tcname     (.getClassName ?fieldType))
-                 (equals ?isSameInterface (getInterfaceName ?tcname))
+                 (equals ?isSameInterface (getInterface ?tcname))
                  (equals true        (nil? ?isSameInterface));check whether the type is interface or not!!
                  (equals ?fieldName  (str "<Field name: " (.getName ?field) ">"))))
  
  (inspect (sort (ekeko [?t ?f ?typef ?sig] (getField-AtC ?t ?f ?typef ?sig))))
+ ;############################### Advice-Class  dependence (AC) #########################
+ ; if a class is  the type of a parameter of a piece of advice of an aspect 
+ (defn getAC-p1 [?aspectName ?adviceKind ?AdviceParameter] 
+   (l/fresh [?aspect ?typesofAdvice ?advice  ?isSameInterface ?tcname]
+            (NOFA-in-aspects ?aspect ?advice)
+            (equals   ?aspectName (.getName ?aspect))
+            (equals   ?adviceKind (.getKind ?advice))
+            (equals   ?typesofAdvice (.getParameterTypes (.getSignature ?advice)))
+            (contains ?typesofAdvice ?AdviceParameter)
+            (equals   ?tcname  (.getClassName ?AdviceParameter))
+            (equals   ?isSameInterface (getInterface ?tcname));control whether a selected type is interface that was implemented in a given AspectJ app 
+            (succeeds (nil? ?isSameInterface))
+            (equals false (.isPrimitiveType ?AdviceParameter))
+            (equals false (IndexOfText  ?tcname "AroundClosure"))
+            (equals false (.startsWith ?tcname "JoinPoint"))))            
+ 
+ (inspect  (sort-by first (ekeko [?as ?a ?r] (getAC-p1 ?as ?a ?r))))
+ 
+ ; the return type of the piece of advice - around - ; after returning is being checked in the above function called -getAC-p1-
+ (defn getAC-p2 [?aspectName ?adviceKind ?returntype] 
+   (l/fresh [?aspect ?advice ?tcname ?isSameInterface]
+            (NOFA-in-aspects ?aspect ?advice)
+            (equals ?aspectName (.getName ?aspect))            
+            (equals ?adviceKind (.getKind ?advice))
+            (succeeds (= 5 (.getKey (.getKind ?advice))))
+            (equals ?returntype (.getReturnType (.getSignature ?advice)))
+            (equals false (.isPrimitiveType ?returntype))
+            (equals ?tcname  (.getClassName ?returntype))
+            (equals ?isSameInterface (getInterface ?tcname))
+            (succeeds  (nil? ?isSameInterface))))
+  
+  (inspect  (sort-by first (ekeko [?as ?a ?r] (getAC-p2 ?as ?a ?r)))) 
  ;################################## NOPointcuts ##################################
  ;aspect or class and its pointcut definitions
  (inspect (ekeko [?type ?pointdef] (w/type-pointcutdefinition ?type ?pointdef )))
@@ -382,18 +413,12 @@
  
  (inspect (ekeko [?c ?aspect] (ajdt/compilationunit-aspect ?c ?aspect)))
  
-  (defn getListt [?return ?name]
-    (l/fresh [?list ?res]
-     (equals ?list (getInterfaces ?name))
-     (equals true (nil? (first ?list)))))
-  
-  (ekeko [?l ?name] (getListt ?l "Undoable"))
   ;)
  
-  (defn getInterfaceName [?name]
+  (defn- getInterface [?name]
         (first (ekeko [?i] (w/interface ?i) (equals true (= ?name (.getClassName ?i))))))
   
-  (defn getEnumName [?name]
+  (defn- getEnum [?name]
         (first (ekeko [?i] (w/enum ?i) (equals true (= ?name (.getClassName ?i))))))
  
   (defn- 
