@@ -316,7 +316,7 @@
 
  (inspect (ekeko [?aspect ?soot|method ?calledmethods] (NOMethodCalls-perAdvice ?aspect ?calledmethods ?soot|method)))
  ;COUNT
- ;(count (ekeko [?advices ?calledmethods] (NOMethodCalls-perAdvice ?advices ?calledmethods)))
+ ;(count (ekeko [?aspect ?soot|method ?calledmethods] (NOMethodCalls-perAdvice ?aspect ?calledmethods ?soot|method)))
 
  ;soot|value|invocation-soot|method
  ;soot.jimple.internal.JAssignStmt
@@ -333,18 +333,22 @@
  
  ;####################### Attribute-Class dependence Measure (AtC) #########################
  ;Definition : if a class is the type of an field of an aspect
-  (defn getField [?aspect ?fieldName ?fieldType ?signature] 
-         (l/fresh [?field]
-                 (w/type-field ?aspect ?field)
-                 (succeeds (.isAspect ?aspect))            
-                 (equals ?fieldType (.getClassName (.getType ?field)))                 
-                 (equals ?signature (.getSignature (.getType ?field)))
-                 (equals false (.isPrimitiveType (.getType ?field))); I ignore primitive types such as boolean, int , void ,double, and so on.
-                 (equals false (or (.startsWith (.getName ?field) "ajc") (.startsWith (.getName ?field) "this")))  
-                 (equals ?fieldName (str "<Field : " (.getName ?field) " >"))))
-                 ;(succeeds (IndexOfText (.toString ?type) "InvariantTypeConditions"))))
  
- (inspect (ekeko [?t ?typef ?f ?sig] (getField ?t ?f ?typef ?sig))) 
+ ;Filtering primitive types and interface that could be the type of a field!
+  (defn getField-AtC [?aspect ?fieldName ?fieldType ?signature] 
+         (l/fresh [?field ?tcname ?isSameInterface]
+                 (w/type-field ?aspect ?field)
+                 (succeeds (.isAspect ?aspect))
+                 (equals ?fieldType  (.getType ?field))
+                 (equals ?signature  (.getSignature (.getType ?field)))
+                 (equals false       (.isPrimitiveType (.getType ?field))); I ignore primitive types such as boolean, int , void ,double, and so on.
+                 (equals false       (or (.startsWith (.getName ?field) "ajc") (.startsWith (.getName ?field) "this")))
+                 (equals ?tcname     (.getClassName ?fieldType))
+                 (equals ?isSameInterface (getInterfaceName ?tcname))
+                 (equals true        (nil? ?isSameInterface));check whether the type is interface or not!!
+                 (equals ?fieldName  (str "<Field name: " (.getName ?field) ">"))))
+ 
+ (inspect (sort (ekeko [?t ?f ?typef ?sig] (getField-AtC ?t ?f ?typef ?sig))))
  ;################################## NOPointcuts ##################################
  ;aspect or class and its pointcut definitions
  (inspect (ekeko [?type ?pointdef] (w/type-pointcutdefinition ?type ?pointdef )))
@@ -378,11 +382,21 @@
  
  (inspect (ekeko [?c ?aspect] (ajdt/compilationunit-aspect ?c ?aspect)))
  
+  (defn getListt [?return ?name]
+    (l/fresh [?list ?res]
+     (equals ?list (getInterfaces ?name))
+     (equals true (nil? (first ?list)))))
+  
+  (ekeko [?l ?name] (getListt ?l "Undoable"))
+  ;)
  
+  (defn getInterfaceName [?name]
+        (first (ekeko [?i] (w/interface ?i) (equals true (= ?name (.getClassName ?i))))))
+  
+  (defn getEnumName [?name]
+        (first (ekeko [?i] (w/enum ?i) (equals true (= ?name (.getClassName ?i))))))
  
-;)
-
- (defn- 
+  (defn- 
    soot|unit-getDeclarationClassname  
    [?method ?decName]  
    (equals ?decName (.getName (.getDeclaringClass ?method))))
@@ -397,12 +411,12 @@
    [?method]
    (.getMethod (.getInvokeExpr ?method)))
 
- (defn- 
-   lastIndexOfText 
-   [from to]  
-   (> (.lastIndexOf from to) -1))
+  (defn- 
+    lastIndexOfText 
+    [from to]  
+    (> (.lastIndexOf from to) -1))
 
- (defn-  
-   IndexOfText  
-   [from to](> (.indexOf from to) -1))
+  (defn-  
+    IndexOfText  
+    [from to](> (.indexOf from to) -1))
  
