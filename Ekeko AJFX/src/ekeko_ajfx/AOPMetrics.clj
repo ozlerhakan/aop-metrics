@@ -171,29 +171,31 @@
  ;(inspect (ekeko [?methods] (w/method ?methods)))
 
  ;NUMBER OF METHODS: only responsible for classes!  - construct methods including 
- (defn classes-methods [?types ?methods]
-                (l/fresh []
+ (defn classes-methods [?typesn ?methods]
+                (l/fresh [?types]
                          (w/type-method ?types ?methods)
                          (equals false (or
                                          (= "java.lang.Object" (.getName ?types))
                                          (.isAspect ?types)
                                          (.isEnum ?types)
                                          (.isInterface ?types)))
+                         (equals ?typesn (.getName ?types))
                          (succeeds (empty? (filter #(re-matches #"\S+\$\S+" %) [(.getName ?types)])))
                          (equals false (= "STATIC_INITIALIZATION" (.toString (.getKind ?methods))))
-                         (succeeds (empty? (filter #(re-matches #"\S+\$[1-9]+" %) [(.getName (.getDeclaringType ?methods))])))))
+                         (succeeds (empty? (filter #(re-matches #"\S+\$[1-9]+" %) [(.getName ?methods)])))))
+                         ;(succeeds (empty? (filter #(re-matches #"\S+\$[1-9]+" %) [(.getName (.getDeclaringType ?methods))])))
                          ;(succeeds (IndexOfText (.toString (.getName ?types)) "org.contract4j5.reporter.Severity" ))))
  ;1 Classs
- (inspect (ekeko [?types ?m] (classes-methods ?types ?m)))
+ (inspect (sort-by first (ekeko [?types ?m] (classes-methods ?types ?m))))
  (count ( ekeko [?types ?m] (classes-methods ?types ?m)))
 
  ;exclude construct methods of classes!
  (defn classes-methods-with-noconstructs [?t ?m]
              (l/fresh []
                   (classes-methods ?t ?m)
-                  (equals true (= 3 (.getKey (.getKind ?m))))))
+                  (equals false (= 3 (.getKey (.getKind ?m))))))
  ;1 Class
- (inspect (ekeko [?t ?m] (classes-methods-with-noconstructs ?t ?m)))
+ (inspect(sort-by first (ekeko [?t ?m] (classes-methods-with-noconstructs ?t ?m))))
  (count (ekeko [?t ?m] (classes-methods-with-noconstructs ?t ?m)))
 
  ;2 Aspect : find basic method declarations in aspect files
@@ -232,17 +234,18 @@
  (inspect (sort-by first (ekeko [?decAspect ?methods] (aspects-intertyped-methods  ?decAspect ?methods))))
  (inspect (count (ekeko [?get ?decAspect] (aspects-intertyped-methods ?get ?decAspect))))
   
+ ;get the all intertype method declaration implemented in a project
+ ;--- the difference from the above query is that this query also reaches abstract intertype methods
  (inspect (sort-by first  (ekeko [?aspect ?interName ?i] 
                                  (l/fresh [] 
                                           (w/intertype|method ?i)
                                           (equals ?aspect (.getName (.getAspectType ?i)))
                                           (equals ?interName (.getName (.getSignature ?i)))))))
- ;(inspect  (ekeko [?method-aspect] (ajdt/method ?method-aspect)))
   
  ;COUNT: 1 class + 2 aspect + 1 aspect :RESULT combines with 
 
  ;(inspect (count (ekeko [?method-aspect] (ajdt/method ?method-aspect))))
- ;----------------------------------------------
+ ;-------------------------------------------------------------------------------------------------
  ;NUMBER OF ADVICES: only for aspects;
 (defn NOFA-in-aspects [?aspect ?adv]  
               (l/fresh []
@@ -361,7 +364,7 @@
  
  ;####################### Attribute-Class dependence Measure (AtC) #########################
  ;Definition : if a class is the type of an field of an aspect
- ;Filtering primitive types and interface that could be the type of a field!
+ ;Filtering primitive types and interfaces that could be the type of a field!
   (defn getField-AtC [?aspectName ?fieldName ?fieldType ?signature] 
          (l/fresh [?field ?tcname ?aspect ?isSameInterface]
                  (w/type-field ?aspect ?field)
@@ -412,8 +415,7 @@
                             (ekeko [?as ?a ?r] (getAC-p1 ?as ?a ?r))
                             (ekeko [?as ?a ?r] (getAC-p2 ?as ?a ?r)))))
  ;############################### Intertype-Class dependence (IC) ###############################
- ;if a class is the type of a parameter or a return type of an intertype method declaration in an aspect
- ;if classes are the type of  parameters or return types of intertype method declarations in aspects 
+ ;if classes are the type of  parameters or return type of intertype method declarations in aspects 
  
  ;find all return types 
  (defn measureIC-returnType [?aspect ?interName ?type ?returnname] 
