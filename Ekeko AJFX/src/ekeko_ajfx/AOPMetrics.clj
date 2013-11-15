@@ -171,7 +171,7 @@
  ;METHODS: both all classes and aspects
  ;(inspect (ekeko [?methods] (w/method ?methods)))
 
- ;NUMBER OF METHODS: only responsible for classes!  
+ ;NUMBER OF METHODS: only responsible for classes!  - construct methods including 
  (defn classes-methods [?types ?methods]
                 (l/fresh []
                          (w/type-method ?types ?methods)
@@ -182,16 +182,41 @@
                                          (.isInterface ?types)))
                          (succeeds (empty? (filter #(re-matches #"\S+\$\S+" %) [(.getName ?types)])))
                          (equals false (= "STATIC_INITIALIZATION" (.toString (.getKind ?methods))))
-                         (equals false (.isInterface ?methods))
                          (succeeds (empty? (filter #(re-matches #"\S+\$[1-9]+" %) [(.getName (.getDeclaringType ?methods))])))))
                          ;(succeeds (IndexOfText (.toString (.getName ?types)) "org.contract4j5.reporter.Severity" ))))
-;1 Classs
-(inspect (ekeko [?types ?m] (classes-methods ?types ?m)))
-(inspect (count ( ekeko [get] (classes-methods get))))
+ ;1 Classs
+ (inspect (ekeko [?types ?m] (classes-methods ?types ?m)))
+ (count ( ekeko [?types ?m] (classes-methods ?types ?m)))
+
+ ;exclude construct methods of classes!
+ (defn classes-methods-with-noconstructs [?t ?m]
+             (l/fresh []
+                  (classes-methods ?t ?m)
+                  (equals true (= 3 (.getKey (.getKind ?m))))))
+
+ (inspect (ekeko [?t ?m] (classes-methods-with-noconstructs ?t ?m)))
+ (count (ekeko [?t ?m] (classes-methods-with-noconstructs ?t ?m)))
 
  ;2 Aspect : find basic method declarations in aspect files
- (inspect  (ekeko [?method-aspect] (ajdt/method ?method-aspect)))
+ (inspect (sort-by first (ekeko [?file ?methodName] 
+                                (l/fresh [?method-aspect]
+                                         (ajdt/method ?method-aspect)
+                                         (equals ?methodName (.getElementName ?method-aspect))
+                                         (equals ?file (.getName (.getResource ?method-aspect)))))))
+ ;2 Aspect : find basic method declarations in aspect files
+ (defn aspects-methods [?tname ?methodName]
+                (l/fresh [?types ?methods]
+                        (w/type-method ?types ?methods)
+                        (equals ?tname (.getClassName ?types))
+                        (equals ?methodName (.getName ?methods))
+                        (succeeds (.isAspect ?types))
+                        (equals false (= 8 (.getModifiers ?methods)))
+                        (equals false (.startsWith (.getName ?methods) "ajc"))
+                        (equals false (or (= "hasAspect" (.getName ?methods)) 
+                                          (= "aspectOf" (.getName ?methods)) 
+                                          (= "<init>" (.getName ?methods))))))
 
+ (inspect (sort-by first  (ekeko [?t ?m] (aspects-methods ?t ?m))))
  ; <= without intertyped method declarations
  ;----------------------------------------------
  ;    intertyped method declarations =>
@@ -219,13 +244,13 @@
 (defn NOFA-in-aspects [?aspect ?adv]  
               (l/fresh []
                    (w/advice ?adv)
-                   (equals ?aspect (.getConcreteAspect ?adv))
+                   (equals ?aspect (.toString (.getConcreteAspect ?adv)))
                    (equals false (IndexOfText (.getName (.getClass ?adv)) "Checker"))
                    (equals false (or
                                    (or (.isCflow (.getKind ?adv)) (.isPerEntry (.getKind ?adv)))
                                    (= "softener" (.getName (.getKind ?adv)))))));exclude perThis, perTarget , perCflow, Cflow, CflowBelow, softener, and Checker(warning)!!
 
-(inspect (ekeko [?a ?adv] (NOFA-in-aspects ?a ?adv)))
+(inspect (sort-by first (ekeko [?a ?adv] (NOFA-in-aspects ?a ?adv))))
 (count (ekeko [?a ?adv] (NOFA-in-aspects ?a ?adv)))
 
 (inspect (ekeko [?softener] (w/declare|soft ?softener)))
@@ -348,12 +373,11 @@
                  (equals ?fieldName  (str "<Field name: " (.getName ?field) ">"))))
  
  (inspect (sort (ekeko [?t ?f ?typef ?sig] (getField-AtC ?t ?f ?typef ?sig))))
- ;############################### Advice-Class  dependence (AC) #########################
+ ;############################### Advice-Class  dependence (AC) ###############################Intertype-Class dependence (IC):
  ; if a class is  the type of a parameter of a piece of advice of an aspect 
- (defn getAC-p1 [?aspectName ?adviceKind ?AdviceParameter] 
-   (l/fresh [?aspect ?typesofAdvice ?advice  ?isSameInterface ?tcname]
+ (defn getAC-p1 [?aspect ?adviceKind ?AdviceParameter] 
+   (l/fresh [?typesofAdvice ?advice  ?isSameInterface ?tcname]
             (NOFA-in-aspects ?aspect ?advice)
-            (equals   ?aspectName (.getName ?aspect))
             (equals   ?adviceKind (.getKind ?advice))
             (equals   ?typesofAdvice (.getParameterTypes (.getSignature ?advice)))
             (contains ?typesofAdvice ?AdviceParameter)
@@ -362,15 +386,13 @@
             (succeeds (nil? ?isSameInterface))
             (equals false (.isPrimitiveType ?AdviceParameter))
             (equals false (IndexOfText  ?tcname "AroundClosure"))
-            (equals false (.startsWith ?tcname "JoinPoint"))))            
+            (equals false (.startsWith  ?tcname "JoinPoint"))))            
  
- (inspect  (sort-by first (ekeko [?as ?a ?r] (getAC-p1 ?as ?a ?r))))
- 
+ (inspect  (sort-by first (ekeko [?as ?a ?r] (getAC-p1 ?as ?a ?r)))) 
  ; the return type of the piece of advice - around - ; after returning is being checked in the above function called -getAC-p1-
- (defn getAC-p2 [?aspectName ?adviceKind ?returntype] 
-   (l/fresh [?aspect ?advice ?tcname ?isSameInterface]
-            (NOFA-in-aspects ?aspect ?advice)
-            (equals ?aspectName (.getName ?aspect))            
+ (defn getAC-p2 [?aspect ?adviceKind ?returntype] 
+   (l/fresh [?advice ?tcname ?isSameInterface]
+            (NOFA-in-aspects ?aspect ?advice)            
             (equals ?adviceKind (.getKind ?advice))
             (succeeds (= 5 (.getKey (.getKind ?advice))))
             (equals ?returntype (.getReturnType (.getSignature ?advice)))
@@ -379,9 +401,19 @@
             (equals ?isSameInterface (getInterface ?tcname))
             (succeeds  (nil? ?isSameInterface))))
   
-  (inspect  (sort-by first (ekeko [?as ?a ?r] (getAC-p2 ?as ?a ?r)))) 
- ;################################## NOPointcuts ##################################
- ;aspect or class and its pointcut definitions
+  (inspect  (sort-by first (ekeko [?as ?a ?r] (getAC-p2 ?as ?a ?r))))
+  
+  ;combined the two query in one inspect
+  (inspect (sort-by first  (clojure.set/union
+                            (ekeko [?as ?a ?r] (getAC-p1 ?as ?a ?r))
+                            (ekeko [?as ?a ?r] (getAC-p2 ?as ?a ?r)))))
+ ;############################### Intertype-Class dependence (IC) ###############################
+ ;if a class is the type of a parameter of an intertype declaration of an aspect or the class is the return type of intertype declaration
+  
+ 
+ 
+ 
+ ;################################## NOPointcuts ################################## ;aspect or class and its pointcut definitions
  (inspect (ekeko [?type ?pointdef] (w/type-pointcutdefinition ?type ?pointdef )))
  ;count aspects and its poincuts' definitions
  (inspect (ekeko [?aspects ?pointcuts] (w/aspect-pointcutdefinition ?aspects ?pointcuts )))
