@@ -260,8 +260,8 @@
 (inspect (sort-by first (ekeko [?a ?adv] (NOFA-in-aspects ?a ?adv))))
 (count (ekeko [?a ?adv] (NOFA-in-aspects ?a ?adv)))
 
-(inspect (ekeko [?softener] (w/declare|soft ?softener)))
-(inspect (ekeko [?dec] (w/declare|warning  ?dec)))
+;(inspect (ekeko [?softener] (w/declare|soft ?softener)))
+;(inspect (ekeko [?dec] (w/declare|warning  ?dec)))
  
  ;GET THE ADVICES that have EMPTY POINTCUTS
  (inspect (ekeko [?as ?ad]
@@ -384,37 +384,39 @@
  ;############################### Advice-Class  dependence (AC) ###############################
  ; if a class is  the type of a parameter of a piece of advice of an aspect 
  (defn getAC-p1 [?aspect ?adviceKind ?AdviceParameter] 
-   (l/fresh [?typesofAdvice ?advice  ?isSameInterface ?tcname]
+   (l/fresh [?typesofAdvice ?advice  ?isInterface ?tcname ?parameter]
             (NOFA-in-aspects ?aspect ?advice)
             (equals   ?adviceKind (.getKind ?advice))
             (equals   ?typesofAdvice (.getParameterTypes (.getSignature ?advice)))
-            (contains ?typesofAdvice ?AdviceParameter)
-            (equals   ?tcname  (.getClassName ?AdviceParameter))
-            (equals   ?isSameInterface (getInterface ?tcname));control whether a selected type is interface that was implemented in a given AspectJ app 
-            (succeeds (nil? ?isSameInterface))
-            (equals false (.isPrimitiveType ?AdviceParameter))
+            (contains ?typesofAdvice ?parameter)
+            (equals   ?tcname  (.getClassName ?parameter))
+            (equals   ?isInterface (getInterface ?tcname));control whether a selected type is interface that was implemented in a given AspectJ app 
+            (succeeds (nil? ?isInterface))
+            (equals false (.isPrimitiveType ?parameter))
+            (equals ?AdviceParameter (.getName ?parameter))
             (equals false (IndexOfText  ?tcname "AroundClosure"))))            
  
  (inspect  (sort-by first (ekeko [?as ?a ?r] (getAC-p1 ?as ?a ?r)))) 
  
  ; the return type of the piece of advice - around - ; "after returning" is being checked in the above function called -getAC-p1-
- (defn getAC-p2 [?aspect ?adviceKind ?returntype] 
-   (l/fresh [?advice ?tcname ?isSameInterface]
+ (defn getAC-p2 [?aspect ?adviceKind ?returntypename] 
+   (l/fresh [?advice ?tcname ?isInterface ?returntype]
             (NOFA-in-aspects ?aspect ?advice)
             (equals ?adviceKind (.getKind ?advice))
             (succeeds (= 5 (.getKey (.getKind ?advice))))
             (equals ?returntype (.getReturnType (.getSignature ?advice)))
+            (equals ?returntypename (.getName ?returntype))
             (equals false (.isPrimitiveType ?returntype))
             (equals ?tcname  (.getClassName ?returntype))
-            (equals ?isSameInterface (getInterface ?tcname))
-            (succeeds  (nil? ?isSameInterface))))
+            (equals ?isInterface (getInterface ?tcname))
+            (succeeds  (nil? ?isInterface))))
   
-  (inspect  (sort-by first (ekeko [?as ?a ?r] (getAC-p2 ?as ?a ?r))))
+  (inspect  (sort-by first (ekeko [?r ?as ?a] (getAC-p2 ?as ?a ?r))))
   
   ;combined the two queries in one inspect
   (inspect (sort-by first  (clojure.set/union
-                            (ekeko [?as ?a ?r] (getAC-p1 ?as ?a ?r))
-                            (ekeko [?as ?a ?r] (getAC-p2 ?as ?a ?r)))))
+                            (ekeko [?vari ?as ?ad ] (getAC-p1 ?as ?ad ?vari))
+                            (ekeko [?vari ?as ?ad ] (getAC-p2 ?as ?ad ?vari)))))
  ;############################### Intertype method-Class dependence (IC) ###############################
  ;if classes are the type of  parameters or return type of intertype method declarations in aspects of a given AspectJ App
  
@@ -433,7 +435,7 @@
                                         (equals ?interName (str (.getClassName (.getDeclaringType (.getSignature (.getMunger ?i))))"."(.getName (.getSignature ?i))))))
  
  (inspect (sort-by first  (ekeko [?aspect ?interName ?type ?return] (measureIC-returnType ?aspect ?interName ?type ?return))))
- ;find all parameter(s) of intertype method declarations
+ ;find all parameter types of intertype method declarations
  (defn measureIC-parameters [?aspect ?interName ?param ?variName] 
 	                             (l/fresh [?v ?tcname ?isInterface ?i ?vari] 
                                         (w/intertype|method ?i)
@@ -452,8 +454,8 @@
 
   ;combined the two queries in one inspect
   (inspect (sort-by first (clojure.set/union
-                            (ekeko [?r ?as ?a ?t ] (measureIC-returnType ?as ?a ?t ?r))
-                            (ekeko [?r ?as ?a ?t ] (measureIC-parameters ?as ?a ?t ?r)))))
+                            (ekeko [?vari ?as ?a ?t ] (measureIC-returnType ?as ?a ?t ?vari))
+                            (ekeko [?vari ?as ?a ?t ] (measureIC-parameters ?as ?a ?t ?vari)))))
   
  ;############################### Method-Class dependence (MC) ###############################
  ;Definition: if classes are the type(s) of parameters or return type(s) of method declarations in aspects of a given AspectJ App
@@ -490,8 +492,12 @@
    
   ;combined the two queries in one inspect
   (inspect (sort-by first (clojure.set/union
-                            (ekeko [?p ?A ?m ?r] (measureMC-param ?A ?m ?p ?r))
-                            (ekeko [?p ?A ?m ?r] (measureMC-return ?A ?m ?p ?r)))))
+                            (ekeko [?vari ?A ?m ?r] (measureMC-param ?A ?m ?vari ?r))
+                            (ekeko [?vari ?A ?m ?r] (measureMC-return ?A ?m ?vari ?r)))))
+  ;############################### Pointcut-Class dependence (PC) ###############################
+  (inspect (ekeko [?point] (w/pointcutdefinition ?point)))
+  
+  
   
   ;############################### NOPointcuts ############################### ;aspect or class and its pointcut definitions
  (inspect (ekeko [?type ?pointdef] (w/type-pointcutdefinition ?type ?pointdef )))
@@ -533,8 +539,11 @@
                      (equals ?nameI (.getClassName ?i))
                      (equals true 
                              (or  (= ?name ?nameI) 
-                                  (.startsWith ?name "Annotation") 
-                                  (.startsWith ?name "JoinPoint")))))))
+                                  (= ?name "Annotation") 
+                                  (= ?name "JoinPoint")
+                                  (= ?name "JoinPoint$Static")
+                                  (= ?name "Remote")
+                                  (= ?name "Runnable")))))))
   
   (defn- getEnum [?name]
         (first (ekeko [?i] (w/enum ?i) (equals true (= ?name (.getClassName ?i))))))
