@@ -36,7 +36,8 @@
     [org.aspectj.weaver.patterns Pointcut AndPointcut]))
 
  (comment )
-;##################################### METRIC LOC ###################################
+   
+ ;############################### METRIC LOC ###############################
  ;the number of lines code per aspect except blank lines (comments & javadocs are still counted)
  ;(inspect (ekeko [?asp ?size]
  ;              (l/fresh [?Filelocation ?StringFileName]  
@@ -45,7 +46,7 @@
  ;                       (equals ?StringFileName (.getSourceFile ?Filelocation))
  ;                       (equals ?size (count (filter #(re-find #"\S" %) (line-seq (io/reader ?StringFileName))))))))
 
- ;##################################### METRIC LOC ###################################
+ ;############################### METRIC LOC ###############################
  ;count the number of lines of code per class except blank lines (comments & javadocs are still counted
 
  ;(defn pick-up-all-compilationUnits [?path ?classes]
@@ -59,7 +60,7 @@
  ;           (pick-up-all-compilationUnits ?class-path ?classes)
  ;           (equals ?size (count (filter #(re-find #"\S" %) (line-seq (io/reader ?class-path)))))))
  ;(inspect (ekeko [?classes ?size] (class-LOC-v2 ?size ?classes )))
- ;###################################### METRIC LOC ################################### PASS
+ ;############################### METRIC LOC ###############################
  ;count the number of lines of java code in a given project
  (defn class-loc [filePath]
   (reduce
@@ -71,7 +72,7 @@
  ;(class-loc (io/file"C:/Users/HAKAN/Desktop/Thesis/ws/AJHotDraw/src/aspects"));36225
  ;(class-loc (io/file"C:/Users/HAKAN/workspace/PetstoreAspectJ/blueprints/petstore1.4/src"))
  (class-loc (io/file"C:/Users/HAKAN/runtime-New_configuration-clojure/Contract4J5/contract4j5/src"))
- ;##################################### METRIC LOC ###################################
+ ;############################### METRIC LOC ###############################
  ;count the number of lines of aspect code in a given project
  (defn aspect-loc [filePath]
   (reduce
@@ -83,7 +84,7 @@
  ;(aspect-loc (io/file"C:/Users/HAKAN/Desktop/Thesis/ws/AJHotDraw/src/aspects"));2111
  ;(aspect-loc (io/file "C:/Users/HAKAN/workspace/PetstoreAspectJ/blueprints/petstore1.4/src"))
  (class-loc (io/file "C:/Users/HAKAN/runtime-New_configuration-clojure/Contract4J5/contract4j5/src"))
- ;#################################### METRIC VS ##################################### PASS
+ ;############################### METRIC VS ###############################
  ;the number of JAVA classes (.java) in a selected project
  (defn class-count [filePath]
   (reduce
@@ -115,7 +116,7 @@
     (for [file (file-seq filePath) :when (.endsWith (.toString file )".aj")] 1) ))
  (aspect-count (io/file "C:/Users/HAKAN/workspace/PetstoreAspectJ/blueprints/petstore1.4/src"))
 
- ;########################## METRIC NOAttributes-fields ############################# 
+ ;############################### METRIC NOAttributes-fields ###############################
  (inspect  (ekeko [?fields] (w/field ?fields)));get the entire fields from the weaver
  
  ;only works for aspects to count the number of fields!
@@ -166,7 +167,7 @@
                (succeeds (IndexOfText (.toString (.getName ?c)) "org.contract4j5.interpreter.bsf.jexl.JexlBSFEngine" ))));
  )
  
- ;#################################### METRIC NOO ###################################
+ ;############################### METRIC NOO ###############################
  ;METHODS: both all classes and aspects
  ;(inspect (ekeko [?methods] (w/method ?methods)))
 
@@ -217,7 +218,7 @@
                                           (= "aspectOf" (.getName ?methods)) 
                                           (= "<init>" (.getName ?methods))))))
 
- (inspect (sort-by first  (ekeko [?t ?m] (aspects-methods ?t ?m))))
+ (inspect (sort-by first  (ekeko [?tn ?m] (l/fresh [?t] (aspects-methods ?t ?m) (equals ?tn (.getClassName ?t))))))
  ; <= without intertyped method declarations
  ;-------------------------------------------------------------
  ;    intertyped method declarations =>
@@ -269,7 +270,7 @@
                  (equals ?po (.getPointcut ?ad))
                  (equals  true (empty? (.toString  ?po))))))
  
- ;############# Advice-Method dependence (AM) :the number of method calls per advice body ##############
+ ;############################### Advice-Method dependence (AM) :the number of method calls per advice body ###############################
 
  (inspect (ekeko [?advices] (w/advice ?advices)))
  ;only get the declaration of advices
@@ -362,7 +363,7 @@
  ;(inspect (ekeko [?caller ?callee ?call ?receiver]  ( method-methodCalls ?caller ?callee ?call ?receiver)))
  ;(inspect (ekeko [?advice ?unit] (advice-soot|unit ?advice ?unit)))
  
- ;####################### Attribute-Class dependence Measure (AtC) ###############################
+ ;############################### Attribute-Class dependence Measure (AtC) ###############################
  ;Definition : if a class is the type of an field of an aspect - - count the number of types that belong to fields in aspects
  ;Filtering primitive types and interfaces that could be the type of a field!
   (defn getField-AtC [?aspectName ?fieldName ?fieldType ?signature] 
@@ -380,7 +381,7 @@
                  (equals ?fieldName  (str "<Field name: " (.getName ?field) ">"))))
  
  (inspect (sort-by first (ekeko [?t ?f ?typef ?sig] (getField-AtC ?t ?f ?typef ?sig))))
- ;############################### Advice-Class  dependence (AC) ##################################
+ ;############################### Advice-Class  dependence (AC) ###############################
  ; if a class is  the type of a parameter of a piece of advice of an aspect 
  (defn getAC-p1 [?aspect ?adviceKind ?AdviceParameter] 
    (l/fresh [?typesofAdvice ?advice  ?isSameInterface ?tcname]
@@ -392,15 +393,14 @@
             (equals   ?isSameInterface (getInterface ?tcname));control whether a selected type is interface that was implemented in a given AspectJ app 
             (succeeds (nil? ?isSameInterface))
             (equals false (.isPrimitiveType ?AdviceParameter))
-            (equals false (IndexOfText  ?tcname "AroundClosure"))
-            (equals false (.startsWith  ?tcname "JoinPoint"))))            
+            (equals false (IndexOfText  ?tcname "AroundClosure"))))            
  
  (inspect  (sort-by first (ekeko [?as ?a ?r] (getAC-p1 ?as ?a ?r)))) 
  
  ; the return type of the piece of advice - around - ; "after returning" is being checked in the above function called -getAC-p1-
  (defn getAC-p2 [?aspect ?adviceKind ?returntype] 
    (l/fresh [?advice ?tcname ?isSameInterface]
-            (NOFA-in-aspects ?aspect ?advice)            
+            (NOFA-in-aspects ?aspect ?advice)
             (equals ?adviceKind (.getKind ?advice))
             (succeeds (= 5 (.getKey (.getKind ?advice))))
             (equals ?returntype (.getReturnType (.getSignature ?advice)))
@@ -415,7 +415,7 @@
   (inspect (sort-by first  (clojure.set/union
                             (ekeko [?as ?a ?r] (getAC-p1 ?as ?a ?r))
                             (ekeko [?as ?a ?r] (getAC-p2 ?as ?a ?r)))))
- ;############################### Intertype method-Class dependence (IC) ##########################
+ ;############################### Intertype method-Class dependence (IC) ###############################
  ;if classes are the type of  parameters or return type of intertype method declarations in aspects of a given AspectJ App
  
  ;find all return types of intertype method declarations
@@ -455,8 +455,45 @@
                             (ekeko [?r ?as ?a ?t ] (measureIC-returnType ?as ?a ?t ?r))
                             (ekeko [?r ?as ?a ?t ] (measureIC-parameters ?as ?a ?t ?r)))))
   
+ ;############################### Method-Class dependence (MC) ###############################
+ ;Definition: if classes are the type(s) of parameters or return type(s) of method declarations in aspects of a given AspectJ App
+ (defn measureMC-param [?aspectn ?methodN ?paramName ?rtype] 
+   (l/fresh [?aspect ?params ?paramClassName ?method ?param ?isInterface]
+     (aspects-methods ?aspect ?method)
+     (equals ?aspectn (.getName ?aspect))
+     (equals ?params (.getParameterTypes ?method))
+     (contains ?params ?param)
+     (equals false (.isPrimitiveType ?param))
+     (equals ?paramClassName (.getClassName ?param))
+     (equals ?isInterface (getInterface ?paramClassName));except interface classes
+     (succeeds  (nil? ?isInterface))
+     (equals ?paramName (.getName ?param))
+     (equals ?methodN (.getName ?method))
+     (equals ?rtype (str "PARAM"))))
   
-  ;################################## NOPointcuts ################################## ;aspect or class and its pointcut definitions
+ (inspect (sort-by first  (ekeko [?p ?A ?m ?r] (measureMC-param ?A ?m ?p ?r))))
+  
+ (defn measureMC-return [?aspectn ?methodN ?returnName ?rtype] 
+   (l/fresh [?aspect ?retClassName ?return ?method ?isInterface]
+     (aspects-methods ?aspect ?method)
+     (equals ?aspectn (.getName ?aspect))
+     (equals ?return (.getReturnType ?method))
+     (equals false (.isPrimitiveType ?return))
+     (equals ?retClassName (.getClassName ?return))
+     (equals ?isInterface (getInterface ?retClassName));except interface classes
+     (succeeds  (nil? ?isInterface))
+     (equals ?returnName (.getName ?return))
+     (equals ?methodN (.getName ?method))
+     (equals ?rtype (str "RETURN"))))
+  
+  (inspect (sort-by first  (ekeko [?p ?A ?m ?r] (measureMC-return ?A ?m ?p ?r))))
+   
+  ;combined the two queries in one inspect
+  (inspect (sort-by first (clojure.set/union
+                            (ekeko [?p ?A ?m ?r] (measureMC-param ?A ?m ?p ?r))
+                            (ekeko [?p ?A ?m ?r] (measureMC-return ?A ?m ?p ?r)))))
+  
+  ;############################### NOPointcuts ############################### ;aspect or class and its pointcut definitions
  (inspect (ekeko [?type ?pointdef] (w/type-pointcutdefinition ?type ?pointdef )))
  ;count aspects and its poincuts' definitions
  (inspect (ekeko [?aspects ?pointcuts] (w/aspect-pointcutdefinition ?aspects ?pointcuts )))
@@ -476,7 +513,7 @@
  ;if it is not pointcut definion of the advice, the advice will not show off
  (inspect (ekeko [?advice ?pointdef] (w/advice-pointcutdefinition ?advice ?pointdef)))
 
-;################################# SHADOWS #################################
+ ;############################### SHADOWS ###############################
 
  (inspect (ekeko [?shadow ?type] (w/shadow-ancestor|type ?shadow ?type)))
 
@@ -491,7 +528,13 @@
   ;)
  
   (defn- getInterface [?name]
-        (first (ekeko [?i] (w/interface ?i) (equals true (= ?name (.getClassName ?i))))))
+        (first (ekeko [?i] (w/interface ?i)
+                     (l/fresh [?nameI]
+                     (equals ?nameI (.getClassName ?i))
+                     (equals true 
+                             (or  (= ?name ?nameI) 
+                                  (.startsWith ?name "Annotation") 
+                                  (.startsWith ?name "JoinPoint")))))))
   
   (defn- getEnum [?name]
         (first (ekeko [?i] (w/enum ?i) (equals true (= ?name (.getClassName ?i))))))
