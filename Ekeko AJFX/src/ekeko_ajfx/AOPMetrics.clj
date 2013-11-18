@@ -310,13 +310,14 @@
                       (succeeds (IndexOfText (.getName ?class) "org.contract4j5.debug")))))
 
 ;################################## WORKING!! (I hope so) ####################################
- (defn NOMethodCalls-perAdvice [?aspectName ?calledmethods ?soot|method]; ?method : class soot.SootMethod
-          (l/fresh [?aspect ?advices ?units ?sootMDeclass]
+ (defn NOMethodCalls-perAdvice [?aspectName ?calledmethods ?soot|methodName]; ?method : class soot.SootMethod
+          (l/fresh [?aspect ?advices ?units ?sootMDeclass ?soot|method]
             (NOFA-in-aspects ?aspect ?advices)
 	          (ajsoot/advice-soot|method ?advices ?soot|method)
             (succeeds (.hasActiveBody ?soot|method))
             (soot|unit-getDeclarationClassname ?soot|method ?aspectName)
             (equals ?units (.getUnits (.getActiveBody ?soot|method)))
+            (equals ?soot|methodName (.getName ?soot|method))
             (contains ?units ?calledmethods)
             ;(jsoot/soot|method-soot|unit ?soot|method ?calledmethods)
             (succeeds (.containsInvokeExpr ?calledmethods))
@@ -343,6 +344,7 @@
 		                    (.startsWith (.toString (.getInvokeExpr ?calledmethods)) "virtualinvoke"))
 		                  (or
 		                     (lastIndexOfText (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "$advice")
+                         (=     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "valueOf")
                          (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$")
 		                    ;(.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$around$")
                          (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "access$"))))
@@ -352,7 +354,7 @@
                   (= "makeJP" (.getName (.getMethod (.getValue (.getInvokeExprBox ?calledmethods)))))))))
 	          ;(equals true (= "spacewar.Display$DisplayAspect" (.getName (.getDeclaringClass ?soot|method))))))
 
- (inspect (ekeko [?aspect ?soot|method ?calledmethods] (NOMethodCalls-perAdvice ?aspect ?calledmethods ?soot|method)))
+ (inspect (sort-by first (ekeko [?aspect ?soot|method ?calledmethods] (NOMethodCalls-perAdvice ?aspect ?calledmethods ?soot|method))))
  ;COUNT
  ;(count (ekeko [?aspect ?soot|method ?calledmethods] (NOMethodCalls-perAdvice ?aspect ?calledmethods ?soot|method)))
 
@@ -432,7 +434,7 @@
                   (equals ?return (.getReturnType (.getSignature ?i)))
                   (equals false (.isPrimitiveType ?return));except primitive types
                   (equals ?returnname  (.getName ?return))
-                  (equals ?isInterface (getInterface ?returnname));except interface classes
+                  (equals ?isInterface (getInterface ?returnname));except interfaces
                   (succeeds  (nil? ?isInterface))
                   (equals ?type (str "RETURN"))
                   (equals ?interName (str (.getClassName (.getDeclaringType (.getSignature (.getMunger ?i))))"."(.getName (.getSignature ?i))))))
@@ -447,7 +449,7 @@
 	                (contains ?v ?vari)
 	                (equals false (.isPrimitiveType ?vari));except primitive types
 	                (equals ?variName  (.getName ?vari))
-	                (equals ?isInterface (getInterface ?variName));except interface classes
+	                (equals ?isInterface (getInterface ?variName));except interfaces
 	                (succeeds  (nil? ?isInterface))
 	                (equals ?param (str "PARAM"))
 	                (equals ?interName (str (.getClassName (.getDeclaringType (.getSignature (.getMunger ?i))))"."(.getName (.getSignature ?i))))))
@@ -494,8 +496,9 @@
   (inspect (sort-by first (clojure.set/union
                             (ekeko [?vari ?A ?m ?r] (measureMC-param ?A ?m ?vari ?r))
                             (ekeko [?vari ?A ?m ?r] (measureMC-return ?A ?m ?vari ?r)))))
+  
   ;############################### Pointcut-Class dependence (PC) ###############################
-  ;if a class is the type of a parameter of a pointcut in an aspect
+  ;if a class is the type of a parameter of a pointcut (poincutDefinition) in an aspect
   (defn measurePC [?typename ?pn ?aspect] 
     (l/fresh [?point ?types ?type ?isInterface]
              (w/pointcutdefinition ?point)
@@ -509,6 +512,22 @@
              (equals ?pn (str "<Pointcut Name :"(.getName ?point)">"))))
   
   (inspect (sort-by first (ekeko [?tn ?pn ?aspect] (measurePC ?tn ?pn ?aspect))))
+  
+  ;############################### Pointcut-Method dependence (PM) ###############################
+  ;if a pointcut of an aspect contains at least one join point that is related to a method of a class
+  (defn countPM [?className ?shadowStr ?adviceKind ?aspectName ?pointcut] 
+                  (l/fresh [?aspect ?advice ?shadow]
+                           (NOFA-in-aspects ?aspect ?advice)
+                           (w/advice-shadow ?advice ?shadow);in order to reach the join point shadows, I used w/advice-shadow to pick them up along with advices' poincuts 
+                           (equals false (.isCode ?shadow))
+                           (succeeds (= "class" (.toString (.getKind (.getParent ?shadow)))))
+                           (equals ?className (.getName (.getParent ?shadow)))
+                           (equals ?adviceKind (.getKind ?advice))
+                           (equals ?aspectName (.toString ?aspect))
+                           (equals ?shadowStr (str "<Join Point Shadow : "(.toString ?shadow)">"))
+                           (equals ?pointcut (.getPointcut ?advice))))
+  
+  (inspect (sort-by first (ekeko [?className ?shadow ?adviceKind ?aspect ?pointcut] (countPM ?className ?shadow ?adviceKind ?aspect ?pointcut))))
   ;############################### NOPointcuts ############################### ;aspect or class and its pointcut definitions
  (inspect (ekeko [?type ?pointdef] (w/type-pointcutdefinition ?type ?pointdef )))
  ;count aspects and its poincuts' definitions
@@ -535,7 +554,7 @@
 
  (inspect (ekeko [?shadow ?class] (w/shadow-ancestor|class ?shadow ?class))) 
  (inspect (ekeko [?shadow ?aspect] (w/shadow-ancestor|aspect ?shadow ?aspect)))
- (inspect (ekeko [?shadow ?advice] (w/shadow-ancestor|advice ?shadow ?advice)))
+ 
 
  ;##########################################################################
  
@@ -582,6 +601,7 @@
                      (= ?name "org.aspectj.lang.JoinPoint$StaticPart")
                      (= ?name "java.lang.annotation")
                      (= ?name "java.lang.Runnable")
+                     (= ?name "java.util.Set")
                      (= ?name "java.rmi.Remote")))))))
 
   (defn- getEnum [?name]
