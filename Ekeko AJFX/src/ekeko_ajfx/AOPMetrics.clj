@@ -495,11 +495,20 @@
                             (ekeko [?vari ?A ?m ?r] (measureMC-param ?A ?m ?vari ?r))
                             (ekeko [?vari ?A ?m ?r] (measureMC-return ?A ?m ?vari ?r)))))
   ;############################### Pointcut-Class dependence (PC) ###############################
-  ;
-  (inspect (ekeko [?point] (w/pointcutdefinition ?point)))
+  ;if a class is the type of a parameter of a pointcut in an aspect
+  (defn measurePC [?typename ?pn ?aspect] 
+    (l/fresh [?point ?types ?type ?isInterface]
+             (w/pointcutdefinition ?point)
+             (equals ?types (.getParameterTypes ?point))
+             (contains ?types ?type)
+             (equals false (.isPrimitiveType ?type))
+             (equals ?typename (.getName ?type))
+             (equals ?isInterface (getInterface ?typename))
+             (succeeds  (nil? ?isInterface))
+             (equals ?aspect (.getName (.getDeclaringType ?point)))
+             (equals ?pn (str "<Pointcut Name :"(.getName ?point)">"))))
   
-  
-  
+  (inspect (sort-by first (ekeko [?tn ?pn ?aspect] (measurePC ?tn ?pn ?aspect))))
   ;############################### NOPointcuts ############################### ;aspect or class and its pointcut definitions
  (inspect (ekeko [?type ?pointdef] (w/type-pointcutdefinition ?type ?pointdef )))
  ;count aspects and its poincuts' definitions
