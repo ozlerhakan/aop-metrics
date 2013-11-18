@@ -99,6 +99,7 @@
                   (equals false (or                                   
                                   (.isEnum ?classes)
                                   (IndexOfText (.getName ?classes) "$")
+                                  (IndexOfText (.getName ?classes) "MainTST")
                                   (IndexOfText (.getName ?classes) "Maincontract");our initial main to activate soot analysis, so I ignore it
                                   (IndexOfText (.getName ?classes) "lang.Object")))))
  
@@ -141,7 +142,7 @@
                                      (.startsWith (.getName ?f) "this")
                                      (IndexOfText (.getName ?f) "$")))))
                      
- (inspect (ekeko [?c ?f] (count-fields-in-modules ?c ?f )))
+ (inspect (sort-by first (ekeko [?cn ?f] (l/fresh [?c] (count-fields-in-modules ?c ?f ) (equals ?cn (.getName ?c))))))
  (inspect (count (ekeko [?c ?f] (count-fields-in-modules ?c ?f)))) 
  
  (comment 
@@ -290,11 +291,16 @@
  (defn get-signature-advice|method [?signature]
                (l/fresh [?adv ?aspect ?soot]
                          (NOFA-in-aspects ?aspect ?adv)
-                         (ajsoot/advice-soot|method2 ?adv ?signature)
-                         (jsoot/soot-method-signature ?soot ?signature)))
+                         (ajsoot/advice-soot|method ?adv ?signature)))
+                         ;(ajsoot/advice-soot|method2 ?adv ?signature)
+                         ;(jsoot/soot-method-signature ?soot ?signature)))
   
  (inspect (ekeko [?s] (get-signature-advice|method ?s)))
  
+ ;find all SootMethods
+(inspect (ekeko [?m]
+  (jsoot/soot :method ?m)))
+
  ;get the all transforming classes with a given part of a class name
  (inspect (ekeko [?model ?scne ?class]
              (l/fresh [?classes]
@@ -366,16 +372,16 @@
  ;############################### Attribute-Class dependence Measure (AtC) ###############################
  ;Definition : if a class is the type of an field of an aspect - - count the number of types that belong to fields in aspects
  ;Filtering primitive types and interfaces that could be the type of a field!
-  (defn getField-AtC [?aspectName ?fieldName ?fieldType ?signature] 
-         (l/fresh [?field ?tcname ?aspect ?isSameInterface]
+  (defn getField-AtC [?aspectName ?fieldName ?fieldType ?tcname] 
+         (l/fresh [?field ?aspect ?isSameInterface ?signature]
                  (w/type-field ?aspect ?field)
                  (succeeds (.isAspect ?aspect))
                  (equals ?aspectName (.getName ?aspect))
                  (equals ?fieldType  (.getType ?field))
-                 (equals ?signature  (.getSignature (.getType ?field)))
+                 ;(equals ?signature  (.getName (.getType ?field)))
                  (equals false       (.isPrimitiveType (.getType ?field))); I ignore primitive types such as boolean, int , void ,double, and so on.
                  (equals false       (or (.startsWith (.getName ?field) "ajc") (.startsWith (.getName ?field) "this")))
-                 (equals ?tcname     (.getClassName ?fieldType))
+                 (equals ?tcname     (.getName ?fieldType))
                  (equals ?isSameInterface (getInterface ?tcname))
                  (equals true        (nil? ?isSameInterface));check whether the type is interface or not!!
                  (equals ?fieldName  (str "<Field name: " (.getName ?field) ">"))))
@@ -383,32 +389,30 @@
  (inspect (sort-by first (ekeko [?t ?f ?typef ?sig] (getField-AtC ?t ?f ?typef ?sig))))
  ;############################### Advice-Class  dependence (AC) ###############################
  ; if a class is  the type of a parameter of a piece of advice of an aspect 
- (defn getAC-p1 [?aspect ?adviceKind ?AdviceParameter] 
-   (l/fresh [?typesofAdvice ?advice  ?isInterface ?tcname ?parameter]
+ (defn getAC-p1 [?aspect ?adviceKind ?typename] 
+   (l/fresh [?typesofAdvice ?advice  ?isInterface ?parameter]
             (NOFA-in-aspects ?aspect ?advice)
             (equals   ?adviceKind (.getKind ?advice))
             (equals   ?typesofAdvice (.getParameterTypes (.getSignature ?advice)))
             (contains ?typesofAdvice ?parameter)
-            (equals   ?tcname  (.getClassName ?parameter))
-            (equals   ?isInterface (getInterface ?tcname));control whether a selected type is interface that was implemented in a given AspectJ app 
+            (equals   ?typename  (.getName ?parameter))
+            (equals   ?isInterface (getInterface ?typename));control whether a selected type is interface that was implemented in a given AspectJ app 
             (succeeds (nil? ?isInterface))
-            (equals false (.isPrimitiveType ?parameter))
-            (equals ?AdviceParameter (.getName ?parameter))
-            (equals false (IndexOfText  ?tcname "AroundClosure"))))            
+            (equals false (.isPrimitiveType ?parameter))))
+            ;(equals false (IndexOfText  ?typename "AroundClosure"))))            
  
  (inspect  (sort-by first (ekeko [?as ?a ?r] (getAC-p1 ?as ?a ?r)))) 
  
  ; the return type of the piece of advice - around - ; "after returning" is being checked in the above function called -getAC-p1-
  (defn getAC-p2 [?aspect ?adviceKind ?returntypename] 
-   (l/fresh [?advice ?tcname ?isInterface ?returntype]
+   (l/fresh [?advice ?isInterface ?returntype]
             (NOFA-in-aspects ?aspect ?advice)
             (equals ?adviceKind (.getKind ?advice))
             (succeeds (= 5 (.getKey (.getKind ?advice))))
             (equals ?returntype (.getReturnType (.getSignature ?advice)))
             (equals ?returntypename (.getName ?returntype))
             (equals false (.isPrimitiveType ?returntype))
-            (equals ?tcname  (.getClassName ?returntype))
-            (equals ?isInterface (getInterface ?tcname))
+            (equals ?isInterface (getInterface ?returntypename))
             (succeeds  (nil? ?isInterface))))
   
   (inspect  (sort-by first (ekeko [?r ?as ?a] (getAC-p2 ?as ?a ?r))))
@@ -422,33 +426,31 @@
  
  ;find all return types of intertype method declarations
  (defn measureIC-returnType [?aspect ?interName ?type ?returnname] 
-			                         (l/fresh [?tcname ?isInterface ?i ?return] 
-			                                  (w/intertype|method ?i)
-			                                  (equals ?aspect (.getName (.getAspectType ?i)))
-			                                  (equals ?return (.getReturnType (.getSignature ?i)))
-			                                  (equals false (.isPrimitiveType ?return));except primitive types
-			                                  (equals ?tcname  (.getClassName ?return))
-			                                  (equals ?isInterface (getInterface ?tcname));except interface classes
-			                                  (succeeds  (nil? ?isInterface))
-                                        (equals ?returnname (.getName ?return))
-			                                  (equals ?type (str "RETURN"))
-                                        (equals ?interName (str (.getClassName (.getDeclaringType (.getSignature (.getMunger ?i))))"."(.getName (.getSignature ?i))))))
+         (l/fresh [?isInterface ?i ?return] 
+                  (w/intertype|method ?i)
+                  (equals ?aspect (.getName (.getAspectType ?i)))
+                  (equals ?return (.getReturnType (.getSignature ?i)))
+                  (equals false (.isPrimitiveType ?return));except primitive types
+                  (equals ?returnname  (.getName ?return))
+                  (equals ?isInterface (getInterface ?returnname));except interface classes
+                  (succeeds  (nil? ?isInterface))
+                  (equals ?type (str "RETURN"))
+                  (equals ?interName (str (.getClassName (.getDeclaringType (.getSignature (.getMunger ?i))))"."(.getName (.getSignature ?i))))))
  
  (inspect (sort-by first  (ekeko [?aspect ?interName ?type ?return] (measureIC-returnType ?aspect ?interName ?type ?return))))
  ;find all parameter types of intertype method declarations
  (defn measureIC-parameters [?aspect ?interName ?param ?variName] 
-	                             (l/fresh [?v ?tcname ?isInterface ?i ?vari] 
-                                        (w/intertype|method ?i)
-	                                      (equals ?aspect (.getName (.getAspectType ?i)))
-	                                      (equals ?v (.getParameterTypes (.getSignature ?i)))
-	                                      (contains ?v ?vari)
-	                                      (equals false (.isPrimitiveType ?vari));except primitive types
-	                                      (equals ?tcname  (.getClassName ?vari))
-	                                      (equals ?isInterface (getInterface ?tcname));except interface classes
-	                                      (succeeds  (nil? ?isInterface))
-	                                      (equals ?variName (.getName ?vari))
-                                        (equals ?param (str "PARAM"))
-	                                      (equals ?interName (str (.getClassName (.getDeclaringType (.getSignature (.getMunger ?i))))"."(.getName (.getSignature ?i))))))
+	       (l/fresh [?v ?isInterface ?i ?vari] 
+	                (w/intertype|method ?i)
+	                (equals ?aspect (.getName (.getAspectType ?i)))
+	                (equals ?v (.getParameterTypes (.getSignature ?i)))
+	                (contains ?v ?vari)
+	                (equals false (.isPrimitiveType ?vari));except primitive types
+	                (equals ?variName  (.getName ?vari))
+	                (equals ?isInterface (getInterface ?variName));except interface classes
+	                (succeeds  (nil? ?isInterface))
+	                (equals ?param (str "PARAM"))
+	                (equals ?interName (str (.getClassName (.getDeclaringType (.getSignature (.getMunger ?i))))"."(.getName (.getSignature ?i))))))
  
  (inspect (sort-by first  (ekeko [?aspect ?interName ?type ?variName] (measureIC-parameters ?aspect ?interName ?type ?variName))))
 
@@ -460,31 +462,29 @@
  ;############################### Method-Class dependence (MC) ###############################
  ;Definition: if classes are the type(s) of parameters or return type(s) of method declarations in aspects of a given AspectJ App
  (defn measureMC-param [?aspectn ?methodN ?paramName ?rtype] 
-   (l/fresh [?aspect ?params ?paramClassName ?method ?param ?isInterface]
+   (l/fresh [?aspect ?params ?method ?param ?isInterface]
      (aspects-methods ?aspect ?method)
      (equals ?aspectn (.getName ?aspect))
      (equals ?params (.getParameterTypes ?method))
      (contains ?params ?param)
      (equals false (.isPrimitiveType ?param))
-     (equals ?paramClassName (.getClassName ?param))
-     (equals ?isInterface (getInterface ?paramClassName));except interface classes
-     (succeeds  (nil? ?isInterface))
      (equals ?paramName (.getName ?param))
+     (equals ?isInterface (getInterface ?paramName));except interface classes
+     (succeeds  (nil? ?isInterface))
      (equals ?methodN (.getName ?method))
      (equals ?rtype (str "PARAM"))))
   
  (inspect (sort-by first  (ekeko [?p ?A ?m ?r] (measureMC-param ?A ?m ?p ?r))))
   
  (defn measureMC-return [?aspectn ?methodN ?returnName ?rtype] 
-   (l/fresh [?aspect ?retClassName ?return ?method ?isInterface]
+   (l/fresh [?aspect ?return ?method ?isInterface]
      (aspects-methods ?aspect ?method)
      (equals ?aspectn (.getName ?aspect))
      (equals ?return (.getReturnType ?method))
      (equals false (.isPrimitiveType ?return))
-     (equals ?retClassName (.getClassName ?return))
-     (equals ?isInterface (getInterface ?retClassName));except interface classes
-     (succeeds  (nil? ?isInterface))
      (equals ?returnName (.getName ?return))
+     (equals ?isInterface (getInterface ?returnName));except interface classes
+     (succeeds  (nil? ?isInterface))
      (equals ?methodN (.getName ?method))
      (equals ?rtype (str "RETURN"))))
   
@@ -495,6 +495,7 @@
                             (ekeko [?vari ?A ?m ?r] (measureMC-param ?A ?m ?vari ?r))
                             (ekeko [?vari ?A ?m ?r] (measureMC-return ?A ?m ?vari ?r)))))
   ;############################### Pointcut-Class dependence (PC) ###############################
+  ;
   (inspect (ekeko [?point] (w/pointcutdefinition ?point)))
   
   
@@ -532,19 +533,48 @@
  (inspect (ekeko [?c ?aspect] (ajdt/compilationunit-aspect ?c ?aspect)))
  
   ;)
- 
-  (defn- getInterface [?name]
-        (first (ekeko [?i] (w/interface ?i)
-                     (l/fresh [?nameI]
-                     (equals ?nameI (.getClassName ?i))
-                     (equals true 
-                             (or  (= ?name ?nameI) 
-                                  (= ?name "Annotation") 
-                                  (= ?name "JoinPoint")
-                                  (= ?name "JoinPoint$Static")
-                                  (= ?name "Remote")
-                                  (= ?name "Runnable")))))))
   
+  (defn- getInterfaces-soot [?mn]
+         (l/fresh [?m]
+             (jsoot/soot :class ?m) 
+             (equals ?mn (.getName ?m)) 
+             (succeeds (.isInterface ?m))))
+  
+  ;(inspect (sort-by first (ekeko [?s] (getInterfaces-soot ?s))))
+  
+  (defn- getInterface-soot [?name] 
+    (first (ekeko [?m]                   
+                       (getInterfaces-soot ?m)
+                       (equals true (= ?name ?m)))))
+  
+  ;(inspect (sort-by first (getInterface-soot "java.sql.ResultSet")))
+  
+  (defn- getInterface [?name]
+    (first (ekeko [?i] 
+         (w/interface ?i)
+         (l/fresh [?nameI]
+            (equals ?nameI (.getName ?i))
+            (equals true 
+                (or  (= ?name ?nameI) 
+                     (= ?name "java.sql.Connection")
+                     (= ?name "java.sql.PreparedStatement")
+                     (= ?name "java.sql.ResultSet")
+                     (= ?name "java.util.Collection")
+                     (= ?name "java.util.Iterator")
+                     (= ?name "javax.jms.QueueConnection")
+                     (= ?name "javax.jms.TopicConnection")
+                     (= ?name "javax.servlet.ServletContext")
+                     (= ?name "javax.servlet.http.HttpServletRequest")
+                     (= ?name "javax.servlet.http.HttpServletResponse")
+                     (= ?name "javax.transaction.UserTransaction")
+                     (= ?name "org.w3c.dom.Document")
+                     (= ?name "org.w3c.dom.Element")
+                     (= ?name "org.aspectj.lang.JoinPoint")
+                     (= ?name "org.aspectj.lang.JoinPoint$StaticPart")
+                     (= ?name "java.lang.annotation")
+                     (= ?name "java.lang.Runnable")
+                     (= ?name "java.rmi.Remote")))))))
+
   (defn- getEnum [?name]
         (first (ekeko [?i] (w/enum ?i) (equals true (= ?name (.getClassName ?i))))))
  
