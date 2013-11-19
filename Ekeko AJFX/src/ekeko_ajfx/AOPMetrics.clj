@@ -92,31 +92,34 @@
     (for [file (file-seq filePath) :when (.endsWith (.toString file ) ".java")] 1) ))
  (class-count (io/file "C:/Users/HAKAN/runtime-New_configuration-clojure/Contract4J5/contract4j5/src"));
 
- ;Number of Classes in the project except enums, interfaces,and their sub-classes!!
+ ;Number of Classes in the project except enums, interfaces, their sub-classes!!, and some main classes.
  (defn NOClasses [?classes]
             (l/fresh []
                   (w/class ?classes)
                   (equals false (or                                   
-                                  (.isEnum ?classes)
-                                  (IndexOfText (.getName ?classes) "$")
-                                  (IndexOfText (.getName ?classes) "MainTST")
-                                  (IndexOfText (.getName ?classes) "Maincontract");our initial main to activate soot analysis, so I ignore it
-                                  (IndexOfText (.getName ?classes) "lang.Object")))))
+                          (.isEnum ?classes)
+                          (IndexOfText (.getName ?classes) "$")
+                          (lastIndexOfText (.getName ?classes) "MainTST");our initial main to activate soot analysis, so I ignore it
+                          (lastIndexOfText (.getName ?classes) "Maincontract");our initial main to activate soot analysis, so I ignore it
+                          (IndexOfText (.getName ?classes) "lang.Object")))))
  
- (inspect (ekeko [?c] (NOClasses ?c)))
-
+ (inspect  (sort-by first (ekeko [?cn] (l/fresh [?c] (NOClasses ?c) (equals ?cn (.getName ?c))))))
+ (count (ekeko [?cn] (l/fresh [?c] (NOClasses ?c) (equals ?cn (.getName ?c)))))
  ;the number of aspects in a selected project -include sub-aspects
- (inspect (ekeko [?aspects ?source]  
-                 (w/aspect ?aspects) 
-                 (equals ?source (.getSourceLocation ?aspects) )));just to be sure!
-
+ (defn NOAspects [?aspects ?source]  
+   (l/fresh []
+           (w/aspect ?aspects) 
+           (equals ?source (.getSourceLocation ?aspects))));just to be sure!
+ 
+ (inspect (sort-by first (ekeko [?an] (l/fresh [?as ?sour] (NOAspects ?as ?sour) (equals ?an (.getName ?as))))))
+ (count (ekeko [?an] (l/fresh [?as ?sour] (NOAspects ?as ?sour) (equals ?an (.getName ?as)))))
+ 
  ;the number of aspectj (.aj) files in a project!  Just an additional query, it is not relating with the main query!  
  (defn aspect-count [filePath]
   (reduce
     +
     (for [file (file-seq filePath) :when (.endsWith (.toString file )".aj")] 1) ))
  (aspect-count (io/file "C:/Users/HAKAN/workspace/PetstoreAspectJ/blueprints/petstore1.4/src"))
-
  ;############################### METRIC NOAttributes-fields ###############################
  (inspect  (ekeko [?fields] (w/field ?fields)));get the entire fields from the weaver
  
@@ -143,44 +146,17 @@
                                      (IndexOfText (.getName ?f) "$")))))
                      
  (inspect (sort-by first (ekeko [?cn ?f] (l/fresh [?c] (count-fields-in-modules ?c ?f ) (equals ?cn (.getName ?c))))))
- (inspect (count (ekeko [?c ?f] (count-fields-in-modules ?c ?f)))) 
- 
- (comment 
- ;#### jsoot/soot-class-field function still does not get some fields in a project!!
- (inspect  (ekeko [?c ?f]
-                (jsoot/soot-class-field ?c ?f)
-                (equals false (or  
-                                (IndexOfText  (.getName ?c) "aspectj")    
-								                (IndexOfText  (.getName ?c) "apache")
-								                (.startsWith  (.getPackageName ?c) "groovy")
-								                (IndexOfText  (.getName ?c) "objectweb")
-                                (IndexOfText  (.getName ?c) "codehaus")
-								                (IndexOfText  (.getPackageName ?c) "antlr")
-								                (IndexOfText  (.getPackageName ?c) "junit")
-								                (IndexOfText  (.getName ?c) "$")
-                                (= "Enum" (.getShortName (.getSuperclass ?c)))))
-               (succeeds (empty? (filter #(re-matches #"\S+\$[1-9]+" %)  [(.getName ?c)])))
-               (equals false (or 
-                               (.startsWith (.getName ?f) "ajc")
-                               ;(.startsWith (.getName ?f) "$")
-                               (IndexOfText (.getName ?f) "$")
-                               (.startsWith (.getName ?f) "this")))
-               (succeeds (IndexOfText (.toString (.getName ?c)) "org.contract4j5.interpreter.bsf.jexl.JexlBSFEngine" ))));
- )
- 
- ;############################### METRIC NOO ###############################
+ (count (ekeko [?c ?f] (count-fields-in-modules ?c ?f))) 
+
+ ;############################### METRIC NOOperations (methods and advices) ###############################
  ;METHODS: both all classes and aspects
  ;(inspect (ekeko [?methods] (w/method ?methods)))
 
  ;NUMBER OF METHODS: only responsible for classes!  - construct methods including 
  (defn classes-methods [?typesn ?methods]
                 (l/fresh [?types]
+                         (NOClasses ?types)
                          (w/type-method ?types ?methods)
-                         (equals false (or
-                                         (= "java.lang.Object" (.getName ?types))
-                                         (.isAspect ?types)
-                                         (.isEnum ?types)
-                                         (.isInterface ?types)))
                          (equals ?typesn (.getName ?types))
                          (succeeds (empty? (filter #(re-matches #"\S+\$\S+" %) [(.getName ?types)])))
                          (equals false (= "STATIC_INITIALIZATION" (.toString (.getKind ?methods))))
@@ -208,11 +184,12 @@
                                          (equals ?file (.getName (.getResource ?method-aspect)))))))
  ;2 Aspect : find basic method declarations in aspect files
  (defn aspects-methods [?types ?methods]
-                (l/fresh [?tname ?methodName]
+                (l/fresh [?tname ?source ?methodName]
+                        (NOAspects ?types ?source)
                         (w/type-method ?types ?methods)
                         (equals ?tname (.getClassName ?types))
                         (equals ?methodName (.getName ?methods))
-                        (succeeds (.isAspect ?types))
+                        ;(succeeds (.isAspect ?types))
                         (equals false (= 8 (.getModifiers ?methods)))
                         (equals false (.startsWith (.getName ?methods) "ajc"))
                         (equals false (or (= "hasAspect" (.getName ?methods)) 
@@ -220,11 +197,12 @@
                                           (= "<init>" (.getName ?methods))))))
 
  (inspect (sort-by first  (ekeko [?tn ?m] (l/fresh [?t] (aspects-methods ?t ?m) (equals ?tn (.getClassName ?t))))))
+ (count (ekeko [?tn ?m] (l/fresh [?t] (aspects-methods ?t ?m) (equals ?tn (.getClassName ?t)))))
  ; <= without intertyped method declarations
  ;-------------------------------------------------------------
  ;    intertyped method declarations =>
 
- ;METHODS: only intertyped method declarations in aspect
+ ;METHODS: only intertyped method declarations in aspects
  ;1 Aspect
  (defn aspects-intertyped-methods [?decAspect ?methods]
                 (l/fresh [?types]
@@ -234,21 +212,21 @@
                           (succeeds   (.startsWith (.getName ?methods) "ajc$interMethod$"))));$AFTER,$BEFORE, so on...
 
  (inspect (sort-by first (ekeko [?decAspect ?methods] (aspects-intertyped-methods  ?decAspect ?methods))))
- (inspect (count (ekeko [?get ?decAspect] (aspects-intertyped-methods ?get ?decAspect))))
+ (count (ekeko [?get ?decAspect] (aspects-intertyped-methods ?get ?decAspect)))
   
  ;get the all intertype method declaration implemented in a project
- ;--- the difference from the above query is that this query also reaches abstract intertype methods
+ ;--- the difference from the above query is that this query also reaches abstract intertype method declarations
  (inspect (sort-by first  (ekeko [?aspect ?interName ?i] 
                                  (l/fresh [] 
                                           (w/intertype|method ?i)
                                           (equals ?aspect (.getName (.getAspectType ?i)))
                                           (equals ?interName (.getName (.getSignature ?i)))))))
-  
+ 
  ;COUNT: 1 class + 2 aspect + 1 aspect :RESULT combines with 
 
  ;(inspect (count (ekeko [?method-aspect] (ajdt/method ?method-aspect))))
  ;-------------------------------------------------------------------------------------------------
- ;NUMBER OF ADVICES: only for aspects;
+ ;NUMBER OF ADVICES
 (defn NOFA-in-aspects [?aspect ?adv]  
               (l/fresh []
                    (w/advice ?adv)
@@ -256,7 +234,7 @@
                    (equals false (IndexOfText (.getName (.getClass ?adv)) "Checker"))
                    (equals false (or
                                    (or (.isCflow (.getKind ?adv)) (.isPerEntry (.getKind ?adv)))
-                                   (= "softener" (.getName (.getKind ?adv)))))));exclude perThis, perTarget , perCflow, Cflow, CflowBelow, softener, and Checker(warning)!!
+                                   (= "softener" (.getName (.getKind ?adv)))))));I must exclude perThis, perTarget , perCflow, Cflow, CflowBelow, softener, and Checker(warning)!!
 
 (inspect (sort-by first (ekeko [?a ?adv] (NOFA-in-aspects ?a ?adv))))
 (count (ekeko [?a ?adv] (NOFA-in-aspects ?a ?adv)))
@@ -400,8 +378,7 @@
             (equals   ?typename  (.getName ?parameter))
             (equals   ?isInterface (getInterface ?typename));control whether a selected type is interface that was implemented in a given AspectJ app 
             (succeeds (nil? ?isInterface))
-            (equals false (.isPrimitiveType ?parameter))))
-            ;(equals false (IndexOfText  ?typename "AroundClosure"))))            
+            (equals false (.isPrimitiveType ?parameter))))           
  
  (inspect  (sort-by first (ekeko [?as ?a ?r] (getAC-p1 ?as ?a ?r)))) 
  
@@ -473,7 +450,7 @@
      (equals ?paramName (.getName ?param))
      (equals ?isInterface (getInterface ?paramName));except interface classes
      (succeeds  (nil? ?isInterface))
-     (equals ?methodN (.getName ?method))
+     (equals ?methodN (str "<Method Name: "(.getName ?method)">"))
      (equals ?rtype (str "PARAM"))))
   
  (inspect (sort-by first  (ekeko [?p ?A ?m ?r] (measureMC-param ?A ?m ?p ?r))))
@@ -487,7 +464,7 @@
      (equals ?returnName (.getName ?return))
      (equals ?isInterface (getInterface ?returnName));except interface classes
      (succeeds  (nil? ?isInterface))
-     (equals ?methodN (.getName ?method))
+     (equals ?methodN (str "<Method Name: "(.getName ?method)">"))
      (equals ?rtype (str "RETURN"))))
   
   (inspect (sort-by first  (ekeko [?p ?A ?m ?r] (measureMC-return ?A ?m ?p ?r))))
@@ -515,20 +492,27 @@
   
   ;############################### Pointcut-Method dependence (PM) ###############################
   ;if a pointcut of an aspect contains at least one join point that is related to a method of a class
-  (defn countPM [?className ?shadowStr ?adviceKind ?aspectName ?pointcut] 
-                  (l/fresh [?aspect ?advice ?shadow]
-                           (NOFA-in-aspects ?aspect ?advice)
-                           (w/advice-shadow ?advice ?shadow);in order to reach the join point shadows, I used w/advice-shadow to pick them up along with advices' poincuts 
-                           (equals false (.isCode ?shadow))
-                           (succeeds (= "class" (.toString (.getKind (.getParent ?shadow)))))
-                           (equals ?className (.getName (.getParent ?shadow)))
-                           (equals ?adviceKind (.getKind ?advice))
-                           (equals ?aspectName (.toString ?aspect))
-                           (equals ?shadowStr (str "<Join Point Shadow : "(.toString ?shadow)">"))
-                           (equals ?pointcut (.getPointcut ?advice))))
+ (defn countPM [?calledClass ?calledMth  ?aspectName ?adviceKind ?pointcut ] 
+            (l/fresh [?toLongStringmethod ?methodName ?aspect ?advice ?shadow ?shadowParent]
+                    (NOFA-in-aspects ?aspect ?advice)
+                    (w/advice-shadow ?advice ?shadow);in order to reach the join point shadows, I used w/advice-shadow to pick them up along with advices' pointcut
+                    (equals true (.isCode ?shadow))
+                    (equals ?shadowParent (.getParent (.getParent ?shadow)))
+                    (succeeds  (or (.startsWith (.getName ?shadow) "method-call")
+                                   (.startsWith (.getName ?shadow) "constructor-call")))
+                    (succeeds  (= "class" (.toString (.getKind ?shadowParent))));we only want to show class - method/construct calls!
+                    (equals ?pointcut (.getPointcut ?advice))
+                    (equals ?aspectName (str "Aspect {"(.getName (.getDeclaringType ?advice))"}"))
+                    (equals ?calledMth (str "In Class: " (.getName ?shadowParent)" -> "(.toString ?shadow)))
+                    (equals ?adviceKind (.getKind ?advice))
+                    (equals ?toLongStringmethod (first (clojure.string/split (first (rest (clojure.string/split (.getName ?shadow) #" "))) #"\(")))
+                    (equals ?calledClass (str "<Class Name :"(subs ?toLongStringmethod 0 (.lastIndexOf ?toLongStringmethod ".")) ">"))
+                    (equals ?methodName (subs ?toLongStringmethod (+ (.lastIndexOf ?toLongStringmethod ".") 1)))))
   
-  (inspect (sort-by first (ekeko [?className ?shadow ?adviceKind ?aspect ?pointcut] (countPM ?className ?shadow ?adviceKind ?aspect ?pointcut))))
-  ;############################### NOPointcuts ############################### ;aspect or class and its pointcut definitions
+ (inspect (sort-by first  (ekeko [?CalledM  ?calledC  ?aspect ?adv ?pnt] (countPM ?calledC ?CalledM ?aspect ?adv ?pnt))))
+ ;output ex: ["In Class: MediaController -> constructor-call(void lancs.mobilemedia.core.ui.screens.AddMediaToAlbum.<init>(java.lang.String))" "<Class Name :lancs.mobilemedia.core.ui.screens.AddMediaToAlbum>" "Aspect {lancs.mobilemedia.alternative.music.MusicAspect}" #<AdviceKind afterReturning> #<AndPointcut (call(lancs.mobilemedia.core.ui.screens.AddMediaToAlbum.new(..)) && persingleton(lancs.mobilemedia.alternative.music.MusicAspect))>]
+  
+ ;############################### NOPointcuts ############################### ;aspect or class and its pointcut definitions
  (inspect (ekeko [?type ?pointdef] (w/type-pointcutdefinition ?type ?pointdef )))
  ;count aspects and its poincuts' definitions
  (inspect (ekeko [?aspects ?pointcuts] (w/aspect-pointcutdefinition ?aspects ?pointcuts )))
@@ -549,13 +533,10 @@
  (inspect (ekeko [?advice ?pointdef] (w/advice-pointcutdefinition ?advice ?pointdef)))
 
  ;############################### SHADOWS ###############################
-
  (inspect (ekeko [?shadow ?type] (w/shadow-ancestor|type ?shadow ?type)))
 
  (inspect (ekeko [?shadow ?class] (w/shadow-ancestor|class ?shadow ?class))) 
  (inspect (ekeko [?shadow ?aspect] (w/shadow-ancestor|aspect ?shadow ?aspect)))
- 
-
  ;##########################################################################
  
  (inspect (ekeko [?c ?aspect] (ajdt/compilationunit-aspect ?c ?aspect)))
@@ -602,6 +583,7 @@
                      (= ?name "java.lang.annotation")
                      (= ?name "java.lang.Runnable")
                      (= ?name "java.util.Set")
+                     (= ?name "java.util.Map")
                      (= ?name "java.rmi.Remote")))))))
 
   (defn- getEnum [?name]
