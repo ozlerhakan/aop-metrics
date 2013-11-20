@@ -493,7 +493,7 @@
   ;############################### Pointcut-Method dependence (PM) ###############################
   ;if a pointcut of an aspect contains at least one join point that is related to a method of a class
  (defn countPM [?calledClass ?calledMth  ?aspectName ?adviceKind ?pointcut ] 
-            (l/fresh [?toLongStringmethod ?methodName ?aspect ?advice ?shadow ?shadowParent]
+            (l/fresh [?toLongStringmethod ?methodName ?aspect ?advice ?shadow ?shadowParent ?fullyClassName ?class]
                     (NOFA-in-aspects ?aspect ?advice)
                     (w/advice-shadow ?advice ?shadow);in order to reach the join point shadows, I used w/advice-shadow to pick them up along with advices' pointcut
                     (equals true (.isCode ?shadow))
@@ -502,16 +502,26 @@
                                    (.startsWith (.getName ?shadow) "constructor-call")))
                     (succeeds  (= "class" (.toString (.getKind ?shadowParent))));we only want to show class - method/construct calls!
                     (equals ?pointcut (.getPointcut ?advice))
-                    (equals ?aspectName (str "Aspect {"(.getName (.getDeclaringType ?advice))"}"))
+                    (equals ?fullyClassName (str (.getPackageName ?shadowParent)"."(.getName ?shadowParent)))
+                    (equals ?aspectName (str "Aspect {"(.getSimpleName (.getDeclaringType ?advice))"}"))
                     (equals ?calledMth (str "In Class: " (.getName ?shadowParent)" -> "(.toString ?shadow)))
                     (equals ?adviceKind (.getKind ?advice))
                     (equals ?toLongStringmethod (first (clojure.string/split (first (rest (clojure.string/split (.getName ?shadow) #" "))) #"\(")))
-                    (equals ?calledClass (str "<Class Name :"(subs ?toLongStringmethod 0 (.lastIndexOf ?toLongStringmethod ".")) ">"))
-                    (equals ?methodName (subs ?toLongStringmethod (+ (.lastIndexOf ?toLongStringmethod ".") 1)))))
+                    (equals ?class (subs ?toLongStringmethod 0 (.lastIndexOf ?toLongStringmethod ".")))
+                    (equals ?calledClass (str "<Class Name :" ?class ">"))
+                    (equals ?methodName (subs ?toLongStringmethod (+ (.lastIndexOf ?toLongStringmethod ".") 1)))
+                    (succeeds (= ?fullyClassName ?class))))
   
  (inspect (sort-by first  (ekeko [?CalledM  ?calledC  ?aspect ?adv ?pnt] (countPM ?calledC ?CalledM ?aspect ?adv ?pnt))))
- ;output ex: ["In Class: MediaController -> constructor-call(void lancs.mobilemedia.core.ui.screens.AddMediaToAlbum.<init>(java.lang.String))" "<Class Name :lancs.mobilemedia.core.ui.screens.AddMediaToAlbum>" "Aspect {lancs.mobilemedia.alternative.music.MusicAspect}" #<AdviceKind afterReturning> #<AndPointcut (call(lancs.mobilemedia.core.ui.screens.AddMediaToAlbum.new(..)) && persingleton(lancs.mobilemedia.alternative.music.MusicAspect))>]
-  
+ ;output ex: mobilemedia-> 
+ ;["In Class: MediaListController -> method-call(void lancs.mobilemedia.core.ui.controller.MediaListController.appendMedias(lancs.mobilemedia.core.ui.datamodel.MediaData[], lancs.mobilemedia.core.ui.screens.MediaListScreen))" 
+ ; "<Class Name :lancs.mobilemedia.core.ui.controller.MediaListController>" 
+ ; "Aspect {SortingAspect}" 
+ ; #<AdviceKind before> 
+ ; #<AndPointcut (((call(public void lancs.mobilemedia.core.ui.controller.MediaListController.appendMedias(lancs.mobilemedia.core.ui.datamodel.MediaData[], lancs.mobilemedia.core.ui.screens.MediaListScreen)) && this(BindingTypePattern(lancs.mobilemedia.core.ui.controller.MediaListController, 0))) && args(BindingTypePattern(lancs.mobilemedia.core.ui.datamodel.MediaData[], 1), BindingTypePattern(lancs.mobilemedia.core.ui.screens.MediaListScreen, 2))) && persingleton(lancs.mobilemedia.optional.sorting.SortingAspect))>]
+ ; The output says that a declared pointcut that connects with a advice before in SortingAspect refers to a method which is "appendMedias" in MediaListController
+ ; so, this method is belongs to the class, in other words,a pointcut matches the method called "appendMedias" of MediaListController  
+ 
  ;############################### NOPointcuts ############################### ;aspect or class and its pointcut definitions
  (inspect (ekeko [?type ?pointdef] (w/type-pointcutdefinition ?type ?pointdef )))
  ;count aspects and its poincuts' definitions
