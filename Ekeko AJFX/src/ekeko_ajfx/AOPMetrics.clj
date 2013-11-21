@@ -230,13 +230,13 @@
 (defn NOFA-in-aspects [?aspect ?adv]  
               (l/fresh []
                    (w/advice ?adv)
-                   (equals ?aspect (.toString (.getConcreteAspect ?adv)))
+                   (equals ?aspect (.getConcreteAspect ?adv))
                    (equals false (IndexOfText (.getName (.getClass ?adv)) "Checker"))
                    (equals false (or
                                    (or (.isCflow (.getKind ?adv)) (.isPerEntry (.getKind ?adv)))
                                    (= "softener" (.getName (.getKind ?adv)))))));I must exclude perThis, perTarget , perCflow, Cflow, CflowBelow, softener, and Checker(warning)!!
 
-(inspect (sort-by first (ekeko [?a ?adv] (NOFA-in-aspects ?a ?adv))))
+(inspect (sort-by first (ekeko [?an ?adv] (l/fresh [?a] (NOFA-in-aspects ?a ?adv) (equals ?an (.toString ?a))))))
 (count (ekeko [?a ?adv] (NOFA-in-aspects ?a ?adv)))
 
 ;(inspect (ekeko [?softener] (w/declare|soft ?softener)))
@@ -352,26 +352,27 @@
  ;############################### Attribute-Class dependence Measure (AtC) ###############################
  ;Definition : if a class is the type of an field of an aspect - - count the number of types that belong to fields in aspects
  ;Filtering primitive types and interfaces that could be the type of a field!
-  (defn getField-AtC [?aspectName ?fieldName ?fieldType ?tcname] 
-         (l/fresh [?field ?aspect ?isSameInterface ?signature]
+  (defn getField-AtC [?aspectName ?fieldName ?fieldTypeName] 
+         (l/fresh [?field ?aspect ?isSameInterface ?signature ?fieldType]
                  (w/type-field ?aspect ?field)
                  (succeeds (.isAspect ?aspect))
-                 (equals ?aspectName (.getName ?aspect))
+                 (equals ?aspectName (str "Aspect {"(.getName ?aspect)"}"))
                  (equals ?fieldType  (.getType ?field))
                  ;(equals ?signature  (.getName (.getType ?field)))
                  (equals false       (.isPrimitiveType (.getType ?field))); I ignore primitive types such as boolean, int , void ,double, and so on.
                  (equals false       (or (.startsWith (.getName ?field) "ajc") (.startsWith (.getName ?field) "this")))
-                 (equals ?tcname     (.getName ?fieldType))
-                 (equals ?isSameInterface (getInterface ?tcname))
+                 (equals ?fieldTypeName     (.getName ?fieldType))
+                 (equals ?isSameInterface (getInterface ?fieldTypeName))
                  (equals true        (nil? ?isSameInterface));check whether the type is interface or not!!
                  (equals ?fieldName  (str "<Field name: " (.getName ?field) ">"))))
  
- (inspect (sort-by first (ekeko [?t ?f ?typef ?sig] (getField-AtC ?t ?f ?typef ?sig))))
+ (inspect (sort-by first (ekeko [?typef ?f ?t] (getField-AtC ?t ?f ?typef))))
  ;############################### Advice-Class  dependence (AC) ###############################
  ; if a class is  the type of a parameter of a piece of advice of an aspect 
- (defn getAC-p1 [?aspect ?adviceKind ?typename] 
-   (l/fresh [?typesofAdvice ?advice  ?isInterface ?parameter]
+ (defn getAC-p1 [?aspectSN ?adviceKind ?typename] 
+   (l/fresh [?aspect ?typesofAdvice ?advice  ?isInterface ?parameter]
             (NOFA-in-aspects ?aspect ?advice)
+            (equals ?aspectSN (.getSimpleName ?aspect))
             (equals   ?adviceKind (.getKind ?advice))
             (equals   ?typesofAdvice (.getParameterTypes (.getSignature ?advice)))
             (contains ?typesofAdvice ?parameter)
@@ -383,9 +384,10 @@
  (inspect  (sort-by first (ekeko [?as ?a ?r] (getAC-p1 ?as ?a ?r)))) 
  
  ; the return type of the piece of advice - around - ; "after returning" is being checked in the above function called -getAC-p1-
- (defn getAC-p2 [?aspect ?adviceKind ?returntypename] 
-   (l/fresh [?advice ?isInterface ?returntype]
+ (defn getAC-p2 [?aspectSN ?adviceKind ?returntypename] 
+   (l/fresh [?aspect ?advice ?isInterface ?returntype]
             (NOFA-in-aspects ?aspect ?advice)
+            (equals ?aspectSN (.getSimpleName ?aspect))
             (equals ?adviceKind (.getKind ?advice))
             (succeeds (= 5 (.getKey (.getKind ?advice))))
             (equals ?returntype (.getReturnType (.getSignature ?advice)))
@@ -443,7 +445,7 @@
  (defn measureMC-param [?aspectn ?methodN ?paramName ?rtype] 
    (l/fresh [?aspect ?params ?method ?param ?isInterface]
      (aspects-methods ?aspect ?method)
-     (equals ?aspectn (.getName ?aspect))
+     (equals ?aspectn (str "Aspect {"(.getSimpleName ?aspect) "}"))
      (equals ?params (.getParameterTypes ?method))
      (contains ?params ?param)
      (equals false (.isPrimitiveType ?param))
@@ -458,7 +460,7 @@
  (defn measureMC-return [?aspectn ?methodN ?returnName ?rtype] 
    (l/fresh [?aspect ?return ?method ?isInterface]
      (aspects-methods ?aspect ?method)
-     (equals ?aspectn (.getName ?aspect))
+     (equals ?aspectn (str "Aspect {"(.getSimpleName ?aspect) "}"))
      (equals ?return (.getReturnType ?method))
      (equals false (.isPrimitiveType ?return))
      (equals ?returnName (.getName ?return))
@@ -491,7 +493,7 @@
   (inspect (sort-by first (ekeko [?tn ?pn ?aspect] (measurePC ?tn ?pn ?aspect))))
   
   ;############################### Pointcut-Method dependence (PM) ###############################
-  ;if a pointcut of an aspect contains at least one join point that is related to a method of a class
+  ;if a pointcut of an aspect contains at least one join point that is related to a method/construct of a class
  (defn countPM [?calledClass ?calledMth  ?aspectName ?adviceKind ?pointcut ] 
             (l/fresh [?toLongStringmethod ?methodName ?aspect ?advice ?shadow ?shadowParent ?fullyClassName ?class]
                     (NOFA-in-aspects ?aspect ?advice)
@@ -503,9 +505,9 @@
                     (succeeds  (= "class" (.toString (.getKind ?shadowParent))));we only want to show class - method/construct calls!
                     (equals ?pointcut (.getPointcut ?advice))
                     (equals ?fullyClassName (str (.getPackageName ?shadowParent)"."(.getName ?shadowParent)))
-                    (equals ?aspectName (str "Aspect {"(.getSimpleName (.getDeclaringType ?advice))"}"))
+                    (equals ?aspectName (str "Aspect {"(.getSimpleName ?aspect)"}"))
                     (equals ?calledMth (str "In Class: " (.getName ?shadowParent)" -> "(.toString ?shadow)))
-                    (equals ?adviceKind (.getKind ?advice))
+                    (equals ?adviceKind (str "Advice {"(.getKind ?advice)"}"))
                     (equals ?toLongStringmethod (first (clojure.string/split (first (rest (clojure.string/split (.getName ?shadow) #" "))) #"\(")))
                     (equals ?class (subs ?toLongStringmethod 0 (.lastIndexOf ?toLongStringmethod ".")))
                     (equals ?calledClass (str "<Class Name :" ?class ">"))
@@ -519,8 +521,76 @@
  ; "Aspect {SortingAspect}" 
  ; #<AdviceKind before> 
  ; #<AndPointcut (((call(public void lancs.mobilemedia.core.ui.controller.MediaListController.appendMedias(lancs.mobilemedia.core.ui.datamodel.MediaData[], lancs.mobilemedia.core.ui.screens.MediaListScreen)) && this(BindingTypePattern(lancs.mobilemedia.core.ui.controller.MediaListController, 0))) && args(BindingTypePattern(lancs.mobilemedia.core.ui.datamodel.MediaData[], 1), BindingTypePattern(lancs.mobilemedia.core.ui.screens.MediaListScreen, 2))) && persingleton(lancs.mobilemedia.optional.sorting.SortingAspect))>]
- ; The output says that a declared pointcut that connects with a advice before in SortingAspect refers to a method which is "appendMedias" in MediaListController
- ; so, this method is belongs to the class, in other words,a pointcut matches the method called "appendMedias" of MediaListController  
+ ; The output says that a declared pointcut that connects with an advice before in SortingAspect refers to a method which is "appendMedias" in MediaListController
+ ; so, this method is belongs to the class, in other words,a join point shadow matches the method called "appendMedias" of MediaListController  
+ 
+ ;############################### Coupling on intercepted modules (CIM) ###############################
+ ;counts the number of modules completely named in the pointcuts in a given aspect.
+ (defn returnVectorForm-unfiltered [?shortAspect ?nameaspect ?pointdefs ?list] 
+                            (l/fresh [?aspect ?advice]
+                                     (NOFA-in-aspects ?aspect ?advice)
+                                     (equals ?shortAspect (str "Aspect {"(.getSimpleName ?aspect)"}"))
+                                     (equals ?pointdefs (.getPointcut ?advice))
+                                     (equals false (= "" (.toString  ?pointdefs)))
+                                     (equals ?nameaspect (str "Advice {"(.toString (.getKind ?advice))"}"))
+                                     (getRelatedKinds ?pointdefs ?list)))
+ 
+ (inspect (sort-by first (ekeko [?shortAspect ?nameaspect ?pointdefs ?list] 
+                                (returnVectorForm-unfiltered ?shortAspect ?nameaspect ?pointdefs ?list))))
+ 
+ ;consider only declaring type of fields, methods, and constructors , here we go...
+ ;gathering the all primitive pointcuts that have a complete module name!! - (not look at the return type of eack item' name or items' name)
+ (defn returnVectorForm-filtered [?shortAspect ?itemName ?nameaspect ?pointdefs]
+             (l/fresh [?list ?item ?decType ?excTypeName ?isInterface]
+                        (returnVectorForm-unfiltered ?shortAspect ?nameaspect ?pointdefs ?list)
+                        (contains ?list ?item)
+                        (equals ?itemName (str  (.getKind ?item)"{ "(.toString (.getSignature ?item))" }"))
+                        (equals ?decType (.getDeclaringType (.getSignature ?item)))
+                        (equals ?excTypeName (.getExactType ?decType))
+                        (equals false (or 
+                                        (IndexOfText (.toString ?decType) "+") ;eliminate all wildcards! that could be used to reach multiple modules in a project!
+                                        (IndexOfText (.toString ?decType) "*")
+                                        (IndexOfText (.toString ?decType) "..")))
+                         (equals ?isInterface (getInterface (.toString ?excTypeName))); perhaps the type of the item is interface so, check it!
+                         (succeeds (nil? ?isInterface))))
+ 
+ (inspect (sort-by first (ekeko [?shortAspect ?item ?nameaspect ?p] 
+                                (returnVectorForm-filtered ?shortAspect ?item ?nameaspect ?p ))))
+ ;for instance: method-call; the module name of the so-called "setPoolSize" is "db.ConnectionPool" in a given poincut connected with after around in the ConnectionPoolHandlers!
+ ;[ "Aspect {ConnectionPoolHandlers}" 
+ ;  "Advice {around}" 
+ ;  "method-call{ * db.ConnectionPool.setPoolSize(..) }" 
+ ;  #<OrPointcut ((((withincode(void db.ConnectionPool.setProperties(..)) && call(* db.ConnectionPool.setRestoreTimerDelay(..))) && persingleton(db.ConnectionPoolHandlers)) || ((withincode(void db.ConnectionPool.setProperties(..)) && call(* db.ConnectionPool.setPoolSize(..))) && persingleton(db.ConnectionPoolHandlers))) || (execution(void db.ConnectionPool.setProperties(..)) && persingleton(db.ConnectionPoolHandlers)))>]
+ 
+ (defn getRelatedKinds [?pointcut ?list]
+   "it is responsible for some primitive pointcuts that reach certain modules 
+    such as method-call/execution, construct-call/execution, field-get/set"
+   (l/fresh [?res ?y]
+     (equals ?res (java.util.ArrayList. []))
+     (equals ?y (calls ?pointcut ?res))
+     (equals ?list ?res)))
+ 
+ ;This part represents Functional language ->
+ (defn calls [pointcut res]
+   "a nested function \"calls\" is to pick up the related modules whose kind ID is 1 in a pointcut!"
+   (if  (or (= (getKind pointcut) 5 ) (= (getKind pointcut) 6))
+      [(calls (getLeft pointcut) res) (calls (getRight pointcut) res)]
+      (if (= (getKind pointcut) 1) (addlist res pointcut))))
+ 
+ (defn- addlist [lst relatedModule]
+   (.add lst relatedModule)) 
+ 
+ (defn- getSignature [pointcut] 
+      (.getSignature pointcut))
+  
+ (defn- getLeft [pointcut] 
+      (.getLeft pointcut))
+  
+ (defn- getRight [pointcut] 
+      (.getRight pointcut))
+ 
+ (defn- getKind [pointcut] 
+      (.getPointcutKind pointcut))
  
  ;############################### NOPointcuts ############################### ;aspect or class and its pointcut definitions
  (inspect (ekeko [?type ?pointdef] (w/type-pointcutdefinition ?type ?pointdef )))
@@ -593,7 +663,14 @@
                      (= ?name "java.lang.annotation")
                      (= ?name "java.lang.Runnable")
                      (= ?name "java.util.Set")
+                     (= ?name "java.sql.Statement")
                      (= ?name "java.util.Map")
+                     (= ?name "javax.sql.DataSource")
+                     (= ?name "java.sql.PreparedStatement")
+                     (= ?name "javax.jms.TopicConnectionFactory")
+                     (= ?name "javax.xml.transform.Source")
+                     (= ?name "org.xml.sax.XMLReader")
+                     (= ?name "javax.jms.QueueConnectionFactory")
                      (= ?name "java.rmi.Remote")))))))
 
   (defn- getEnum [?name]
