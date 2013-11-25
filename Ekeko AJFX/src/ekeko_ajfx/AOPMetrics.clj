@@ -41,16 +41,15 @@
 
  ;############################### METRIC LOC ###############################
  ;count the number of lines of java code & aspect code in a given project - except blank lines (comments & javadocs are still counted)
- (defn class-loc [filePath]
+ (defn class-loc [filePath ignoredTestName]
   (reduce
     +
-    (for [file (file-seq  filePath) :when (and (.endsWith (.toString file )".java") (false? (lastIndexOfText (.toString file) "MainTST")))]
+    (for [file (file-seq  filePath) :when (and (.endsWith (.toString file )".java") (false? (lastIndexOfText (.toString file) ignoredTestName)))]
       (with-open [rdr (io/reader  file)] (count  (filter #(re-find #"\S" %) (line-seq rdr)))))))
 
 ;(class-loc (io/file "C:/Users/HAKAN/runtime-New_configuration-clojure/Clojure-1/src/"))
- ;(class-loc (io/file"C:/Users/HAKAN/Desktop/Thesis/ws/AJHotDraw/src/aspects"));36225
- (class-loc (io/file"C:/Users/HAKAN/Desktop/Thesis/ws/aopetstore/PetstoreAspectJ/blueprints/petstore1.4/src"))
- ;(class-loc (io/file"C:/Users/HAKAN/runtime-New_configuration-clojure/Contract4J5/contract4j5/src"))
+;(class-loc (io/file"C:/Users/HAKAN/Desktop/Thesis/ws/AJHotDraw/src/aspects"));36225
+(class-loc (io/file "C:/Users/HAKAN/runtime-New_configuration-clojure/Clojure-1/src/") "MainTST")
 
  (defn aspect-loc [filePath]
   (reduce
@@ -70,7 +69,7 @@
  ;   (for [file (file-seq filePath) :when (.endsWith (.toString file ) ".java")] 1) ))
  ;(class-count (io/file "C:/Users/HAKAN/runtime-New_configuration-clojure/Contract4J5/contract4j5/src"));
 
- ;Number of Classes in the project except enums, interfaces, their sub-classes!!, and some main classes.
+ ;Number of Classes in the project except enums, interfaces, their sub-classes!!, and a test class.
  (defn NOClasses [?classes]
             (l/fresh []
                   (w/class ?classes)
@@ -149,16 +148,10 @@
              (l/fresh []
                   (classes-methods ?t ?m)
                   (equals false (= 3 (.getKey (.getKind ?m))))))
- ;1 Class
+ ;1 Class -nonConstructs
  (inspect(sort-by first (ekeko [?t ?m] (classes-methods-without-constructs ?t ?m))))
  (count (ekeko [?t ?m] (classes-methods-without-constructs ?t ?m)))
 
- ;2 Aspect : find basic method declarations in aspect files
- (inspect (sort-by first (ekeko [?file ?methodName] 
-                                (l/fresh [?method-aspect]
-                                         (ajdt/method ?method-aspect)
-                                         (equals ?methodName (.getElementName ?method-aspect))
-                                         (equals ?file (.getName (.getResource ?method-aspect)))))))
  ;2 Aspect : find basic method declarations in aspect files
  (defn aspects-methods [?aspects ?methods]
                 (l/fresh [?tname ?source ?methodName]
@@ -178,8 +171,8 @@
  ;-------------------------------------------------------------
  ;    intertyped method declarations =>  METRIC NOOI (methods and advices and intertype methods)
  
- ;METHODS: only intertyped method declarations in aspects
- ;1 Aspect
+ ;METHODS: only intertyped method declarations
+ ;2.2 Aspect : get the all intertype method declaration implemented in a project
  (defn aspects-intertyped-methods [?decAspect ?methods]
                 (l/fresh [?types]
                           (w/type-method ?types ?methods)
@@ -189,16 +182,16 @@
 
  (inspect (sort-by first (ekeko [?decAspect ?methods] (aspects-intertyped-methods  ?decAspect ?methods))))
  (count (ekeko [?get ?decAspect] (aspects-intertyped-methods ?get ?decAspect)))
-  
- ;get the all intertype method declaration implemented in a project
- ;--- the difference from the above query is that this query also reaches abstract intertype method declarations
- (inspect (sort-by first  (ekeko [?aspect ?interName ?i] 
-                                 (l/fresh [] 
-                                          (w/intertype|method ?i)
-                                          (equals ?aspect (.getName (.getAspectType ?i)))
-                                          (equals ?interName (.getName (.getSignature ?i)))))))
  
- ;COUNT: 1 class + 2 aspect + 1 aspect :RESULT combines with 
+ ;2.2 Aspect get the all intertype method declaration implemented in a project
+ (defn intertype-methods [?i] 
+                       (l/fresh [] 
+                            (w/intertype|method ?i)
+                            (equals false (.isAbstract (.getSignature ?i)))))
+ 
+  (inspect (ekeko [?i] (intertype-methods ?i)))
+  (count (ekeko [?i] (intertype-methods ?i)))
+ ;COUNT: 1 class + 2 aspect + 2.2 aspect :RESULT combines with 
 
  ;(inspect (count (ekeko [?method-aspect] (ajdt/method ?method-aspect))))
  ;-------------------------------------------------------------------------------------------------
@@ -216,32 +209,20 @@
 (count (ekeko [?a ?adv] (NOAdvices ?a ?adv)))
 
 ;(inspect (ekeko [?softener] (w/declare|soft ?softener)))
-;(inspect (ekeko [?dec] (w/declare|warning  ?dec))) 
- ;############################### AM & IM & MM Dependence ###############################
- 
- ;Additional query: get the entire advice soot methods of the selected advice package
- (defn get-advices-soot|methods [?soot|advicemethod ?units]
-               (l/fresh [?adv ?aspect]
-                         (NOAdvices ?aspect ?adv);I am using this function or I can also use ajdt/advice function to get the proper declarded advice in a project and to avoid the errors!
-                         (ajsoot/advice-soot|method ?adv ?soot|advicemethod)
-                         (succeeds (.hasActiveBody ?soot|advicemethod))
-                         (equals ?units (.getUnits (.getActiveBody ?soot|advicemethod)))
-                         (equals true (=  "org.jhotdraw.ccconcerns.commands.undo.ChangeAttributeCommandUndo" (.getName (.getDeclaringClass ?soot|advicemethod))))))
+;(inspect (ekeko [?dec] (w/declare|warning  ?dec)))
 
- (inspect (ekeko [?soot|advicemethod ?units] (get-advices-soot|methods ?soot|advicemethod ?units)))
- 
  ;############################### Advice-Method dependence (AM) :the number of method calls per advice body ###############################
  (defn get-soot-advice|method [?aspectName ?calledmethods ?soot|methodName]
                (l/fresh [?soot|method ?advice ?aspect ?soot]
                          (NOAdvices ?aspect ?advice)
                          (ajsoot/advice-soot|method ?advice ?soot|method)
-                         (NOMethodCalls ?soot|method ?aspectName ?calledmethods ?soot|methodName))) 
+                         (NOMethodCalls ?soot|method ?aspectName ?calledmethods ?soot|methodName)))
  
  (inspect (sort-by first (ekeko [?aspectName ?calledmethods ?soot|methodName] (get-soot-advice|method ?aspectName ?calledmethods ?soot|methodName))))
- 
+ (count (sort-by first (ekeko [?aspectName ?calledmethods ?soot|methodName] (get-soot-advice|method ?aspectName ?calledmethods ?soot|methodName)))) 
  ;############################### IntertypeMethod-Method dependence (IM) :the number of method calls per intertype method body ###############################
  (defn get-soot-intertype|method [?aspectName ?calledmethods ?soot|interName]
-               (l/fresh [?soot ?itmethod ?units ?unit ?inter|method ?soot|methodName]
+               (l/fresh [?soot ?itmethod ?units ?unit ?soot  ?inter|method ?soot|methodName]
                          (ajsoot/intertype|method-soot|method ?itmethod ?soot)
                          (succeeds (.hasActiveBody ?soot))
                          (equals ?units (.getUnits (.getActiveBody ?soot)))
@@ -254,7 +235,12 @@
                          (NOMethodCalls ?inter|method ?aspectName ?calledmethods ?soot|methodName)
                          (equals ?soot|interName (str "InterMethod {"(subs ?soot|methodName (+ (.lastIndexOf ?soot|methodName "$") 1))))))
  
- (inspect (sort-by first (ekeko [?aspectName ?soot|methodName ?calledmethods] (get-soot-intertype|method ?aspectName ?calledmethods ?soot|methodName))))
+ (inspect (sort-by first (ekeko [ ?aspectName ?calledmethods ?soot|interName ] (get-soot-intertype|method  ?aspectName ?calledmethods ?soot|interName ))))
+ 
+ (inspect (ekeko [?soot]
+                 (l/fresh [ ?itmethod]
+                          (ajsoot/intertype|method-soot|method ?itmethod ?soot)
+                          (equals true (= (.getName ?soot) "aspectUpdating")))))
  
  ;############################### Method-Method dependence (MM) :the number of method calls per method body declared in aspects ###############################
  (defn get-ajmethods-soot|method [ ?aspectName ?calledmethods ?soot|methodName]
@@ -263,9 +249,10 @@
                         (ajsoot/method-soot|method ?ajmethod ?soot|method);new function has been created in the Ekeko AspectJ project -> /EkekoAspectJ/src/damp/ekeko/aspectj/soot.clj Line: 113
                         (NOMethodCalls ?soot|method ?aspectName ?calledmethods ?soot|methodName)))
  
- (inspect (sort-by first (ekeko [ ?aspectName  ?soot|methodName ?calledmethods] 
-                                (get-ajmethods-soot|method  ?aspectName ?calledmethods ?soot|methodName))))
- 
+ (inspect (count (sort-by first (ekeko [ ?aspectName  ?soot|methodName ?calledmethods] 
+                                       (get-ajmethods-soot|method  ?aspectName ?calledmethods ?soot|methodName)))))
+ (count (sort-by first (ekeko [ ?aspectName  ?soot|methodName ?calledmethods] 
+                                       (get-ajmethods-soot|method  ?aspectName ?calledmethods ?soot|methodName))))
  ;find the RELATED SootMethod(s)
  (inspect (ekeko [?m ?n]
   (jsoot/soot :method ?m)
@@ -276,6 +263,16 @@
  (inspect (ekeko [?m ?n]
   (jsoot/soot :method ?m)))
   
+ ;Additional query: get the entire advice soot methods of the selected advice package
+ (defn get-advices-soot|methods [?soot|advicemethod ?units]
+               (l/fresh [?adv ?aspect]
+                         (NOAdvices ?aspect ?adv);I am using this function or I can also use ajdt/advice function to get the proper declarded advice in a project and to avoid the errors!
+                         (ajsoot/advice-soot|method ?adv ?soot|advicemethod)
+                         (succeeds (.hasActiveBody ?soot|advicemethod))
+                         (equals ?units (.getUnits (.getActiveBody ?soot|advicemethod)))
+                         (equals true (=  "org.jhotdraw.ccconcerns.commands.undo.ChangeAttributeCommandUndo" (.getName (.getDeclaringClass ?soot|advicemethod))))))
+
+ (inspect (ekeko [?soot|advicemethod ?units] (get-advices-soot|methods ?soot|advicemethod ?units))) 
  ;get the all transforming classes with a given part of a package name
  (inspect (ekeko [?model ?scne ?class]
              (l/fresh [?classes]
@@ -316,11 +313,10 @@
 		                    (.startsWith (.toString (.getInvokeExpr ?calledmethods)) "staticinvoke")
 		                    (.startsWith (.toString (.getInvokeExpr ?calledmethods)) "virtualinvoke"))
 		                  (or
+                         (=               (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "valueOf")
 		                     (lastIndexOfText (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "$advice")
-                         (= (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "valueOf")
                          (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$afterReturning$")
 		                     (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$around$")
-                         (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$interMethod$")
                          (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$interFieldSetDispatch$")
                          (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$interFieldGetDispatch$")
                          (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$before$")
@@ -331,24 +327,6 @@
                 (or
                   (= "aspectOf" (.getName (.getMethod (.getValue (.getInvokeExprBox ?calledmethods)))))
                   (= "makeJP" (.getName (.getMethod (.getValue (.getInvokeExprBox ?calledmethods)))))))))
-	          ;(equals true (= "spacewar.Display$DisplayAspect" (.getName (.getDeclaringClass ?soot|method))))))
-
- (inspect (sort-by first (ekeko [?aspect ?soot|method ?calledmethods] (NOMethodCalls ?aspect ?calledmethods ?soot|method))))
- ;COUNT
- ;(count (ekeko [?aspect ?soot|method ?calledmethods] (NOMethodCalls-perAdvice ?aspect ?calledmethods ?soot|method)))
-
- ;soot|value|invocation-soot|method
- ;soot.jimple.internal.JAssignStmt
- ;soot.jimple.internal.JInvokeStmt
-
- ;(inspect (ekeko [?method ?call]
- ;  (jsoot/soot|method-soot|unit ?method ?call))) ;?call : class soot.jimple.internal.JInvokeStmt,JInterfaceInvoke,JSpecialInvoke,JStaticInvoke ,JVirtualInvoke
-
- ;(inspect (ekeko [?t ?m]  (w/type-method ?t ?m)))
- ;(println "type-method")
-
- ;(inspect (ekeko [?caller ?callee ?call ?receiver]  ( method-methodCalls ?caller ?callee ?call ?receiver)))
- ;(inspect (ekeko [?advice ?unit] (advice-soot|unit ?advice ?unit)))
  
  ;############################### Attribute-Class dependence Measure (AtC) ###############################
  ;Definition : if a class is the type of an field of an aspect - - count the number of types that belong to fields in aspects
@@ -359,7 +337,6 @@
                  (succeeds (.isAspect ?aspect))
                  (equals ?aspectName (str "Aspect {"(.getName ?aspect)"}"))
                  (equals ?fieldType  (.getType ?field))
-                 ;(equals ?signature  (.getName (.getType ?field)))
                  (equals false       (.isPrimitiveType (.getType ?field))); I ignore primitive types such as boolean, int , void ,double, and so on.
                  (equals false       (or (.startsWith (.getName ?field) "ajc") (.startsWith (.getName ?field) "this")))
                  (equals ?fieldTypeName     (.getName ?fieldType))
@@ -409,7 +386,7 @@
  ;find all return types of intertype method declarations
  (defn measureIC-returnType [?aspect ?interName ?type ?returnname] 
          (l/fresh [?isInterface ?i ?return] 
-                  (w/intertype|method ?i)
+                  (intertype-methods ?i)
                   (equals ?aspect (str "Aspect {"(.getName (.getAspectType ?i))"}"))
                   (equals ?return (.getReturnType (.getSignature ?i)))
                   (equals false (.isPrimitiveType ?return));except primitive types
@@ -423,7 +400,7 @@
  ;find all parameter types of intertype method declarations
  (defn measureIC-parameters [?aspect ?interName ?param ?variName] 
 	       (l/fresh [?v ?isInterface ?i ?vari] 
-	                (w/intertype|method ?i)
+	                (intertype-methods ?i)
 	                (equals ?aspect (str "Aspect {"(.getName (.getAspectType ?i))"}"))
 	                (equals ?v (.getParameterTypes (.getSignature ?i)))
 	                (contains ?v ?vari)
@@ -622,7 +599,7 @@
  
  (inspect (ekeko [?c ?aspect] (ajdt/compilationunit-aspect ?c ?aspect)))
  
- ; )
+ ;)
   
   (defn- getInterfaces-soot [?mn]
          (l/fresh [?m]
