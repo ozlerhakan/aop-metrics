@@ -114,6 +114,7 @@
          (l/fresh []
                      (w/type-field ?c ?f)
                      (equals false (.isEnum ?c))
+                     (equals false (.isInterface ?c))
                      (equals false (and (.isClass ?c) (IndexOfText  (.getName ?c) "$")))
                      (succeeds (empty? (filter #(re-matches #"\S+\$[1-9]+" %)  [(.getName ?c)])))
                      (equals false (or 
@@ -193,7 +194,6 @@
   (count (ekeko [?i] (intertype-methods ?i)))
  ;COUNT: 1 class + 2 aspect + 2.2 aspect :RESULT combines with 
 
- ;(inspect (count (ekeko [?method-aspect] (ajdt/method ?method-aspect))))
  ;-------------------------------------------------------------------------------------------------
  ;NUMBER OF ADVICES
 (defn NOAdvices [?aspect ?adv]  
@@ -203,7 +203,9 @@
                    (equals false (IndexOfText (.getName (.getClass ?adv)) "Checker"))
                    (equals false (or
                                    (or (.isCflow (.getKind ?adv)) (.isPerEntry (.getKind ?adv)))
-                                   (= "softener" (.getName (.getKind ?adv)))))));I must exclude perThis, perTarget , perCflow, Cflow, CflowBelow, softener, and Checker(warning)!!
+                                   (= "softener" (.getName (.getKind ?adv)))));I must exclude perThis, perTarget , perCflow, Cflow, CflowBelow, softener, and Checker(warning)!!
+                   (equals false (= "" (.toString (.getPointcut ?adv))))))
+                   ;(equals true (= (.getName ?aspect) (.getName (.getDeclaringType (.getSignature ?adv)))))))
 
 (inspect (sort-by first (ekeko [?an ?adv] (l/fresh [?a] (NOAdvices ?a ?adv) (equals ?an (.toString ?a))))))
 (count (ekeko [?a ?adv] (NOAdvices ?a ?adv)))
@@ -251,8 +253,9 @@
  
  (inspect (count (sort-by first (ekeko [ ?aspectName  ?soot|methodName ?calledmethods] 
                                        (get-ajmethods-soot|method  ?aspectName ?calledmethods ?soot|methodName)))))
- (count (sort-by first (ekeko [ ?aspectName  ?soot|methodName ?calledmethods] 
-                                       (get-ajmethods-soot|method  ?aspectName ?calledmethods ?soot|methodName))))
+ (count (ekeko [ ?aspectName  ?soot|methodName ?calledmethods] 
+                                       (get-ajmethods-soot|method  ?aspectName ?calledmethods ?soot|methodName)))
+ ;-------------------------------------------------------------------------------------------------------------------------------------------------------------
  ;find the RELATED SootMethod(s)
  (inspect (ekeko [?m ?n]
   (jsoot/soot :method ?m)
@@ -260,7 +263,7 @@
   (equals true (IndexOfText ?n "createUndoActivity"))))
 
  ;find all SootMethods
- (inspect (ekeko [?m ?n]
+ (inspect (ekeko [?m ]
   (jsoot/soot :method ?m)))
   
  ;Additional query: get the entire advice soot methods of the selected advice package
@@ -482,6 +485,7 @@
                                    (.startsWith (.getName ?shadow) "constructor-call")))
                     (succeeds  (= "class" (.toString (.getKind ?shadowParent))));we only want to show class - method/construct calls!
                     (equals ?pointcut (.getPointcut ?advice))
+                    (equals false (= "" (.toString  ?pointcut)))
                     (equals ?fullyClassName (str (.getPackageName ?shadowParent)"."(.getName ?shadowParent)))
                     (equals ?aspectName (str "Aspect {"(.getSimpleName ?aspect)"}"))
                     (equals ?calledMth (str "In Class: " (.getName ?shadowParent)" -> "(.toString ?shadow)))
@@ -503,15 +507,16 @@
  ; so, this method is belongs to the class, in other words,a join point shadow matches the method called "appendMedias" of MediaListController  
  
  ;############################### Coupling on intercepted modules (CIM) ###############################
- ;counts the number of modules completely named in the pointcuts in a given aspect.
- (defn returnVectorForm-unfiltered [?shortAspect ?nameaspect ?pointdefs ?list] 
-                            (l/fresh [?aspect ?advice]
+ ;counts the number of modules completely named in the pointcuts in given aspects.
+ (defn returnVectorForm-unfiltered [?shortAspect ?nameaspect ?pointdefs ?items] 
+                            (l/fresh [?aspect ?advice ?list]
                                      (NOAdvices ?aspect ?advice)
                                      (equals ?shortAspect (str "Aspect {"(.getSimpleName ?aspect)"}"))
                                      (equals ?pointdefs (.getPointcut ?advice))
                                      (equals false (= "" (.toString  ?pointdefs)))
                                      (equals ?nameaspect (str "Advice {"(.toString (.getKind ?advice))"}"))
-                                     (getRelatedKinds ?pointdefs ?list)))
+                                     (getRelatedKinds ?pointdefs ?list)
+                                     (equals ?items (vec (into #{} ?list)))))
  
  (inspect (sort-by first (ekeko [?shortAspect ?nameaspect ?pointdefs ?list] 
                                 (returnVectorForm-unfiltered ?shortAspect ?nameaspect ?pointdefs ?list))))
@@ -534,6 +539,8 @@
  
  (inspect (sort-by first (ekeko [?shortAspect ?item ?nameaspect ?p] 
                                 (returnVectorForm-filtered ?shortAspect ?item ?nameaspect ?p ))))
+  (count (ekeko [?shortAspect ?item ?nameaspect ?p] 
+                                (returnVectorForm-filtered ?shortAspect ?item ?nameaspect ?p )))
  ;for instance: method-call; the module name of the so-called "setPoolSize" is "db.ConnectionPool" in a given poincut connected with after around in the ConnectionPoolHandlers!
  ;[ "Aspect {ConnectionPoolHandlers}" 
  ;  "Advice {around}" 
@@ -551,25 +558,96 @@
  ;This part represents Functional language ->
  (defn calls [pointcut res]
    "a nested function \"calls\" is to pick up the related poincuts whose kind ID are 1!"
-   (if  (or (= (getKind pointcut) 5 ) (= (getKind pointcut) 6))
+   (if  (or (= (getPKind pointcut) 5 ) (= (getPKind pointcut) 6))
       [(calls (getLeft pointcut) res) (calls (getRight pointcut) res)]
-      (if (= (getKind pointcut) 1) (addlist res pointcut))))
+      (if (= (getPKind pointcut) 1) (addlist res pointcut))))
  
  (defn- addlist [lst selectedPointcut]
    (.add lst selectedPointcut)) 
  
  (defn- getSignature [pointcut] 
       (.getSignature pointcut))
-  
- (defn- getLeft [pointcut] 
-      (.getLeft pointcut))
-  
- (defn- getRight [pointcut] 
-      (.getRight pointcut))
  
- (defn- getKind [pointcut] 
-      (.getPointcutKind pointcut))
+ ;############################### IAM : Do aspects often inherit from abstract aspects? ###############################
+ (defn NOIAspects [?aspectname ?name]
+         (l/fresh  [?aspect ?source ?super]
+                   (NOAspects ?aspect ?source)
+                   (w/aspect-declaredsuper ?aspect ?super)
+                   (equals ?aspectname (str "Aspect {"(.getSimpleName ?aspect)"}"))
+                   (equals ?name (str "From Abstract Aspect -> "(.getSimpleName ?super)))
+                   (succeeds(.isAbstract ?super))))
  
+ (inspect (sort-by first (ekeko [?aspectname ?name] (NOIAspects ?aspectname ?name))))
+ (count (ekeko [?aspectname ?name] (NOIAspects ?aspectname ?name)))
+ ;############################### NOAE: How often is adviceExecution used? ###############################
+ (defn NOAdviceexecution [?shortAspect ?nameaspect ?pointdefs ?arg] 
+                            (l/fresh [?aspect ?advice ?args ?ar]
+                                     (NOAdvices ?aspect ?advice)
+                                     (equals ?shortAspect (str "Aspect {"(.getSimpleName ?aspect)"}"))
+                                     (equals ?pointdefs (.getPointcut ?advice))
+                                     (equals false (= "" (.toString  ?pointdefs)))
+                                     (equals ?nameaspect (str "Advice {"(.toString (.getKind ?advice))"}"))
+                                     (getRelatedKinds ?pointdefs ?args)
+                                     (equals ?ar (vec (into #{} ?args)))
+                                     (contains ?ar ?arg)
+                                     (equals true (= "adviceexecution" (.toString (getKind ?arg))))))
+ 
+ (inspect  (sort-by first (ekeko [?shortAspect ?nameaspect ?list ?pointdefs] 
+                                      (NOAdviceexecution ?shortAspect ?nameaspect ?pointdefs ?list)))) 
+ (count (ekeko [?shortAspect ?nameaspect ?list ?pointdefs] 
+                                      (NOAdviceexecution ?shortAspect ?nameaspect ?pointdefs ?list)))
+ ;############################### NOSA: Are most aspects singletons? ###############################
+ ; If an aspect has no parent aspect, then by default the aspect is a singleton aspect
+  (defn NOSAspects [?aspectname]
+         (l/fresh  [?source ?aspect ?super]
+                   (NOAspects ?aspect ?source)
+                   (w/aspect-declaredsuper ?aspect ?super)
+                   (equals ?aspectname (str "Aspect {"(.getSimpleName ?aspect)"}"))
+                   (succeeds (= "Object" (.getSimpleName ?super)))))
+  
+  (inspect (ekeko [?a] (NOSAspects ?a)))
+  (count (ekeko [?a] (NOSAspects ?a)))  
+ ;############################### NOJPS: How many join point shadows per advice? ###############################
+  (defn NOJPShadows [?aspectname ?adviceKind ?shadow]
+                  (l/fresh [?aspect ?advice]
+                           (NOAdvices ?aspect ?advice)
+                           (w/advice-shadow ?advice ?shadow)
+                           (equals ?aspectname (str "Aspect {"(.getSimpleName ?aspect)"}"))
+                           (equals ?adviceKind (str "Advice {"(.getKind ?advice)"}"))))
+  
+  (inspect (sort-by first (ekeko [?a ?ad ?s] (NOJPShadows ?a ?ad ?s))))
+  (count (ekeko [?a ?ad ?s] (NOJPShadows ?a ?ad ?s)))
+ ;############################### NOAG: How many args() are bound ? ###############################
+  (defn NOArgs [?shortAspect ?nameaspect ?pointdefs ?arg] 
+                            (l/fresh [?aspect ?advice ?args ?ar]
+                                     (NOAdvices ?aspect ?advice)
+                                     (equals ?shortAspect (str "Aspect {"(.getSimpleName ?aspect)"}"))
+                                     (equals ?pointdefs (.getPointcut ?advice))
+                                     (equals false (= "" (.toString  ?pointdefs)))
+                                     (equals ?nameaspect (str "Advice {"(.toString (.getKind ?advice))"}"))
+                                     (getArgs ?pointdefs ?args)
+                                     (equals ?ar (vec (into #{} ?args)))
+                                     (contains ?ar ?arg)))
+ 
+  (inspect  (sort-by first (ekeko [?shortAspect ?nameaspect ?list ?pointdefs] 
+                                      (NOArgs ?shortAspect ?nameaspect ?pointdefs ?list))))
+  (count (ekeko [?shortAspect ?nameaspect ?list ?pointdefs] 
+                                      (NOArgs ?shortAspect ?nameaspect ?pointdefs ?list)))
+  (defn getArgs [?pointcut ?arglist]
+   "it is responsible for the primitive pointcut called \"args\" "
+   (l/fresh [?result ?y]
+     (equals ?result (java.util.ArrayList. []))
+     (equals ?y (PPargs ?pointcut ?result))
+     (equals ?arglist ?result)))
+ 
+ (defn PPargs [pointcut res]
+   "a nested function \"PPargs\" is to pick up the related primitive poincut that its kind ID are 4!"
+   (if  (or (= (getPKind pointcut) 5 ) (= (getPKind pointcut) 6))
+      [(PPargs (getLeft pointcut) res) (PPargs (getRight pointcut) res)]
+      (if (= (getPKind pointcut) 4) (addargs res pointcut))))
+ 
+  (defn- addargs [lst selectedPointcut]
+   (.add lst selectedPointcut)) 
  ;############################### NOPointcuts ############################### ;aspect or class and its pointcut definitions
  (inspect (ekeko [?type ?pointdef] (w/type-pointcutdefinition ?type ?pointdef )))
  ;count aspects and its poincuts' definitions
@@ -600,6 +678,19 @@
  (inspect (ekeko [?c ?aspect] (ajdt/compilationunit-aspect ?c ?aspect)))
  
  ;)
+  
+  
+  (defn- getLeft [pointcut] 
+      (.getLeft pointcut))
+  
+  (defn- getRight [pointcut] 
+      (.getRight pointcut))
+ 
+  (defn- getPKind [pointcut] 
+      (.getPointcutKind pointcut))
+  
+  (defn- getKind [pointcut] 
+      (.getKind pointcut))  
   
   (defn- getInterfaces-soot [?mn]
          (l/fresh [?m]
