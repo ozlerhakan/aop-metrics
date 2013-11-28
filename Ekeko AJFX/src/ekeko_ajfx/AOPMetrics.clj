@@ -3,20 +3,12 @@
     :author "Hakan Ozler - ozler.hakan[at]gmail.com" }
   (:refer-clojure :exclude [== type declare class])
   (:require [clojure.core.logic :as l]
-            [clojure.core :as cr]
             [clojure.java.io :as io]
             [damp.ekeko.aspectj  
              [weaverworld :as w]  
-             [soot :as ajsoot] 
-             [ajdtastnode :as ajst] 
-             [ajdt :as ajdt]]
+             [soot :as ajsoot]]
             [damp.ekeko.soot     
-             [soot :as jsoot]] 
-            [damp.ekeko.jdt      
-             [reification :as reif] 
-             [javaprojectmodel :as jpm] 
-             [basic :as bsc] 
-             [astnode :as astn]])
+             [soot :as jsoot]])
   (:use [inspector-jay.core]
         [clojure.repl]
         [damp.ekeko logic]
@@ -25,93 +17,65 @@
         [damp.ekeko]
         [clojure.inspector :exclude [inspect]])
   (:import [soot.jimple IdentityStmt]
-    [soot.jimple.internal JimpleLocal]
-    [soot.jimple ThisRef ParameterRef]
-    [org.aspectj.lang Signature]
-    [java.lang Integer]
-    [org.eclipse.jdt.core IJavaElement ITypeHierarchy IType IPackageFragment IClassFile ICompilationUnit
-     IJavaProject WorkingCopyOwner IMethod]
-    [org.eclipse.jdt.core.dom Expression IVariableBinding ASTParser AST IBinding Type TypeDeclaration 
-     QualifiedName SimpleName ITypeBinding MethodDeclaration
-     MethodInvocation ClassInstanceCreation SuperConstructorInvocation SuperMethodInvocation
-     SuperFieldAccess FieldAccess ConstructorInvocation ASTNode ASTNode$NodeList CompilationUnit]
-    [org.aspectj.weaver.patterns Pointcut AndPointcut]))
+    [org.aspectj.lang Signature]))
 
  (comment )
 
  ;############################### METRIC LOC ###############################
- ;count the number of lines of java code & aspect code in a given project - except blank lines (comments & javadocs are still counted)
+
  (defn class-loc [filePath ignoredTestName]
+   "count the number of lines of java code in a given project - except blank lines (comments & javadocs are still counted)"
   (reduce
     +
     (for [file (file-seq  filePath) :when (and (.endsWith (.toString file )".java") (false? (lastIndexOfText (.toString file) ignoredTestName)))]
       (with-open [rdr (io/reader  file)] (count  (filter #(re-find #"\S" %) (line-seq rdr)))))))
 
-;(class-loc (io/file "C:/Users/HAKAN/runtime-New_configuration-clojure/Clojure-1/src/"))
-;(class-loc (io/file"C:/Users/HAKAN/Desktop/Thesis/ws/AJHotDraw/src/aspects"));36225
-(class-loc (io/file "C:/Users/HAKAN/runtime-New_configuration-clojure/Clojure-1/src/") "MainTST")
+ ;(class-loc (io/file"C:/Users/HAKAN/Desktop/Thesis/ws/AJHotDraw/src/aspects"));36225
+ ;(class-loc (io/file "C:/Users/HAKAN/runtime-New_configuration-clojure/Clojure-1/src/") "MainTST")
 
  (defn aspect-loc [filePath]
-  (reduce
-    +
-    (for [file (file-seq  filePath) :when (.endsWith (.toString file )".aj")]
-      (with-open [rdr (io/reader file)] (count  (filter #(re-find #"\S" %) (line-seq rdr)))))))
+   "count the number of lines of aspectj code in a given project - except blank lines (comments & javadocs are still counted)"
+   (reduce
+     +
+     (for [file (file-seq  filePath) :when (.endsWith (.toString file )".aj")]
+       (with-open [rdr (io/reader file)] (count  (filter #(re-find #"\S" %) (line-seq rdr)))))))
 
-;(aspect-loc (io/file "C:/Users/HAKAN/runtime-New_configuration-clojure/Clojure-1/src/"))
  ;(aspect-loc (io/file"C:/Users/HAKAN/Desktop/Thesis/ws/AJHotDraw/src/aspects"));2111
- ;(aspect-loc (io/file "C:/Users/HAKAN/workspace/PetstoreAspectJ/blueprints/petstore1.4/src"))
- (class-loc (io/file "C:/Users/HAKAN/runtime-New_configuration-clojure/Contract4J5/contract4j5/src"))
+ ;(class-loc (io/file "C:/Users/HAKAN/runtime-New_configuration-clojure/Contract4J5/contract4j5/src"))
+ 
  ;############################### METRIC VS ###############################
- ;the number of JAVA classes (.java) in a selected project
- ;(defn class-count [filePath]
- ; (reduce
- ;   +
- ;   (for [file (file-seq filePath) :when (.endsWith (.toString file ) ".java")] 1) ))
- ;(class-count (io/file "C:/Users/HAKAN/runtime-New_configuration-clojure/Contract4J5/contract4j5/src"));
-
- ;Number of Classes in the project except enums, interfaces, their sub-classes!!, and a test class.
+ 
  (defn NOClasses [?classes]
+   "Number of Classes in the project except enums, interfaces, their sub-classes!!, and a test class."
             (l/fresh []
                   (w/class ?classes)
                   (equals false (or                                   
-                          (.isEnum ?classes)
-                          (IndexOfText (.getName ?classes) "$");this line excludes all sub-classes!
-                          (lastIndexOfText (.getName ?classes) "MainTST");our initial main to activate soot analysis, so I ignore it
-                          (IndexOfText (.getName ?classes) "lang.Object")))))
+                                  (.isEnum ?classes)
+                                  (IndexOfText (.getName ?classes) "$");this line excludes all sub-classes!
+                                  (lastIndexOfText (.getName ?classes) "MainTST");our initial main to activate soot analysis, so I ignore it
+                                  (IndexOfText (.getName ?classes) "lang.Object")))))
  
  (inspect  (sort-by first (ekeko [?cn] (l/fresh [?c] (NOClasses ?c) (equals ?cn (.getName ?c))))))
  (count (ekeko [?cn] (l/fresh [?c] (NOClasses ?c) (equals ?cn (.getName ?c)))))
- ;the number of aspects in a selected project -- include sub-aspects
+ 
  (defn NOAspects [?aspects ?source]  
+   "the number of aspects in a selected project"
    (l/fresh []
-           (w/aspect ?aspects) 
-           (equals ?source (.getSourceLocation ?aspects))));just to be sure!
+            (w/aspect ?aspects) 
+            (equals ?source (.getSourceLocation ?aspects))))
  
  (inspect (sort-by first (ekeko [?an] (l/fresh [?as ?sour] (NOAspects ?as ?sour) (equals ?an (.getName ?as))))))
- (count (ekeko [?an] (l/fresh [?as ?sour] (NOAspects ?as ?sour) (equals ?an (.getName ?as)))))
- 
- ;the number of aspectj (.aj) files in a project!  Just an additional query, it is not relating with the main query!  
- ;(defn aspect-count [filePath]
- ; (reduce
- ;   +
- ;   (for [file (file-seq filePath) :when (.endsWith (.toString file )".aj")] 1) ))
- ;(aspect-count (io/file "C:/Users/HAKAN/workspace/PetstoreAspectJ/blueprints/petstore1.4/src"))
- ;############################### METRIC NOAttributes-fields ###############################
- ;(inspect  (ekeko [?fields] (w/field ?fields)));get the entire fields from the weaver
- 
- ;only works for aspects to count the number of fields!
- ;(inspect (ekeko [?fields] (ajdt/field ?fields)));Relation of fields declared ONLY within aspects
- ;(count (ekeko [?fields] (ajdt/field ?fields )));
- ;(inspect (ekeko [?aspect ?f] (ajdt/aspect-field ?aspect ?f)));same as ajdt/field; for aspect!
+ (count (ekeko [?an] (l/fresh [?as ?sour] (NOAspects ?as ?sour) (equals ?an (.getName ?as))))) 
 
+ ;############################### METRIC NOAttributes (fields) ###############################
  ;get a specific class and its fields in terms of a package name
  (inspect (ekeko [?t ?f] 
                  (w/type-fields ?t ?f)
                  (succeeds (IndexOfText (.toString ?t) "InvariantTypeConditions"))))
  
-;count-fields-in both CLASSES and ASPECTS except their sub-classes' fields!!
-(defn count-fields-in-modules [?c ?f]
-         (l/fresh []
+ (defn count-fields-in-modules [?c ?f]
+   "count fields both CLASSES and ASPECTS except their sub-classes' fields"
+          (l/fresh []
                      (w/type-field ?c ?f)
                      (equals false (.isEnum ?c))
                      (equals false (.isInterface ?c))
@@ -126,45 +90,45 @@
  (count (ekeko [?c ?f] (count-fields-in-modules ?c ?f))) 
 
  ;############################### METRIC NOOperations (methods and advices) ###############################
- ;METHODS: both all classes and aspects
- ;(inspect (ekeko [?methods] (w/method ?methods)))
 
- ;NUMBER OF METHODS: only responsible for classes!  - construct methods including 
  (defn classes-methods [?typesn ?methods]
-                (l/fresh [?types]
-                         (NOClasses ?types)
-                         (w/type-method ?types ?methods)
-                         (equals ?typesn (.getName ?types))
-                         (succeeds (empty? (filter #(re-matches #"\S+\$\S+" %) [(.getName ?types)])))
-                         (equals false (= "STATIC_INITIALIZATION" (.toString (.getKind ?methods))))
-                         (succeeds (empty? (filter #(re-matches #"\S+\$([1-9]|0)+" %) [(.getName ?methods)])))))
-                         ;(succeeds (empty? (filter #(re-matches #"\S+\$[1-9]+" %) [(.getName (.getDeclaringType ?methods))])))
-                         ;(succeeds (IndexOfText (.toString (.getName ?types)) "org.contract4j5.reporter.Severity" ))))
+   "number of methods declared in classes"
+   (l/fresh [?types]
+            (NOClasses ?types)
+            (w/type-method ?types ?methods)
+            (equals ?typesn (.getName ?types))
+            (succeeds (empty? (filter #(re-matches #"\S+\$\S+" %) [(.getName ?types)])))
+            (equals false (= "STATIC_INITIALIZATION" (.toString (.getKind ?methods))))
+            (succeeds (empty? (filter #(re-matches #"\S+\$([1-9]|0)+" %) [(.getName ?methods)])))))
+           ;(succeeds (empty? (filter #(re-matches #"\S+\$[1-9]+" %) [(.getName (.getDeclaringType ?methods))])))
+           ;(succeeds (IndexOfText (.toString (.getName ?types)) "org.contract4j5.reporter.Severity" ))))
  ;1 Classs
  (inspect (sort-by first (ekeko [?types ?m] (classes-methods ?types ?m))))
  (count ( ekeko [?types ?m] (classes-methods ?types ?m)))
 
- ;exclude construct methods of classes!
- (defn classes-methods-without-constructs [?t ?m]
-             (l/fresh []
-                  (classes-methods ?t ?m)
-                  (equals false (= 3 (.getKey (.getKind ?m))))))
- ;1 Class -nonConstructs
- (inspect(sort-by first (ekeko [?t ?m] (classes-methods-without-constructs ?t ?m))))
- (count (ekeko [?t ?m] (classes-methods-without-constructs ?t ?m)))
+ (defn classes-methods-without-constructors [?t ?m]
+   "exclude constructor(s) of classes"
+   (l/fresh []
+        (classes-methods ?t ?m)
+        (equals false (= 3 (.getKey (.getKind ?m))))))
+ 
+ ;1 Class
+ (inspect(sort-by first (ekeko [?t ?m] (classes-methods-without-constructors ?t ?m))))
+ (count (ekeko [?t ?m] (classes-methods-without-constructors ?t ?m)))
 
- ;2 Aspect : find basic method declarations in aspect files
+ ;2 Aspect : 
  (defn aspects-methods [?aspects ?methods]
-                (l/fresh [?tname ?source ?methodName]
-                        (NOAspects ?aspects ?source)
-                        (w/type-method ?aspects ?methods)
-                        (equals ?tname (.getClassName ?aspects))
-                        (equals ?methodName (.getName ?methods))
-                        (equals false (= 8 (.getModifiers ?methods)))
-                        (equals false (.startsWith (.getName ?methods) "ajc"))
-                        (equals false (or (= "hasAspect" (.getName ?methods)) 
-                                          (= "aspectOf" (.getName ?methods)) 
-                                          (= "<init>" (.getName ?methods))))))
+   "find method declarations in aspect files"
+   (l/fresh [?tname ?source ?methodName]
+            (NOAspects ?aspects ?source)
+            (w/type-method ?aspects ?methods)
+            (equals ?tname (.getClassName ?aspects))
+            (equals ?methodName (.getName ?methods))
+            (equals false (= 8 (.getModifiers ?methods)))
+            (equals false (.startsWith (.getName ?methods) "ajc"))
+            (equals false (or (= "hasAspect" (.getName ?methods)) 
+                              (= "aspectOf" (.getName ?methods)) 
+                              (= "<init>" (.getName ?methods))))))
 
  (inspect (sort-by first  (ekeko [?tn ?m] (l/fresh [?t] (aspects-methods ?t ?m) (equals ?tn (.getClassName ?t))))))
  (count (ekeko [?tn ?m] (l/fresh [?t] (aspects-methods ?t ?m) (equals ?tn (.getClassName ?t)))))
@@ -172,81 +136,75 @@
  ;-------------------------------------------------------------
  ;    intertyped method declarations =>  METRIC NOOI (methods and advices and intertype methods)
  
- ;METHODS: only intertyped method declarations
- ;2.2 Aspect : get the all intertype method declaration implemented in a project
- (defn aspects-intertyped-methods [?decAspect ?methods]
-                (l/fresh [?types]
-                          (w/type-method ?types ?methods)
-                          (succeeds   (.isAspect ?types))
-                          (equals ?decAspect (.getName (.getDeclaringType ?methods)))
-                          (succeeds   (.startsWith (.getName ?methods) "ajc$interMethod$"))));$AFTER,$BEFORE, so on...
-
- (inspect (sort-by first (ekeko [?decAspect ?methods] (aspects-intertyped-methods  ?decAspect ?methods))))
- (count (ekeko [?get ?decAspect] (aspects-intertyped-methods ?get ?decAspect)))
- 
- ;2.2 Aspect get the all intertype method declaration implemented in a project except abstracts
+ ;2.2 Aspect 
  (defn intertype-methods [?i] 
-                       (l/fresh [] 
-                            (w/intertype|method ?i)
-                            (equals false (.isAbstract (.getSignature ?i)))))
+   "get the all intertype method declarations implemented in a project except abstracts intertype method declarations"
+   (l/fresh [] 
+            (w/intertype|method ?i)
+            (equals false (.isAbstract (.getSignature ?i)))))
  
   (inspect (ekeko [?i] (intertype-methods ?i)))
   (count (ekeko [?i] (intertype-methods ?i)))
  ;COUNT: 1 class + 2 aspect + 2.2 aspect :RESULT combines with 
 
  ;-------------------------------------------------------------------------------------------------
- ;NUMBER OF ADVICES
-(defn NOAdvices [?aspect ?adv]  
-              (l/fresh []
-                   (w/advice ?adv)
-                   (equals ?aspect (.getConcreteAspect ?adv))
-                   (equals false (IndexOfText (.getName (.getClass ?adv)) "Checker"))
-                   (equals false (or
-                                   (or (.isCflow (.getKind ?adv)) (.isPerEntry (.getKind ?adv)))
-                                   (= "softener" (.getName (.getKind ?adv)))));I must exclude perThis, perTarget , perCflow, Cflow, CflowBelow, softener, and Checker(warning)!!
-                   (equals false (= "" (.toString (.getPointcut ?adv))))))
-                   ;(equals true (= (.getName ?aspect) (.getName (.getDeclaringType (.getSignature ?adv)))))))
+ 
+ (defn NOAdvices [?aspect ?adv]  
+   "Collect all advices"
+   (l/fresh []
+            (w/advice ?adv)
+            (equals ?aspect (.getConcreteAspect ?adv))
+            (equals false (IndexOfText (.getName (.getClass ?adv)) "Checker"))
+            (equals false (or
+                            (or (.isCflow (.getKind ?adv)) (.isPerEntry (.getKind ?adv)))
+                            (= "softener" (.getName (.getKind ?adv)))));I must exclude perThis, perTarget , perCflow, Cflow, CflowBelow, softener, and Checker(warning)!!
+            (equals false (= "" (.toString (.getPointcut ?adv))))))
+            ;(equals true (= (.getName ?aspect) (.getName (.getDeclaringType (.getSignature ?adv)))))))
 
 (inspect (sort-by first (ekeko [?an ?adv] (l/fresh [?a] (NOAdvices ?a ?adv) (equals ?an (.toString ?a))))))
 (count (ekeko [?a ?adv] (NOAdvices ?a ?adv)))
 
- ;############################### Advice-Method dependence (AM) :the number of method calls per advice body ###############################
+ ;############################### Advice-Method dependence (AM) ###############################
  (defn get-soot-advice|method [?aspectName ?calledmethods ?soot|methodName]
-               (l/fresh [?soot|method ?advice ?aspect ?soot]
-                         (NOAdvices ?aspect ?advice)
-                         (ajsoot/advice-soot|method ?advice ?soot|method)
-                         (NOMethodCalls ?soot|method ?aspectName ?calledmethods ?soot|methodName)))
+   "the number of method calls per advice body"
+   (l/fresh [?soot|method ?advice ?aspect ?soot]
+            (NOAdvices ?aspect ?advice)
+            (ajsoot/advice-soot|method ?advice ?soot|method)
+            (NOMethodCalls ?soot|method ?aspectName ?calledmethods ?soot|methodName)))
  
  (inspect (sort-by first (ekeko [?aspectName ?calledmethods ?soot|methodName] (get-soot-advice|method ?aspectName ?calledmethods ?soot|methodName))))
  (count (sort-by first (ekeko [?aspectName ?calledmethods ?soot|methodName] (get-soot-advice|method ?aspectName ?calledmethods ?soot|methodName)))) 
- ;############################### IntertypeMethod-Method dependence (IM) :the number of method calls per intertype method body ###############################
+ ;############################### IntertypeMethod-Method dependence (IM) ###############################
  (defn get-soot-intertype|method [?aspectName ?calledmethods ?soot|interName]
-               (l/fresh [?soot ?itmethod ?units ?unit ?soot  ?inter|method ?soot|methodName]
-                         (ajsoot/intertype|method-soot|method ?itmethod ?soot)
-                         (succeeds (.hasActiveBody ?soot))
-                         (equals ?units (.getUnits (.getActiveBody ?soot)))
-                         (contains ?units ?unit)
-                         (succeeds (.containsInvokeExpr ?unit))
-             	           (succeeds (or (= "soot.jimple.internal.JAssignStmt" (.getName (.getClass ?unit)))  
-                                       (= "soot.jimple.internal.JInvokeStmt" (.getName (.getClass ?unit)))))
-                         (succeeds (.containsInvokeExpr ?unit))
-                         (equals ?inter|method (.getMethod (.getInvokeExpr ?unit)))
-                         (NOMethodCalls ?inter|method ?aspectName ?calledmethods ?soot|methodName)
-                         (equals ?soot|interName (str "InterMethod {"(subs ?soot|methodName (+ (.lastIndexOf ?soot|methodName "$") 1))))))
+   "the number of method calls per intertype method declaration body"
+   (l/fresh [?soot ?itmethod ?units ?unit ?soot  ?inter|method ?soot|methodName]
+            (ajsoot/intertype|method-soot|method ?itmethod ?soot)
+            (succeeds (.hasActiveBody ?soot))
+            (equals ?units (.getUnits (.getActiveBody ?soot)))
+            (contains ?units ?unit)
+            (succeeds (.containsInvokeExpr ?unit))
+            (succeeds (or (= "soot.jimple.internal.JAssignStmt" (.getName (.getClass ?unit)))  
+                          (= "soot.jimple.internal.JInvokeStmt" (.getName (.getClass ?unit)))))
+            (succeeds (.containsInvokeExpr ?unit))
+            (equals ?inter|method (.getMethod (.getInvokeExpr ?unit)))
+            (NOMethodCalls ?inter|method ?aspectName ?calledmethods ?soot|methodName)
+            (equals ?soot|interName (str "InterMethod {"(subs ?soot|methodName (+ (.lastIndexOf ?soot|methodName "$") 1))))))
  
  (inspect (sort-by first (ekeko [ ?aspectName ?calledmethods ?soot|interName ] (get-soot-intertype|method  ?aspectName ?calledmethods ?soot|interName ))))
+ (count (ekeko [ ?aspectName ?calledmethods ?soot|interName ] (get-soot-intertype|method  ?aspectName ?calledmethods ?soot|interName )))
  
  (inspect (ekeko [?soot]
                  (l/fresh [ ?itmethod]
                           (ajsoot/intertype|method-soot|method ?itmethod ?soot)
                           (equals true (= (.getName ?soot) "aspectUpdating")))))
  
- ;############################### Method-Method dependence (MM) :the number of method calls per method body declared in aspects ###############################
+ ;############################### Method-Method dependence (MM) ###############################
  (defn get-ajmethods-soot|method [ ?aspectName ?calledmethods ?soot|methodName]
-               (l/fresh [?aspect ?ajmethod ?soot|method]
-                        (aspects-methods ?aspect ?ajmethod)
-                        (ajsoot/method-soot|method ?ajmethod ?soot|method);new function has been created in the Ekeko AspectJ project -> /EkekoAspectJ/src/damp/ekeko/aspectj/soot.clj Line: 113
-                        (NOMethodCalls ?soot|method ?aspectName ?calledmethods ?soot|methodName)))
+   "the number of method calls per method body declared in aspects"
+   (l/fresh [?aspect ?ajmethod ?soot|method]
+            (aspects-methods ?aspect ?ajmethod)
+            (ajsoot/method-soot|method ?ajmethod ?soot|method);new function has been created in the Ekeko AspectJ project -> /EkekoAspectJ/src/damp/ekeko/aspectj/soot.clj Line: 113
+            (NOMethodCalls ?soot|method ?aspectName ?calledmethods ?soot|methodName)))
  
  (inspect (count (sort-by first (ekeko [ ?aspectName  ?soot|methodName ?calledmethods]   (get-ajmethods-soot|method  ?aspectName ?calledmethods ?soot|methodName)))))
  (count (ekeko [ ?aspectName  ?soot|methodName ?calledmethods] (get-ajmethods-soot|method  ?aspectName ?calledmethods ?soot|methodName)))
@@ -279,8 +237,8 @@
                       (contains ?classes ?class)
                       (succeeds (IndexOfText (.getName ?class) "org.contract4j5.aspects.InvariantCtorConditions")))))
 
-;################################## Main Function for the 3 Metrics, It is working.. (I hope so) ####################################
- (defn NOMethodCalls [?soot|method ?aspectName ?calledmethods ?soot|methodName]; ?method : class soot.SootMethod
+;################################## Main Function for the above 3 Metrics, It is working.. (I hope so) ####################################
+ (defn NOMethodCalls [?soot|method ?aspectName ?calledmethods ?soot|methodName]
           (l/fresh [?units ?sootMDeclass]
             (succeeds (.hasActiveBody ?soot|method))
             (soot|unit-getDeclarationClassname ?soot|method ?aspectName)
@@ -326,10 +284,11 @@
                   (= "aspectOf" (.getName (.getMethod (.getValue (.getInvokeExprBox ?calledmethods)))))
                   (= "makeJP" (.getName (.getMethod (.getValue (.getInvokeExprBox ?calledmethods)))))))))
  
- ;############################### Attribute-Class dependence Measure (AtC) ###############################
- ;Definition : if a class is the type of an field of an aspect - - count the number of types that belong to fields in aspects
+ ;############################### Attribute-Class dependence (AtC) ###############################
+ ;Definition : if a class is the type of an field of an aspect 
  ;Filtering primitive types and interfaces that could be the type of a field!
   (defn getField-AtC [?aspectName ?fieldName ?fieldTypeName] 
+    "count the number of types of fields in aspects"
          (l/fresh [?field ?aspect ?isSameInterface ?signature ?fieldType]
                  (w/type-field ?aspect ?field)
                  (succeeds (.isAspect ?aspect))
@@ -343,6 +302,8 @@
                  (equals ?fieldName  (str "<Field name: " (.getName ?field) ">"))))
  
  (inspect (sort-by first (ekeko [?typef ?f ?t] (getField-AtC ?t ?f ?typef))))
+ (count (ekeko [?typef ?f ?t] (getField-AtC ?t ?f ?typef)))
+ 
  ;############################### Advice-Class  dependence (AC) ###############################
  ; if a class is  the type of a parameter of a piece of advice of an aspect 
  (defn getAC-p1 [?aspectSN ?adviceKind ?typename] 
@@ -378,35 +339,39 @@
   (inspect (sort-by first  (clojure.set/union
                             (ekeko [?vari ?as ?ad ] (getAC-p1 ?as ?ad ?vari))
                             (ekeko [?vari ?as ?ad ] (getAC-p2 ?as ?ad ?vari)))))
+  (count  (clojure.set/union
+            (ekeko [?vari ?as ?ad ] (getAC-p1 ?as ?ad ?vari))
+            (ekeko [?vari ?as ?ad ] (getAC-p2 ?as ?ad ?vari))))
  ;############################### Intertype method-Class dependence (IC) ###############################
  ;if classes are the type of  parameters or return type of intertype method declarations in aspects of a given AspectJ App
  
- ;find all return types of intertype method declarations
  (defn measureIC-returnType [?aspect ?interName ?type ?returnname] 
-         (l/fresh [?isInterface ?i ?return] 
-                  (intertype-methods ?i)
-                  (equals ?aspect (str "Aspect {"(.getName (.getAspectType ?i))"}"))
-                  (equals ?return (.getReturnType (.getSignature ?i)))
-                  (equals false (.isPrimitiveType ?return));except primitive types
-                  (equals ?returnname  (.getName ?return))
-                  (equals ?isInterface (getInterface ?returnname));except interfaces
-                  (succeeds  (nil? ?isInterface))
-                  (equals ?type (str "RETURN"))
-                  (equals ?interName (str (.getClassName (.getDeclaringType (.getSignature (.getMunger ?i))))"."(.getName (.getSignature ?i))))))
+   "find all return types of intertype method declarations"
+   (l/fresh [?isInterface ?i ?return] 
+            (intertype-methods ?i)
+            (equals ?aspect (str "Aspect {"(.getName (.getAspectType ?i))"}"))
+            (equals ?return (.getReturnType (.getSignature ?i)))
+            (equals false (.isPrimitiveType ?return));except primitive types
+            (equals ?returnname  (.getName ?return))
+            (equals ?isInterface (getInterface ?returnname));except interfaces
+            (succeeds  (nil? ?isInterface))
+            (equals ?type (str "RETURN"))
+            (equals ?interName (str (.getClassName (.getDeclaringType (.getSignature (.getMunger ?i))))"."(.getName (.getSignature ?i))))))
  
  (inspect (sort-by first  (ekeko [?aspect ?interName ?type ?return] (measureIC-returnType ?aspect ?interName ?type ?return))))
- ;find all parameter types of intertype method declarations
+
  (defn measureIC-parameters [?aspect ?interName ?param ?variName] 
+   "find all parameter types of intertype method declarations"
 	       (l/fresh [?v ?isInterface ?i ?vari] 
 	                (intertype-methods ?i)
 	                (equals ?aspect (str "Aspect {"(.getName (.getAspectType ?i))"}"))
 	                (equals ?v (.getParameterTypes (.getSignature ?i)))
-	                (contains ?v ?vari)
-	                (equals false (.isPrimitiveType ?vari));except primitive types
-	                (equals ?variName  (.getName ?vari))
+	                 (contains ?v ?vari)
+	                 (equals false (.isPrimitiveType ?vari));except primitive types
+	                 (equals ?variName  (.getName ?vari))
 	                (equals ?isInterface (getInterface ?variName));except interfaces
-	                (succeeds  (nil? ?isInterface))
-	                (equals ?param (str "PARAM"))
+	                 (succeeds  (nil? ?isInterface))
+	                 (equals ?param (str "PARAM"))
 	                (equals ?interName (str (.getClassName (.getDeclaringType (.getSignature (.getMunger ?i))))"."(.getName (.getSignature ?i))))))
  
  (inspect (sort-by first  (ekeko [?aspect ?interName ?type ?variName] (measureIC-parameters ?aspect ?interName ?type ?variName))))
@@ -415,35 +380,38 @@
   (inspect (sort-by first (clojure.set/union
                             (ekeko [?vari ?as ?a ?t ] (measureIC-returnType ?as ?a ?t ?vari))
                             (ekeko [?vari ?as ?a ?t ] (measureIC-parameters ?as ?a ?t ?vari)))))
+  (count (clojure.set/union
+           (ekeko [?vari ?as ?a ?t ] (measureIC-returnType ?as ?a ?t ?vari))
+           (ekeko [?vari ?as ?a ?t ] (measureIC-parameters ?as ?a ?t ?vari))))
   
  ;############################### Method-Class dependence (MC) ###############################
  ;Definition: if classes are the type(s) of parameters or return type(s) of method declarations in aspects of a given AspectJ App
  (defn measureMC-param [?aspectn ?methodN ?paramName ?rtype] 
    (l/fresh [?aspect ?params ?method ?param ?isInterface]
-     (aspects-methods ?aspect ?method)
-     (equals ?aspectn (str "Aspect {"(.getSimpleName ?aspect) "}"))
-     (equals ?params (.getParameterTypes ?method))
-     (contains ?params ?param)
-     (equals false (.isPrimitiveType ?param))
-     (equals ?paramName (.getName ?param))
-     (equals ?isInterface (getInterface ?paramName));except interface classes
-     (succeeds  (nil? ?isInterface))
-     (equals ?methodN (str "<Method Name: "(.getName ?method)">"))
-     (equals ?rtype (str "PARAM"))))
+            (aspects-methods ?aspect ?method)
+            (equals ?aspectn (str "Aspect {"(.getSimpleName ?aspect) "}"))
+            (equals ?params (.getParameterTypes ?method))
+            (contains ?params ?param)
+            (equals false (.isPrimitiveType ?param))
+            (equals ?paramName (.getName ?param))
+            (equals ?isInterface (getInterface ?paramName));except interface classes
+            (succeeds  (nil? ?isInterface))
+            (equals ?methodN (str "<Method Name: "(.getName ?method)">"))
+            (equals ?rtype (str "PARAM"))))
   
  (inspect (sort-by first  (ekeko [?p ?A ?m ?r] (measureMC-param ?A ?m ?p ?r))))
   
  (defn measureMC-return [?aspectn ?methodN ?returnName ?rtype] 
    (l/fresh [?aspect ?return ?method ?isInterface]
-     (aspects-methods ?aspect ?method)
-     (equals ?aspectn (str "Aspect {"(.getSimpleName ?aspect) "}"))
-     (equals ?return (.getReturnType ?method))
-     (equals false (.isPrimitiveType ?return))
-     (equals ?returnName (.getName ?return))
-     (equals ?isInterface (getInterface ?returnName));except interface classes
-     (succeeds  (nil? ?isInterface))
-     (equals ?methodN (str "<Method Name: "(.getName ?method)">"))
-     (equals ?rtype (str "RETURN"))))
+            (aspects-methods ?aspect ?method)
+            (equals ?aspectn (str "Aspect {"(.getSimpleName ?aspect) "}"))
+            (equals ?return (.getReturnType ?method))
+            (equals false (.isPrimitiveType ?return))
+            (equals ?returnName (.getName ?return))
+            (equals ?isInterface (getInterface ?returnName));except interface classes
+            (succeeds  (nil? ?isInterface))
+            (equals ?methodN (str "<Method Name: "(.getName ?method)">"))
+            (equals ?rtype (str "RETURN"))))
   
   (inspect (sort-by first  (ekeko [?p ?A ?m ?r] (measureMC-return ?A ?m ?p ?r))))
    
@@ -451,10 +419,13 @@
   (inspect (sort-by first (clojure.set/union
                             (ekeko [?vari ?A ?m ?r] (measureMC-param ?A ?m ?vari ?r))
                             (ekeko [?vari ?A ?m ?r] (measureMC-return ?A ?m ?vari ?r)))))
+  (count (clojure.set/union
+                            (ekeko [?vari ?A ?m ?r] (measureMC-param ?A ?m ?vari ?r))
+                            (ekeko [?vari ?A ?m ?r] (measureMC-return ?A ?m ?vari ?r))))
   
   ;############################### Pointcut-Class dependence (PC) ###############################
-  ;if a class is the type of a parameter of a pointcut (poincutDefinition) in an aspect
   (defn measurePC [?typename ?pn ?aspect] 
+    "if a class is the type of a parameter of a pointcut (poincutDefinition) in an aspect"
     (l/fresh [?point ?types ?type ?isInterface]
              (w/pointcutdefinition ?point)
              (equals ?types (.getParameterTypes ?point))
@@ -514,7 +485,7 @@
  (inspect (sort-by first (ekeko [?shortAspect ?advicekind ?pointdefs ?list] (returnVectorForm-unfiltered ?shortAspect ?advicekind ?pointdefs ?list))))
  
  ;consider only declaring type of fields, methods, and constructors , here we go...
- ;gathering the all primitive pointcuts that have a complete module name!! - (not look at the return type of eack item's name or items' name)
+ ;gathering the all primitive pointcuts that have a complete module name!! - (not look at the name of each return type or items' name)
  (defn returnVectorForm-filtered [?shortAspect ?itemName ?advicekind ?pointdefs]
              (l/fresh [?list ?item ?decType ?excTypeName ?isInterface]
                         (returnVectorForm-unfiltered ?shortAspect ?advicekind ?pointdefs ?list)
@@ -551,7 +522,7 @@
       [(calls (getLeft pointcut) res) (calls (getRight pointcut) res)]
       (if (= (getPKind pointcut) 1) (addlist res pointcut))))
  
- ;############################### BasicAdvice : How many advice have a pointcut that uses more than the basics? ###############################
+ ;############################### BasicAdvice : How many advice have a pointcut that uses more than the basic primitive pointcuts? ###############################
  (defn NOBAdvices [?total]
    (l/fresh [?advicesize ?advancesize ?aspect ?advice ?shortAspect ?nameaspect ?pointdefs ?list]
        (equals ?advicesize (count  (ekeko [?aspect ?advice] (NOAdvices ?aspect ?advice))))
@@ -561,7 +532,7 @@
  (ekeko [?size ] (NOBAdvices ?size))
  
  ;###############################* AdvanceAdvice : How many advice depend on constructs that can only be determined at runtime? ###############################
- ; count NOAAdvice that have a poincut has at least one of the advance primitive pointcuts such as if, adviceexecution, cflow, and cflowbelow.
+ ; count NOAAdvice that have a poincut has at least one the advance primitive pointcuts such as if, adviceexecution, cflow, and cflowbelow.
   (defn NOAAdvice [?shortAspect ?advicekind ?pointdefs ?ar]
                             (l/fresh [?aspect ?advice ?advices]
                                      (NOAdvices ?aspect ?advice)
@@ -588,7 +559,7 @@
       (if (and (= (getPKind pointcut) 1) (= "adviceexecution" (.toString (getKind pointcut)))) (addlist res pointcut) 
          (if (or (= (getPKind pointcut) 9) (= (getPKind pointcut) 10)) (addlist res pointcut)))))
  
- ;############################### IAM : Do aspects often inherit from abstract aspects? ###############################
+ ;############################### IA : Do aspects often inherit from abstract aspects? ###############################
  (defn NOIAspects [?aspectname ?abstname]
          (l/fresh  [?aspect ?source ?super]
                    (NOAspects ?aspect ?source)
@@ -639,18 +610,20 @@
   (count (ekeko [?a ?ad ?s] (NOJPShadows ?a ?ad ?s)))
   
  ;###############################* NOAG: How many args() are bound? ###############################
+ ;search in each pointcut for an args() 
   (defn NOArgs [?shortAspect ?advicekind ?pointdefs ?arg] 
-                            (l/fresh [?aspect ?advice ?args ?ar]
-                                     (NOAdvices ?aspect ?advice)
-                                     (equals ?shortAspect (str "Aspect {"(.getSimpleName ?aspect)"}"))
-                                     (equals ?pointdefs (.getPointcut ?advice))
-                                     (equals ?advicekind (str "Advice {"(.toString (.getKind ?advice))"}"))
-                                     (getArgs ?pointdefs ?args)
-                                     (equals ?ar (vec (into #{} ?args)))
-                                     (contains ?ar ?arg)))
+    (l/fresh [?aspect ?advice ?args ?ar]
+             (NOAdvices ?aspect ?advice)
+             (equals ?shortAspect (str "Aspect {"(.getSimpleName ?aspect)"}"))
+             (equals ?pointdefs (.getPointcut ?advice))
+             (equals ?advicekind (str "Advice {"(.toString (.getKind ?advice))"}"))
+             (getArgs ?pointdefs ?args)
+             (equals ?ar (vec (into #{} ?args)))
+             (contains ?ar ?arg)))
  
   (inspect  (sort-by first (ekeko [?shortAspect ?advicekind ?list ?pointdefs] (NOArgs ?shortAspect ?advicekind ?pointdefs ?list))))
   (count (ekeko [?shortAspect ?advicekind ?list ?pointdefs] (NOArgs ?shortAspect ?advicekind ?pointdefs ?list)))
+  
   (defn getArgs [?pointcut ?arglist]
    "it is responsible for the primitive pointcut called \"getArgs\" "
    (l/fresh [?result ?y]
@@ -665,7 +638,7 @@
       (if (= (getPKind pointcut) 4) (addargs res pointcut))))
  
  ;############################### NOnPC: In how many around advice is it possible to (not) execute a proceed call ###############################
-  (defn NOPC [?aspectName ?soot|methodName]; ?method : class soot.SootMethod
+  (defn NOPC [?aspectName ?soot|methodName]
           (l/fresh [?aspect ?adv ?soot|advicemethod ?units ?unit]
             (NOAdvices ?aspect ?adv)
             (ajsoot/advice-soot|method ?adv ?soot|advicemethod)
@@ -861,7 +834,7 @@
                  (NOAClasses ?advc)
                  (succeeds (= ?name ?advc)))))
  
- ;############################### NOW: How often are wildcards used in method/constructor-call/execution? ###############################
+ ;############################### NOW: How often are wildcards used in modules declared in method/constructor-call/execution? ###############################
  (defn NOWilcards [?shortAspect ?itemName ?advicekind]
    (l/fresh [?callexecution ?isInterface ?pointdefs ?excTypeName ?decType]
             (CE ?shortAspect ?advicekind  ?callexecution ?pointdefs );line 790
