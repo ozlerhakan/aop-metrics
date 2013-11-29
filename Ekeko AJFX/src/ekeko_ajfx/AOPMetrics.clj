@@ -46,12 +46,12 @@
  ;############################### METRIC VS ###############################
  
  (defn NOClasses [?classes]
-   "Number of Classes in the project except enums, interfaces, their sub-classes!!, and a test class."
+   "Number of Classes in the project except enums, interfaces, their nested-classes!!, and a test class."
             (l/fresh []
                   (w/class ?classes)
                   (equals false (or                                   
                                   (.isEnum ?classes)
-                                  (IndexOfText (.getName ?classes) "$");this line excludes all sub-classes!
+                                  (IndexOfText (.getName ?classes) "$");this line excludes all nested-classes!
                                   (lastIndexOfText (.getName ?classes) "MainTST");our initial main to activate soot analysis, so I ignore it
                                   (IndexOfText (.getName ?classes) "lang.Object")))))
  
@@ -74,7 +74,7 @@
                  (succeeds (IndexOfText (.toString ?t) "InvariantTypeConditions"))))
  
  (defn count-fields-in-modules [?c ?f]
-   "count fields both CLASSES and ASPECTS except their sub-classes' fields"
+   "count fields both CLASSES and ASPECTS except their nested-classes' fields"
           (l/fresh []
                      (w/type-field ?c ?f)
                      (equals false (.isEnum ?c))
@@ -362,17 +362,17 @@
 
  (defn measureIC-parameters [?aspect ?interName ?param ?variName] 
    "find all parameter types of intertype method declarations"
-	       (l/fresh [?v ?isInterface ?i ?vari] 
-	                (intertype-methods ?i)
-	                (equals ?aspect (str "Aspect {"(.getName (.getAspectType ?i))"}"))
-	                (equals ?v (.getParameterTypes (.getSignature ?i)))
-	                 (contains ?v ?vari)
-	                 (equals false (.isPrimitiveType ?vari));except primitive types
-	                 (equals ?variName  (.getName ?vari))
-	                (equals ?isInterface (getInterface ?variName));except interfaces
-	                 (succeeds  (nil? ?isInterface))
-	                 (equals ?param (str "PARAM"))
-	                (equals ?interName (str (.getClassName (.getDeclaringType (.getSignature (.getMunger ?i))))"."(.getName (.getSignature ?i))))))
+   (l/fresh [?v ?isInterface ?i ?vari] 
+            (intertype-methods ?i)
+            (equals ?aspect (str "Aspect {"(.getName (.getAspectType ?i))"}"))
+            (equals ?v (.getParameterTypes (.getSignature ?i)))
+            (contains ?v ?vari)
+            (equals false (.isPrimitiveType ?vari));except primitive types
+            (equals ?variName  (.getName ?vari))
+            (equals ?isInterface (getInterface ?variName));except interfaces
+            (succeeds  (nil? ?isInterface))
+            (equals ?param (str "PARAM"))
+            (equals ?interName (str (.getClassName (.getDeclaringType (.getSignature (.getMunger ?i))))"."(.getName (.getSignature ?i))))))
  
  (inspect (sort-by first  (ekeko [?aspect ?interName ?type ?variName] (measureIC-parameters ?aspect ?interName ?type ?variName))))
 
@@ -532,7 +532,7 @@
  (ekeko [?size ] (NOBAdvices ?size))
  
  ;###############################* AdvanceAdvice : How many advice depend on constructs that can only be determined at runtime? ###############################
- ; count NOAAdvice that have a poincut has at least one the advance primitive pointcuts such as if, adviceexecution, cflow, and cflowbelow.
+ ; count NOAAdvice that have a poincut has at least one of the advance primitive pointcuts such as if, adviceexecution, cflow, and cflowbelow.
   (defn NOAAdvice [?shortAspect ?advicekind ?pointdefs ?ar]
                             (l/fresh [?aspect ?advice ?advices]
                                      (NOAdvices ?aspect ?advice)
@@ -686,9 +686,9 @@
  ;Number of Before/After advices
  (+ (countNOAfter) (countNOBefore))
  
- ;############################### NOACsC: Do aspects often advise classes with a lot of subclasses?--how many advised classes that have subclasses? ###############################
+ ;############################### NOACsC: Do aspects often advise classes with a lot of subclasses?--how many advised classes that have subclasses? ############################### 
  (defn NOClasses-executions [?classname]
-   "collect all the advised classes -method/constructor execution"
+   "collect all the advised classes -method/constructor execution" 
    (l/fresh [?aspect ?advice ?shadow ?class]
             (NOAdvices ?aspect ?advice)
             (w/advice-shadow ?advice ?shadow)
@@ -813,26 +813,15 @@
  ;Which parts of the system are advised? 
  (defn NOAClasses [?advised]
                   (l/fresh [?gets ?gete]
-                           (equals ?gets (getAdvisedClassesbyShadow));line 739
+                           (equals ?gets (getAdvisedClassesbyShadow));line 712
                            (contains ?gets ?gete)
                            (equals ?advised (first ?gete))))
  (inspect (ekeko [?ac] (NOAClasses ?ac)))
  
- ;Main Function NOnonAdvisedClasses
- (defn NOnAClasses [] 
-     (ekeko [?nonAdvised] 
-            (l/fresh [?c] 
-                     (NOClasses ?c) 
-                     (equals ?nonAdvised (.getName ?c))
-                     (succeeds (nil? (findtheclass ?nonAdvised))))))
- 
- (inspect (NOnAClasses))
- (count (NOnAClasses)) 
- 
- (defn- findtheclass [?name]
-   (first (ekeko [?advc]
-                 (NOAClasses ?advc)
-                 (succeeds (= ?name ?advc)))))
+ ;Main Function NOnonAdvisedClasses 
+ (inspect (clojure.set/difference 
+            (set (ekeko [?classes] (l/fresh [?c]  (NOClasses ?c) (equals ?classes (.getName ?c))))) 
+            (set (ekeko [?ac] (NOAClasses ?ac)))))
  
  ;############################### NOW: How often are wildcards used in modules declared in method/constructor-call/execution? ###############################
  (defn NOWilcards [?shortAspect ?itemName ?advicekind]
