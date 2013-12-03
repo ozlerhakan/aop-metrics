@@ -40,7 +40,7 @@
  (defn LOC [filepath ignore]
    (+  (class-loc (io/file filepath) ignore) (aspect-loc (io/file filepath))))
  
- (LOC "C:/Users/HAKAN/Desktop/Thesis/ws/AJHotDraw/src" "MainTST")
+ (LOC "C:/Users/HAKAN/runtime-New_configuration-clojure/Contract4J5/contract4j5/src" "MainTST")
  
  ;############################### METRIC VS ############################### 
  (defn NOClasses [?classes]
@@ -140,7 +140,7 @@
  
  ;2.2 Aspect 
  (defn intertype-methods [?i] 
-   "get the all intertype method declarations implemented in a project except abstracts intertype method declarations"
+   "get the all intertype method declarations implemented in a project except abstract intertype method declarations"
    (l/fresh [] 
             (w/intertype|method ?i)
             (equals false (.isAbstract (.getSignature ?i)))))
@@ -251,23 +251,25 @@
 
 ;################################## Main Function for the above 3 Metrics, It is working.. (I hope so) ####################################
  (defn- NOMethodCalls [?soot|method ?aspectName ?calledmethods ?soot|methodName]
-          (l/fresh [?units ?sootMDeclass]
+   (l/fresh [?units ?sootMDeclass]
             (succeeds (.hasActiveBody ?soot|method))
             (soot|unit-getDeclarationClassname ?soot|method ?aspectName)
             (equals ?units (.getUnits (.getActiveBody ?soot|method)))
             (equals ?soot|methodName (str "Method {"(.getName ?soot|method)"}"))
             (contains ?units ?calledmethods)
             (succeeds (.containsInvokeExpr ?calledmethods))
-	          (succeeds (or (= "soot.jimple.internal.JAssignStmt" (.getName (.getClass ?calledmethods)))  
-	                        (= "soot.jimple.internal.JInvokeStmt" (.getName (.getClass ?calledmethods)))))	          
-	          (equals ?sootMDeclass (.getShortName (.getDeclaringClass (.getMethod (.getInvokeExpr ?calledmethods)))))
-	          (equals false (or  (IndexOfText  ?sootMDeclass "StringBuilder")
-                               (IndexOfText  ?sootMDeclass "aspectj")
-	                             (IndexOfText  ?sootMDeclass "apache")
-                               (IndexOfText  ?sootMDeclass "CFlowCounter")
-                               (IndexOfText  ?sootMDeclass "CFlowStack")
-                               (IndexOfText  ?sootMDeclass "Factory")))
-	          (equals false (= "<init>" (.getName (.getMethod (.getInvokeExpr ?calledmethods)))))
+            (succeeds (or (= "soot.jimple.internal.JAssignStmt" (.getName (.getClass ?calledmethods)))  
+                          (= "soot.jimple.internal.JInvokeStmt" (.getName (.getClass ?calledmethods)))))	          
+            (equals ?sootMDeclass (.getShortName (.getDeclaringClass (.getMethod (.getInvokeExpr ?calledmethods)))))
+            (equals false (or  
+                            (IndexOfText  ?sootMDeclass "StringBuilder")
+                            (IndexOfText  ?sootMDeclass "aspectj")
+                            (IndexOfText  ?sootMDeclass "apache")
+                            (IndexOfText  ?sootMDeclass "Iterator")
+                            (IndexOfText  ?sootMDeclass "CFlowCounter")
+                            (IndexOfText  ?sootMDeclass "CFlowStack")
+                            (IndexOfText  ?sootMDeclass "Factory")))
+            (equals false (= "<init>" (.getName (.getMethod (.getInvokeExpr ?calledmethods)))))
             (equals false
                     (and
                       (.startsWith (.toString (.getInvokeExpr ?calledmethods)) "staticinvoke")
@@ -276,28 +278,29 @@
                       (or
                         (.startsWith (.name (.getMethodRef (.getValue (.getInvokeExprBox (.getFirstNonIdentityStmt (.getActiveBody (.getMethod (.getValue (.getInvokeExprBox ?calledmethods))))))))) "ajc$set")
                         (.startsWith (.name (.getMethodRef (.getValue (.getInvokeExprBox (.getFirstNonIdentityStmt (.getActiveBody (.getMethod (.getValue (.getInvokeExprBox ?calledmethods))))))))) "ajc$get"))))
-	          (equals false
-		                (and
-		                  (or
-		                    (.startsWith (.toString (.getInvokeExpr ?calledmethods)) "staticinvoke")
-		                    (.startsWith (.toString (.getInvokeExpr ?calledmethods)) "virtualinvoke"))
-		                  (or
-                         (=               (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "valueOf")
-		                     (lastIndexOfText (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "$advice")
-                         (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$get$")
-                         (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$set$")
-                         (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$afterReturning$")
-		                     (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$around$")
-                         (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$interFieldSetDispatch$")
-                         (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$interFieldGetDispatch$")
-                         (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$before$")
-                         (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$after$")
-                         (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$afterThrowing$")
-                         (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "access$"))))
-	          (equals false
-                (or
-                  (= "aspectOf" (.getName (.getMethod (.getValue (.getInvokeExprBox ?calledmethods)))))
-                  (= "makeJP" (.getName (.getMethod (.getValue (.getInvokeExprBox ?calledmethods)))))))))
+            (equals false
+                    (and
+                      (or
+                        (.startsWith (.toString (.getInvokeExpr ?calledmethods)) "staticinvoke")
+                        (.startsWith (.toString (.getInvokeExpr ?calledmethods)) "virtualinvoke"))
+                      (or
+                        (=               (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "valueOf")
+                        (lastIndexOfText (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "$advice")
+                        (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$get$")
+                        (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$set$")
+                        (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$afterReturning$")
+                        (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$around$")
+                        (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$interFieldSetDispatch$")
+                        (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$interFieldGetDispatch$")
+                        (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$before$")
+                        (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$after$")
+                        (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "ajc$afterThrowing$")
+                        (.startsWith     (.getName (.getMethod (.getInvokeExpr ?calledmethods))) "access$"))))
+            (equals false
+                    (or
+                      (= "aspectOf" (.getName (.getMethod (.getValue (.getInvokeExprBox ?calledmethods)))))
+                      (= "makeJP" (.getName (.getMethod (.getValue (.getInvokeExprBox ?calledmethods)))))
+                      (= "iterator" (.getName (.getMethod (.getValue (.getInvokeExprBox ?calledmethods)))))))))
  
  ;############################### Attribute-Class dependence (AtC) ###############################
  ;Definition : if a class is the type of an field of an aspect 
@@ -711,39 +714,41 @@
  
  ;############################### AdC: Do aspects often advise classes with a lot of subclasses? ############################### 
  ;count the number of advised classes with advised subclasses
- 
- (defn- NOClasses-executions [?class ?isSubClass]
+ ;all kinded pointcuts..
+ (defn- NOClasses-AdC1 [?class ?isSubClass]
    "collect all the advised classes -method/constructor execution" 
    (l/fresh [?aspect ?advice ?shadow ?classname ?from]
             (NOAdvices ?aspect ?advice)
             (w/advice-shadow ?advice ?shadow)
-            (succeeds (= "class" (.toString (.getKind (.getParent ?shadow)))))
             (equals ?class (.getParent ?shadow))
+            (succeeds (= "class" (.toString (.getKind ?class))))
             (equals ?classname (str (.getPackageName (.getParent ?shadow))"."(.getName (.getParent ?shadow))))
             (equals ?from (isClass ?classname))
             (equals false (nil? ?from))
             (equals ?isSubClass (first ?from))))
+ 
+ (inspect (ekeko [?c ?i] (NOClasses-AdC1 ?c ?i)))
   
- (inspect (ekeko [?c ?i] (NOClasses-executions ?c ?i)))
-  
- (defn- NOClasses-calls [?classname ?isSubClass]
-   "collect all the advised classes -method/constructor call"
+ (defn- NOClasses-AdC2 [?classname ?isSubClass]
+   "collect all the advised classes -method/constructor call & field-get so on.."
    (l/fresh [?aspect ?advice ?shadow ?class ?from]
            (NOAdvices ?aspect ?advice)
            (w/advice-shadow ?advice ?shadow)
-           (succeeds (= "class" (.toString (.getKind (.getParent (.getParent ?shadow))))))
            (equals ?class (.getParent (.getParent ?shadow)))
+           (succeeds (= "class" (.toString (.getKind ?class))))
            (equals ?classname (str (.getPackageName (.getParent ?shadow))"."(.getName (.getParent (.getParent ?shadow)))))
            (equals ?from (isClass ?classname))
            (equals false (nil? ?from))
            (equals ?isSubClass (first ?from))))
  
+ (inspect (ekeko [?C ?i] (NOClasses-AdC2 ?C ?i)))
+ 
  (defn getAdvisedClasses []
-   "combine the above two functions"
+   "combine the above two functions -boolean true value refers to the related class which is a subclass"
    (distinct
      (clojure.set/union
-              (ekeko [?advisedc ?isSubClass] (NOClasses-executions ?advisedc ?isSubClass))
-              (ekeko [?advisedc ?isSubClass] (NOClasses-calls ?advisedc ?isSubClass)))))
+              (ekeko [?advisedc ?isSubClass] (NOClasses-AdC1 ?advisedc ?isSubClass))
+              (ekeko [?advisedc ?isSubClass] (NOClasses-AdC2 ?advisedc ?isSubClass)))))
  
  (inspect (getAdvisedClasses))
  (count (getAdvisedClasses))
@@ -757,40 +762,40 @@
                      (equals true (= ?cn ?name))
                      (equals ?isSub (false? (= "java.lang.Object" (.getName (.getSuperclass ?classes)))))))))
  
- ;############################### NOC VS NOE : How often is call used VS execution? ###############################
+ ;############################### NOC VS NOE : How often is call pointcut used VS execution pointcut? ###############################
  ;method/construct call VS method/construct execution 
  (defn- CE [?shortAspect ?advicekind  ?callexecution  ?pointdefs] 
-                            (l/fresh [?aspect ?advice ?primPoint ?ar]
-                                     (NOAdvices ?aspect ?advice)
-                                     (equals ?shortAspect (str "Aspect {"(.getSimpleName ?aspect)"}"))
-                                     (equals ?pointdefs (.getPointcut ?advice))
-                                     (equals false (= "" (.toString (.getPointcut ?advice))))
-                                     (equals ?advicekind (str "Advice {"(.toString (.getKind ?advice))"}"))
-                                     (getRelatedKinds ?pointdefs ?primPoint)
-                                     (equals ?ar (vec (into #{} ?primPoint)))
-                                     (equals false (empty? ?ar))
-                                     (contains ?ar ?callexecution)))
+   (l/fresh [?aspect ?advice ?primPoint ?ar]
+            (NOAdvices ?aspect ?advice)
+            (equals ?shortAspect (str "Aspect {"(.getSimpleName ?aspect)"}"))
+            (equals ?pointdefs (.getPointcut ?advice))
+            (equals false (= "" (.toString (.getPointcut ?advice))))
+            (equals ?advicekind (str "Advice {"(.toString (.getKind ?advice))"}"))
+            (getRelatedKinds ?pointdefs ?primPoint)
+            (equals ?ar (vec (into #{} ?primPoint)))
+            (equals false (empty? ?ar))
+            (contains ?ar ?callexecution)))
  
  (inspect  (sort-by first (ekeko [?shortAspect  ?advice ?list ?callexe] (CE ?shortAspect ?advice ?list ?callexe))))
  (count (ekeko [?shortAspect ?advice ?list ?callexe] (CE ?shortAspect ?advice  ?list ?callexe)))
  
  ;Number of CALL pointcut
- (defn NOCall [?call]
-   (l/fresh [?shortAspect ?advicekind ?pointdefs]
+ (defn NOCall [?shortAspect ?call]
+   (l/fresh [?advicekind ?pointdefs]
             (CE ?shortAspect ?advicekind  ?call  ?pointdefs)
             (succeeds (or (= "method-call" (.toString (getKind ?call))) (= "constructor-call" (.toString (getKind ?call)))))))
  
- (inspect (ekeko [?c] (NOCall ?c)))
- (count (ekeko [?c] (NOCall ?c)))
+ (inspect (sort-by first (ekeko [?a ?c] (NOCall ?a ?c))))
+ (count (ekeko [?a ?c] (NOCall ?a ?c)))
  
  ;Number of EXECUTION pointcut
- (defn NOExecution [?execution]
-   (l/fresh [?shortAspect ?advicekind ?pointdefs]
+ (defn NOExecution [?shortAspect ?execution]
+   (l/fresh [?advicekind ?pointdefs]
             (CE ?shortAspect ?advicekind  ?execution  ?pointdefs)
             (succeeds (or (= "method-execution" (.toString (getKind ?execution))) (= "constructor-execution" (.toString (getKind ?execution)))))))
  
- (inspect (ekeko [?e] (NOExecution ?e)))
- (count (ekeko [?e] (NOExecution ?e)))
+ (inspect (sort-by first (ekeko [?a ?e] (NOExecution ?a ?e))))
+ (count (ekeko [?a ?e] (NOExecution ?a ?e)))
 
  ;############################### nAdC: Which parts of the system are (not) advised? Amount of non-advised VS advised methods ###############################
  ;Which parts of the system are advised? 
@@ -801,18 +806,20 @@
                            (equals ?advised (first ?gete))))
  (inspect (ekeko [?ac] (NOAClasses ?ac)))
  (count (ekeko [?ac] (NOAClasses ?ac)))
+ 
  ;Main Function NOnonAdvisedClasses 
  (inspect (clojure.set/difference 
             (set (ekeko [?classes] (l/fresh [?c]  (NOClasses ?c) (equals ?classes (.getName ?c))))) 
             (set (ekeko [?ac] (NOAClasses ?ac)))))
+ 
  (count (clojure.set/difference 
             (set (ekeko [?c]  (NOClasses ?c)))
             (set (ekeko [?ac] (NOAClasses ?ac)))))
  
- ;############################### NOW: How often are wildcards used in modules declared in method/constructor-call/execution? ###############################
+ ;############################### NOW: How often are wildcards used in modules declared in all kinded pointcuts? ###############################
  (defn NOWilcards [?shortAspect ?itemName ?advicekind]
    (l/fresh [?callexecution ?isInterface ?pointdefs ?excTypeName ?decType]
-            (CE ?shortAspect ?advicekind  ?callexecution ?pointdefs );line 790
+            (CE ?shortAspect ?advicekind  ?callexecution ?pointdefs );line 767
             (equals ?itemName (str  (.getKind ?callexecution)"{ "(.toString (.getSignature ?callexecution))" }"))
             (equals ?decType (.getDeclaringType (.getSignature ?callexecution)))
             (equals ?excTypeName (.getExactType ?decType))
@@ -825,10 +832,11 @@
  (inspect (sort-by first (ekeko [?s ?i ?p] (NOWilcards ?s ?i ?p))))
  (count (ekeko [?s ?i ?p] (NOWilcards ?s ?i ?p)))
 
- ;############################### TJP: How often is thisjoinpoint used in a given AspectJ project? ###############################
+ ;############################### TJP: How often is thisJoinPoint used in a given AspectJ project? ###############################
+ ;count number of thisJoinPoints that are used at least once per advice body!
  (defn NOThisJoinPoint [?DC|advicemethod ?sootname ?soot|advicemethod]
    (l/fresh [?adv ?aspect ?units ?unit]
-            (NOAdvices ?aspect ?adv);I am using this function or I can also use ajdt/advice function to get the proper declarded advice in a project and to avoid the errors!
+            (NOAdvices ?aspect ?adv)
             (ajsoot/advice-soot|method ?adv ?soot|advicemethod)
             (succeeds (.hasActiveBody ?soot|advicemethod))
             (equals ?units (.getUnits (.getActiveBody ?soot|advicemethod)))
@@ -838,18 +846,17 @@
             (equals ?sootname (.getName ?soot|advicemethod))
             (equals ?DC|advicemethod (.getName (.getDeclaringClass ?soot|advicemethod)))))
  
- (inspect (into #{} (ekeko [?a ?b ?s] (NOThisJoinPoint ?a ?b ?s))))
+ (inspect (sort-by first (into #{} (ekeko [?a ?b ?s] (NOThisJoinPoint ?a ?b ?s)))))
  (count (into #{} (ekeko [?a ?b ?s] (NOThisJoinPoint ?a ?b ?s))))
  
- ;############################### NOPA: How often are args() only accessed? How often are they modified?- how many parameters do args(,,,) have?  ###############################
+ ;############################### NOPA: How often are args() only accessed? How often are they modified?-> how many parameters do args(,,,) have?  ###############################
  ;Definition: the total number of the parameters of the entire args() primitive pointcut declared with advices of aspects in an aspectj project!
  (defn NOParametersofArgs  [?shortAspect ?advicekind ?pointdefs ?arg ?size]
    (l/fresh [?Argstr]
             (NOArgs ?shortAspect ?advicekind ?pointdefs ?arg )
             (equals ?Argstr (.toString ?arg))
             (equals false (or 
-                            (IndexOfText ?Argstr "+") ;check all wildcards!
-                            (IndexOfText ?Argstr "*")
+                            (IndexOfText ?Argstr "*");check all wildcards!
                             (IndexOfText ?Argstr "..")))
             (equals ?size (.size (.getArguments ?arg)))))
  
@@ -930,6 +937,7 @@
                      (= ?name "java.sql.PreparedStatement")
                      (= ?name "javax.jms.TopicConnectionFactory")
                      (= ?name "javax.xml.transform.Source")
+                     (= ?name "java.lang.annotation.Annotation")
                      (= ?name "org.xml.sax.XMLReader")
                      (= ?name "javax.jms.QueueConnectionFactory")
                      (= ?name "java.rmi.Remote")))))))
