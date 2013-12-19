@@ -681,13 +681,12 @@
              (NOAdvices ?aspect ?advice ?pointcut)
              (equals ?shortAspect (str "Aspect {"(.getSimpleName ?aspect)"}"))
              (equals ?advicekind (str "Advice {"(.toString (.getKind ?advice))"}"))
-             (ajsoot/advice-soot|method ?advice ?soot|method)
-             (succeeds (= (.getName (.getSignature ?advice)) (.getName ?soot|method)))
-             ;(equals true (= "OptimizedAbstractTimestampAspect" (.getSimpleName ?aspect)))
+             ;(ajsoot/advice-soot|method ?advice ?soot|method)
+             ;(succeeds (= (.getName (.getSignature ?advice)) (.getName ?soot|method)))
              (getArgs ?pointcut ?args)
              (equals false (empty? ?args))
              (equals ?arg (vec (into #{} ?args)))
-             (equals ?sootname  (.getName ?soot|method))
+             ;(equals ?sootname  (.getName ?soot|method))
              (equals ?return (collectArguments ?arg))
              (equals ?sizelist (java.util.ArrayList. []))
              (equals ?sizeR (argumentsize (clojure.string/split ?return  #",") ?sizelist))
@@ -726,6 +725,11 @@
   (defn AvARGS []
     (format "%.2f" (float (/ (calculateARGS) (COUNTNOAdvices)))))
   (AvARGS)
+  
+  ;total average! args():
+  (defn AvARGS-v1 []
+    (format "%.2f" (float (/ (calculateARGS) (count (ekeko [?shortAspect ?advicekind ?list ?r ?size] (NOArgs ?shortAspect ?advicekind ?list ?r ?size)))))))
+  (AvARGS-v1)
   
  ;############################### NOnPC: In how many around advice is it possible to (not) execute a proceed call? ###############################
   (defn NOPC [?aspectName ?soot|methodName]
@@ -983,13 +987,11 @@
  
  (inspect  (getMethodsFromShadow))
  
-  (defn- allMethods []
-    (sort-by first (ekeko [?mn]
-                      (l/fresh [?m  ?me ?lm]
-                               (equals ?me (NOUnionMethods))
-                               (contains ?me ?m)
-                               (equals ?lm (first ?m))
-                               (equals ?mn (subs (.toString  ?lm) (+ (.indexOf (.toString ?lm) " ") 1 )))))))
+ (defn- allMethods []
+   (sort-by first (ekeko [?mn]
+                         (l/fresh [?types ?list ?m]
+                                  (classes-methods-without-constructors ?types ?m)
+                                  (equals ?mn (subs (.toString ?m) (+ (.indexOf (.toString ?m) " ") 1 )))))))
  (inspect (allMethods))
  (count (allMethods))
  ;THE NUMBER OF ADVISED METHODS
@@ -1223,7 +1225,7 @@
  
  (inspect  (sort-by first (ekeko [?return ?parameters ?arg ?unit] (NOModifying ?return ?parameters ?arg ?unit))))
  (count(ekeko [?return ?parameters ?arg ?unit] (NOModifying ?return ?parameters ?arg ?unit)))
- ; )
+  ;)
  
  (defn accessARG [list]
    (for [x list :when (= "modify" x)] (str "true")))
