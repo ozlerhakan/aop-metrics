@@ -14,8 +14,9 @@ Abbreviations | Definitions
  **VS**|	counts the number of classes and aspects.
  **LOC**|	counts the number of lines of code lines without blank lines.
  **NOA**| 	counts the number of fields declared in both aspects and classes.
- **NOO**| 	counts the number of methods and advices.
- **NOOI**|	counts the number of NOO and intertype method declarations.
+**NOM**| 	counts the number of methods declared in both aspects and classes.
+**NOAd**| 	counts the number of advices.
+**NOI**|	counts the number of intertype method declarations.
  **AM**|	counts how many times the methods of classes are called in the body of advices in aspects.
  **IM**|	counts how many times the methods of classes are called in the body of intertype method declarations in aspects.
  **MM**|	counts how many times the methods of classes are called in the body of methods in aspects.
@@ -25,7 +26,6 @@ Abbreviations | Definitions
  **MC**|	counts the number of classes defined as the types of parameters or return types of methods in aspects.
  **PC**|	counts the number of classes defined as the parameters of pointcut definitions in aspects.
  **PM**|	counts the number of methods and constructors declared in classes are refered by join points defined by pointcuts in aspects.
- **CIM**|	counts the number of modules completely named in the pointcuts in given aspects.
  **AA**|	counts the number of advance advices whose poincuts have at least one of the advance pointcuts such as if, adviceexecution, cflow, and cflowbelow.
  **BA**|	counts the number of basic advices whose pointcuts use more than once the basic pointcuts.
  **InA**|	counts how many aspects inherited by abstract aspects.
@@ -33,7 +33,8 @@ Abbreviations | Definitions
  **nSA**|	counts how many aspects are non-isSingleton.
  **AE**|	counts how many times adviceExecution is used in the body of advices in aspects.
  **AJPS**|	calculates the average of the join point shadows per advice.
- **AARG**|	calculates the average of the args per advice.
+**AgPA**|	calculates the average of size of arguments declared in args per advice.
+**AgPAg**|	calculates the average of size of arguments declared in args per advice that has an args.
  **nPC**|	counts how many around advice do not use a proceed call.
  **ArA**|	counts the number of the around advices in a given system.
  **ABA**|	counts the number of the before and after advices in a given system.
@@ -45,11 +46,12 @@ Abbreviations | Definitions
  **AdM**|	counts the number of advised methods of classes.
  **nAdM**|	counts the number of non-advised methods of classes.
  **CsC**|	counts how many classes are advised along with their subclasses.
- **ACsC**|	calculates the average of CsC.
+ **ACsC**|	calculates the average of subclasses of advised classes per adviced class.
  **NOW**|	counts the amount of used wildcards in modules named in the pointcuts in given aspects.
  **NOnW**|	counts the amount of non-used wildcards in modules named in the pointcuts in given aspects.
  **TJPS**|	counts the amount of used thisJoinPoint and thisJoinPointStatic in the body of advices.
- **ARG**|	counts how many times args are accessed and modified in the body of advices.
+**MoA**|	counts how many times args are modified in the body of advices.
+**AcA**|	counts how many times args are accessed in the body of advices.
 
 
 
