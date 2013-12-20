@@ -53,5 +53,12 @@ Abbreviations | Definitions
 **MoA**|	counts how many times args are modified in the body of advices.
 **AcA**|	counts how many times args are accessed in the body of advices.
 
+### Quick Access
+---
+
+Implemented 41 metrics.. ([See them](https://github.com/ozlerhakan/AOPMetrics-EkekoAJFX/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj))
+
+
+
 
 
