@@ -25,33 +25,33 @@ Abbreviations | Definitions
  **IC**|	counts the number of classes defined as the types of parameters or return types of intertype method declarations in aspects.
  **MC**|	counts the number of classes defined as the types of parameters or return types of methods in aspects.
  **PC**|	counts the number of classes defined as the parameters of pointcut definitions in aspects.
- **PM**|	counts the number of methods and constructors declared in classes are refered by join points defined by pointcuts in aspects.
+ **PM**|	counts the number of methods and constructors of classes are refered by join points defined by pointcuts in aspects.
  **AA**|	counts the number of advance advices whose poincuts have at least one of the advance pointcuts such as if, adviceexecution, cflow, and cflowbelow.
  **BA**|	counts the number of basic advices whose pointcuts use more than once the basic pointcuts.
  **InA**|	counts how many aspects inherited by abstract aspects.
  **SA**|	counts how many aspects are isSingleton.
  **nSA**|	counts how many aspects are non-isSingleton.
  **AE**|	counts how many times adviceExecution is used in the body of advices in aspects.
- **AJPS**|	calculates the average of the join point shadows per advice.
+ **AJPS**|	calculates the average of join point shadows per advice.
 **AgPA**|	calculates the average of size of arguments declared in args per advice.
 **AgPAg**|	calculates the average of size of arguments declared in args per advice that has an args.
  **nPC**|	counts how many around advice do not use a proceed call.
  **ArA**|	counts the number of the around advices in a given system.
  **ABA**|	counts the number of the before and after advices in a given system.
  **ATRA**|	counts the number of the after throwing and after returning advices in a given system.
- **AdC**|	calculates the average of advised classes have at least one join point shadow in a system.
- **nAdC**|	calculates the average of non-advised classes have no any join point shadows in a system.
+ **AdC**|	calculates the average of advised classes have at least one join point shadow.
+ **nAdC**|	calculates the average of non-advised classes have no any join point shadow.
  **NOC**|	counts how many times call pointcut is declared.
  **NOE**|	counts how many times execution pointcut is declared.
  **AdM**|	counts the number of advised methods of classes.
  **nAdM**|	counts the number of non-advised methods of classes.
  **CsC**|	counts how many classes are advised along with their subclasses.
  **ACsC**|	calculates the average of subclasses of advised classes per adviced class.
- **NOW**|	counts the amount of used wildcards in modules named in the pointcuts in given aspects.
- **NOnW**|	counts the amount of non-used wildcards in modules named in the pointcuts in given aspects.
+ **NOW**|	counts the amount of used wildcards in modules named in the pointcuts of aspects.
+ **NOnW**|	counts the amount of non-used wildcards in modules named in the pointcuts of aspects.
  **TJPS**|	counts the amount of used thisJoinPoint and thisJoinPointStatic in the body of advices.
-**MoA**|	counts how many times args are modified in the body of advices.
-**AcA**|	counts how many times args are accessed in the body of advices.
+**MoA**|	counts how many times the arguments of args pointcuts are modified in the body of advices.
+**AcA**|	counts how many times the arguments of args pointcuts are accessed in the body of advices.
 
 ### Quick Access
 ---
