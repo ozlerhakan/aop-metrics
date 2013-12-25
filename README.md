@@ -12,7 +12,7 @@ The list shows the implemented metrics along with their abbreviations and defini
 Abbreviations | Definitions
 --- | --- 
  **VS**|	counts the number of classes and aspects.
- **LOC**|	counts the number of lines of code lines without blank lines.
+ **LOC**|	counts the number of lines of code without blank lines.
  **NOA**| 	counts the number of fields declared in both aspects and classes.
 **NOM**| 	counts the number of methods declared in both aspects and classes.
 **NOAd**| 	counts the number of advices.
@@ -33,8 +33,8 @@ Abbreviations | Definitions
  **nSA**|	counts how many aspects are non-isSingleton.
  **AE**|	counts how many times adviceExecution is used in the body of advices in aspects.
  **AJPS**|	calculates the average of join point shadows per advice.
-**AgPA**|	calculates the average of size of arguments declared in args per advice.
-**AgPAg**|	calculates the average of size of arguments declared in args per advice that has an args.
+**AgPA**|	calculates the average of size of arguments declared in args pointcuts per advice.
+**AgPAg**|	calculates the average of size of arguments declared in args pointcuts per advice that has an args pointcut.
  **nPC**|	counts how many around advice do not use a proceed call.
  **ArA**|	counts the number of the around advices in a given system.
  **ABA**|	counts the number of the before and after advices in a given system.
