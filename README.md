@@ -61,7 +61,7 @@ The implemented 41 metrics.. ([See them](https://github.com/ozlerhakan/AOPMetric
 ### How to run the metrics?
 ---
 
-First of all, make sure that you have all dependencies about the Ekeko Plugin in your Eclipse IDE, if not, you have to download it with its dependencies from [here](https://github.com/cderoove/damp.ekeko/blob/master/EkekoPlugin/README.md). 
+First of all, make sure that you have all dependencies about the Ekeko Plugin in your Eclipse IDE, if not, you have to download it with its dependencies from [here](https://github.com/cderoove/damp.ekeko/wiki/Getting-Started-with-Ekeko). 
 
 In addition, after importing the Ekeko as an Eclipse project, you have to import the Ekeko's AspectJ extension in order to complete all essential parts. The link of the extension is [here](https://github.com/cderoove/damp.ekeko.aspectj).
 
