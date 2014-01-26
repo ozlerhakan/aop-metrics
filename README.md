@@ -1,5 +1,13 @@
-   Master Thesis
-====================
+**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
+
+- [The Definitions of The Metrics](#the-definitions-of-the-metrics)
+
+- [Quick Access](#quick-access)
+
+- [How to run the metrics?](#how-to-run-the-metrics)
+
+### Master Thesis
+---
 
 The aim of my master project is: analysing the existing **[AspectJ](http://eclipse.org/aspectj/)** applications. In order to collect proper informations, I have implemented several **[aspect-oriented programming](http://en.wikipedia.org/wiki/Aspect-oriented_programming) (AOP) Metrics**.
 
