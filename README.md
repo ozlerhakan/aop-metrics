@@ -38,7 +38,7 @@ Abbreviations | Definitions
  **InA**|	counts how many aspects inherited by abstract aspects.
  **SA**|	counts how many aspects are isSingleton.
  **nSA**|	counts how many aspects are non-isSingleton.
- **AE**|	counts how many times adviceExecution is used in the body of advices in aspects.
+ **AE**|	counts how many times adviceexecution pointcut is used.
  **AJPS**|	calculates the average of join point shadows per advice.
 **AgPA**|	calculates the average of size of arguments declared in args pointcuts per advice.
 **AgPAg**|	calculates the average of size of arguments declared in args pointcuts per advice that has an args pointcut.
@@ -59,6 +59,23 @@ Abbreviations | Definitions
  **TJPS**|	counts the amount of used thisJoinPoint and thisJoinPointStatic in the body of advices.
 **MoA**|	counts how many times the arguments of args pointcuts are modified in the body of advices.
 **AcA**|	counts how many times the arguments of args pointcuts are accessed in the body of advices.
+
+### Have a look at an example
+---
+One of the questions we examine is: how many aspects extend to an abstract aspect in a given aspect-oriented project?
+
+The Metric representation of the question is: the number of inherited aspects in a given aspect-oriented project.
+
+```Clojure
+ (defn NOInheritedAspects [?aspectname ?abstractname]
+         (l/fresh [?aspect ?source ?super]
+                   (NOAspects ?aspect ?source)
+                   (w/aspect-declaredsuper ?aspect ?super)
+                   (equals ?aspectname (str "Aspect {"(.getSimpleName ?aspect)"}"))
+                   (equals ?abstractname (str "From Abstract Aspect -> "(.getSimpleName ?super)))
+                   (succeeds (.isAbstract ?super))
+                   (succeeds (.isAspect ?super))))
+```
 
 ### Quick Access
 ---
