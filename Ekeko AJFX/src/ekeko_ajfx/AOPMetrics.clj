@@ -46,13 +46,13 @@
  ;############################### METRIC VS ############################### 
  (defn NOClasses [?classes]
    "Number of Classes in the project except enums, interfaces, their inner classes!!, and a test class."
-   (l/fresh []
-            (w/class ?classes)
-            (equals false (or 
-                            (.isEnum ?classes)
-                            (IndexOfText (.getName ?classes) "$");this line excludes all nested-classes!
-                            (lastIndexOfText (.getName ?classes) "MainTST");our initial main to activate soot analysis, so I ignore it
-                            (IndexOfText (.getName ?classes) "lang.Object")))))
+   (l/all
+    (w/class ?classes)
+     (equals false (or 
+                     (.isEnum ?classes)
+                     (IndexOfText (.getName ?classes) "$");this line excludes all nested-classes!
+                     (lastIndexOfText (.getName ?classes) "MainTST");our initial main to activate soot analysis, so I ignore it
+                     (IndexOfText (.getName ?classes) "lang.Object")))))
  
  (inspect  (sort-by first (ekeko [?cn] (l/fresh [?c] (NOClasses ?c) (equals ?cn (.getName ?c))))))
  
@@ -67,109 +67,78 @@
  
  (defn NOAspects [?aspects ?source]  
    "the number of aspects in a selected project"
-   (l/fresh []
-            (w/aspect ?aspects) 
-            (equals ?source (.getSourceLocation ?aspects))))
+   (l/all
+     (w/aspect ?aspects) 
+     (equals ?source (.getSourceLocation ?aspects))))
  
  (inspect (sort-by first (ekeko [?an] (l/fresh [?as ?sour] (NOAspects ?as ?sour) (equals ?an (.getName ?as))))))
  (count (ekeko [?as ?sour] (NOAspects ?as ?sour)))
 
  (defn VS []
+   (clojure.set/union  (ekeko [?as] (l/fresh [?sour] (NOAspects ?as ?sour)))
+                       (ekeko [?c] (NOClasses ?c))))
+ (VS)
+ 
+ (defn CalculateVS []
    (+  (count (ekeko [?as ?sour] (NOAspects ?as ?sour)))
        (count (ekeko [?c] (NOClasses ?c)))))
- (VS)
+ (CalculateVS)
  ;############################### METRIC NOAttributes (fields) ###############################
- ;get a specific class and its fields in terms of a package name
- (inspect (ekeko [?t ?f] 
-                 (w/type-fields ?t ?f)
-                 (succeeds (IndexOfText (.toString ?t) "InvariantTypeConditions"))))
- 
- (defn count-fields-in-modules [?c ?f]
+
+ (defn NOA [?module ?field]
    "count fields both CLASSES and ASPECTS except their nested-classes' fields"
-          (l/fresh []
-                     (w/type-field ?c ?f)
-                     (equals false (.isEnum ?c))
-                     (equals false (.isInterface ?c))
-                     (equals false (and (.isClass ?c) (IndexOfText  (.getName ?c) "$")))
-                     (succeeds (empty? (filter #(re-matches #"\S+\$([1-9]|0)+" %)  [(.getName ?c)])))
-                     (equals false (or 
-                                     (.startsWith (.getName ?f) "ajc")
-                                     (.startsWith (.getName ?f) "this")
-                                     (IndexOfText (.getName ?f) "$")))))
-                     
- (inspect (sort-by first (ekeko [?cn ?f] (l/fresh [?c] (count-fields-in-modules ?c ?f ) (equals ?cn (.getName ?c))))))
- (count (ekeko [?c ?f] (count-fields-in-modules ?c ?f))) 
+   (l/fresh [?fields ?modules]
+            (equals ?modules (VS))
+            (contains ?modules ?module)
+            (equals ?fields (.getDeclaredFields  (first ?module)))
+            (contains ?fields ?field)  
+            (equals false (or 
+                           (.startsWith (.getName ?field) "ajc$")
+                           (IndexOfText (.getName ?field) "$")))))
+ 
+ (inspect (sort-by first (ekeko [?cn ?f] (l/fresh [?c] (NOA ?c ?f ) (equals ?cn (.getName (first ?c)))))))
+ (count (ekeko [?c ?f] (NOA ?c ?f))) 
 
  ;############################### METRIC NOOperations (methods and advices) ###############################
 
- (defn classes-methods [?typesn ?methods]
-   "number of methods declared in classes"
-   (l/fresh [?types]
-            (NOClasses ?types)
-            (w/type-method ?types ?methods)
-            (equals ?typesn (.getName ?types))
-            (succeeds (empty? (filter #(re-matches #"\S+\$\S+" %) [(.getName ?types)])))
-            (equals false (= "STATIC_INITIALIZATION" (.toString (.getKind ?methods))))
-            (equals false (.isAbstract ?methods))
-            (succeeds (empty? (filter #(re-matches #"\S+\$([1-9]|0)+" %) [(.getName ?methods)])))))
-           ;(succeeds (empty? (filter #(re-matches #"\S+\$[1-9]+" %) [(.getName (.getDeclaringType ?methods))])))
-           ;(succeeds (IndexOfText (.toString (.getName ?types)) "org.contract4j5.reporter.Severity" ))))
- ;1 Classs
- (inspect (sort-by first (ekeko [?types ?m] (classes-methods ?types ?m))))
- (count ( ekeko [?types ?m] (classes-methods ?types ?m)))
-
- (defn classes-methods-without-constructors [?t ?m]
-   "exclude constructor(s) of classes"
-   (l/fresh []
-        (classes-methods ?t ?m)
-        (equals false (= 3 (.getKey (.getKind ?m))))))
+ (defn NOM [?module ?method]
+   "counts the number of methods declarations of classes and aspects"
+   (l/fresh [?types ?modules ?methods]
+            (equals ?modules (VS))
+            (contains ?modules ?module)
+            (equals ?methods (.getDeclaredMethods (first ?module)))
+            (contains ?methods ?method)
+            (equals false (.isAbstract ?method))
+            (equals false (= 3 (.getKey (.getKind ?method))))
+            (equals false (= 8 (.getModifiers ?method)))
+            (equals false (IndexOfText (.getName ?method) "$"))
+            (equals false (or (= "hasAspect" (.getName ?method)) 
+                              (= "aspectOf" (.getName ?method))))))
  
- ;1 Class
- (inspect(sort-by first (ekeko [?t ?m] (classes-methods-without-constructors ?t ?m))))
- (count (ekeko [?t ?m] (classes-methods-without-constructors ?t ?m)))
+ (inspect (sort-by first (ekeko [?module ?method] (l/fresh[?m] (NOM ?m ?method) (equals ?module (.getName (first ?m)))))))
+ (count ( ekeko [?types ?m] (NOM ?types ?m)))
 
- ;2 Aspect : 
- (defn aspects-methods [?aspects ?methods]
-   "find method declarations in aspect files"
-   (l/fresh [?tname ?source ?methodName]
-            (NOAspects ?aspects ?source)
-            (w/type-method ?aspects ?methods)
-            (equals ?tname (.getClassName ?aspects))
-            (equals ?methodName (.getName ?methods))
-            (equals false (.isAbstract ?methods))
-            (equals false (= 8 (.getModifiers ?methods)))
-            (equals false (.startsWith (.getName ?methods) "ajc"))
-            (equals false (or (= "hasAspect" (.getName ?methods)) 
-                              (= "aspectOf" (.getName ?methods)) 
-                              (= "<init>" (.getName ?methods))))))
+ ;############################### METRIC NOIntertype methods ############################### 
 
- (inspect (sort-by first  (ekeko [?tn ?m] (l/fresh [?t] (aspects-methods ?t ?m) (equals ?tn (.getClassName ?t))))))
- (count (ekeko [?tn ?m] (l/fresh [?t] (aspects-methods ?t ?m) (equals ?tn (.getClassName ?t)))))
- ; <= without intertyped method declarations
- ;-------------------------------------------------------------
- ;    intertyped method declarations =>  METRIC NOOI (methods and advices and intertype methods)
- 
- ;2.2 Aspect 
- (defn intertype-methods [?i] 
+ (defn NOIntertype [?i] 
    "get the all intertype method declarations implemented in a project except abstract intertype method declarations"
-   (l/fresh [] 
+   (l/all
             (w/intertype|method ?i)
             (equals false (.isAbstract (.getSignature ?i)))))
  
-  (inspect (ekeko [?i] (intertype-methods ?i)))
-  (count (ekeko [?i] (intertype-methods ?i)))
- ;COUNT: 1 class + 2 aspect + 2.2 aspect :RESULT combines with 
+  (inspect (ekeko [?i] (NOIntertype ?i)))
+  (count (ekeko [?i] (NOIntertype ?i)))
 
- ;-------------------------------------------------------------------------------------------------
+ ;############################### METRIC NOAdvices ############################### 
  
  (defn NOAdvices [?aspect  ?adv ?pointcut]  
-   "Collect all advices"
+   "Counts the number of Advices"
    (l/fresh []
             (w/advice ?adv)
-            ;(equals ?aspect1 (.getConcreteAspect ?adv))
             (equals false (IndexOfText (.getName (.getClass ?adv)) "Checker"))
             (equals false (or
-                            (or (.isCflow (.getKind ?adv)) (.isPerEntry (.getKind ?adv)))
+                            (or (.isCflow (.getKind ?adv)) 
+                                (.isPerEntry (.getKind ?adv)))
                             (= "softener" (.getName (.getKind ?adv)))));I must exclude perThis, perTarget , perCflow, Cflow, CflowBelow, softener, and Checker(warning)!!
             (equals ?aspect  (.getDeclaringType (.getSignature ?adv)))
             (equals ?pointcut (findpointcut ?adv))))
@@ -190,26 +159,16 @@
                                 (equals ?pcut (.getPointcut ?p))
                                 (succeeds (= ?pn (.name (.getPointcut (.getAssociatedShadowMunger (.getSignature ?advice)))))))))))
 
-(defn NOM []
-  (+ (count (ekeko [?a ?ma] (aspects-methods ?a ?ma)))
-     (count (ekeko [?c ?mc] (classes-methods-without-constructors ?c ?mc)))))
-(NOM)
-
-(defn NOUnionMethods []
-  (clojure.set/union
-    (ekeko [?ma] (l/fresh [?a] (aspects-methods ?a ?ma)))
-           (ekeko [?mc] (l/fresh [?c] (classes-methods-without-constructors ?c ?mc)))))
-(inspect  (NOUnionMethods))
  ;############################### Advice-Method dependence (AM) ###############################
- (defn get-soot-advice|method [?aspectName ?calledmethods ?soot|methodName]
-   "the number of method calls per advice body"
-   (l/fresh [?soot|method ?advice ?aspect ?soot ?pointcut]
-            (NOAdvices ?aspect ?advice ?pointcut)
-            (ajsoot/advice-soot|method ?advice ?soot|method)
-            (NOMethodCalls ?soot|method ?aspectName ?calledmethods ?soot|methodName)))
+ (defn AM [?aspectName ?calledmethods ?soot|methodName]
+    "the number of method calls per advice body"
+       (l/fresh [?soot|method ?advice ?aspect ?soot ?pointcut]
+                (NOAdvices ?aspect ?advice ?pointcut)
+                (ajsoot/advice-soot|method ?advice ?soot|method)
+                (NOMethodCalls ?soot|method ?aspectName ?calledmethods ?soot|methodName)))
  
- (inspect (sort-by first (ekeko [?aspectName ?calledmethods ?soot|methodName] (get-soot-advice|method ?aspectName ?calledmethods ?soot|methodName))))
- (count (sort-by first (ekeko [?aspectName ?calledmethods ?soot|methodName] (get-soot-advice|method ?aspectName ?calledmethods ?soot|methodName)))) 
+ (inspect (sort-by first (ekeko [?aspectName ?calledmethods ?soot|methodName] (AM ?aspectName ?calledmethods ?soot|methodName))))
+ (count (sort-by first (ekeko [?aspectName ?calledmethods ?soot|methodName] (AM ?aspectName ?calledmethods ?soot|methodName)))) 
  ;############################### IntertypeMethod-Method dependence (IM) ###############################
  (defn get-soot-intertype|method [?aspectName ?calledmethods ?soot|interName  ]
    "the number of method calls per intertype method declaration body"
@@ -334,15 +293,15 @@
  ;############################### Attribute-Class dependence (AtC) ###############################
  ;Definition : if a class is the type of an field of an aspect 
  ;Filtering primitive types and interfaces that could be the type of a field!
-  (defn getField-AtC [?aspectName ?fieldName ?fieldTypeName] 
-    "count the number of types of fields in aspects"
-         (l/fresh [?field ?aspect ?isSameInterface ?signature ?fieldType]
+  (defn AtC [?aspectName ?fieldName ?fieldTypeName] 
+    "count the number of types of fields of aspects"
+         (l/fresh [?field ?aspect ?isSameInterface ?fieldType]
                  (w/type-field ?aspect ?field)
                  (succeeds (.isAspect ?aspect))
                  (equals ?aspectName (str "Aspect {"(.getName ?aspect)"}"))
                  (equals ?fieldType  (.getType ?field))
                  (equals false       (.isPrimitiveType (.getType ?field))); I ignore primitive types such as boolean, int , void ,double, and so on.
-                 (equals false       (or (.startsWith (.getName ?field) "ajc") (.startsWith (.getName ?field) "this")))
+                 ;(equals false       (or (.startsWith (.getName ?field) "ajc") (.startsWith (.getName ?field) "this")))
                  (equals ?fieldTypeName     (.getName ?fieldType))
                  (equals ?isSameInterface (getInterface ?fieldTypeName))
                  (equals true        (nil? ?isSameInterface));check whether the type is interface or not!!
@@ -475,25 +434,26 @@
                             (ekeko [?vari ?A ?m ?r] (measureMC-return ?A ?m ?vari ?r))))
   
   ;############################### Pointcut-Class dependence (PC) ###############################
-  (defn measurePC [?typename ?pn ?aspect] 
-    "if a class is the type of a parameter of a pointcut (poincutDefinition) in an aspect"
-    (l/fresh [?point ?types ?type ?isInterface]
+  ;if a class is the type of a parameter of a pointcut (poincutDefinition) in an aspect
+  (defn PC [?typename ?pointcutname ?aspect] 
+    "counts pointcut-class dependencies"
+    (l/fresh [?pointcut ?types ?type ?isInterface]
              (w/pointcutdefinition ?point)
-             (equals ?types (.getParameterTypes ?point))
+             (equals ?types (.getParameterTypes ?pointcut))
              (contains ?types ?type)
-             (equals false (.isPrimitiveType ?type))
-             (equals ?typename (.getName ?type))
+             (equals false  (.isPrimitiveType ?type))
+             (equals ?typename    (.getName ?type))
              (equals ?isInterface (getInterface ?typename))
              (succeeds  (nil? ?isInterface))
-             (equals ?aspect (.getName (.getDeclaringType ?point)))
-             (equals ?pn (str "<Pointcut Name :"(.getName ?point)">"))))
+             (equals ?aspect (.getName (.getDeclaringType ?pointcut)))
+             (equals ?pointcutname (str "<Pointcut Name :"(.getName ?pointcut)">"))))
   
   (inspect (sort-by first (ekeko [?tn ?pn ?aspect] (measurePC ?tn ?pn ?aspect))))
   (count (ekeko [?tn ?pn ?aspect] (measurePC ?tn ?pn ?aspect)))
   
   ;############################### Pointcut-Method dependence (PM) ###############################
   ;if a pointcut of an aspect contains at least one join point that is related to a method/construct of a class
- (defn countPM [?calledClass ?calledMth  ?aspectName ?adviceKind ?pointcut ] 
+ (defn countPM [?calledClass ?calledMth  ?aspectName ?adviceKind ?pointcut] 
             (l/fresh [?toLongStringmethod ?methodName ?aspect ?advice ?shadow ?shadowParent ?fullyClassName ?class]
                     (NOAdvices ?aspect ?advice ?pointcut)
                     (w/advice-shadow ?advice ?shadow);in order to reach the join point shadows, I used w/advice-shadow to pick them up along with advices' pointcut
@@ -521,7 +481,7 @@
  ; "Aspect {SortingAspect}" 
  ; #<AdviceKind before> 
  ; #<AndPointcut (((call(public void lancs.mobilemedia.core.ui.controller.MediaListController.appendMedias(lancs.mobilemedia.core.ui.datamodel.MediaData[], lancs.mobilemedia.core.ui.screens.MediaListScreen)) && this(BindingTypePattern(lancs.mobilemedia.core.ui.controller.MediaListController, 0))) && args(BindingTypePattern(lancs.mobilemedia.core.ui.datamodel.MediaData[], 1), BindingTypePattern(lancs.mobilemedia.core.ui.screens.MediaListScreen, 2))) && persingleton(lancs.mobilemedia.optional.sorting.SortingAspect))>]
- ; The output says that a declared pointcut that connects with an advice before in SortingAspect refers to a method which is "appendMedias" in MediaListController
+ ; The output says that a declared pointcut that connects with a before advice in SortingAspect refers to a method which is "appendMedias" in MediaListController
  ; so, this method is belongs to the class, in other words,a join point shadow matches the method called "appendMedias" of MediaListController  
  
  ;###############################* AdvanceAdvice : How many advice depend on constructs that can only be determined at runtime? ###############################
@@ -564,50 +524,46 @@
  (ekeko [?size ] (NOBAdvices ?size))
  
  ;############################### InheritedAspects : Are aspects often inherited by abstract aspects? ############################### 
- (defn NOIAspects [?aspectname ?abstname]
-         (l/fresh  [?aspect ?source ?super]
+ (defn InheritedAspets [?aspect ?super]
+         (l/fresh  [?source]
                    (NOAspects ?aspect ?source)
                    (w/aspect-declaredsuper ?aspect ?super)
-                   (equals ?aspectname (str "Aspect {"(.getSimpleName ?aspect)"}"))
-                   (equals ?abstname (str "From Abstract Aspect -> "(.getSimpleName ?super)))
-                   (succeeds (.isAbstract ?super))
-                   (succeeds (.isAspect ?super))))
+                   (succeeds (.isAbstract ?super))))
  
- (inspect (sort-by first (ekeko [?aspectname ?name] (NOIAspects ?aspectname ?name))))
- (count (ekeko [?aspectname ?name] (NOIAspects ?aspectname ?name)))
+ (inspect (sort-by first (ekeko [?aspectname ?abstract] (l/fresh[?aspect] (InheritedAspets ?aspect ?abstract) (equals ?aspectname (.getName ?aspect))))))
+ (count (ekeko [?aspectname ?name] (InheritedAspets ?aspectname ?name)))
  
- ;############################### SA: Number of isSingleton Aspects? ###############################
-  (defn NOSAspects [?aspectname ?del]
-         (l/fresh  [?source ?aspect]
+ ;############################### SA: Number of Singleton Aspects? ###############################
+  (defn NOSingletonAspects [?aspect ?association]
+         (l/fresh  [?source]
                    (NOAspects ?aspect ?source)
-                   (equals ?aspectname (str "Aspect {"(.getSimpleName ?aspect)"}"))
-                   (equals ?del (.getName (.getKind (.getPerClause (.getDelegate ?aspect)))))
-                   (succeeds (= "issingleton" ?del))))
+                   (equals ?association (.getName (.getKind (.getPerClause (.getDelegate ?aspect)))))
+                   (succeeds (= "issingleton" ?association))))
   
-  (inspect (ekeko [?a ?d] (NOSAspects ?a ?d)))
-  (count (ekeko [?a ?d] (NOSAspects ?a ?d))) 
+  (inspect (ekeko [?a ?d] (NOSingletonAspects ?a ?d)))
+  (count (ekeko [?a ?d] (NOSingletonAspects ?a ?d))) 
   
- ;############################### nSA: Number of non-isSingleton Aspects? ###############################
-  (defn NOnonSAspects [?aspectname ?del]
-         (l/fresh  [?source ?aspect]
+ ;############################### nSA: Number of non-Singleton Aspects? ###############################
+  (defn NOnonSAspects [?aspect ?association]
+         (l/fresh  [?source]
                    (NOAspects ?aspect ?source)
-                   (equals ?aspectname (str "Aspect {"(.getSimpleName ?aspect)"}"))
-                   (equals ?del (.getName (.getKind (.getPerClause (.getDelegate ?aspect)))))
-                   (equals false (= "issingleton" ?del))))
+                   (equals ?association (.getName (.getKind (.getPerClause (.getDelegate ?aspect)))))
+                   (equals false (= "issingleton" ?association))))
   
   (inspect (ekeko [?a ?d] (NOnonSAspects ?a ?d)))
   (count (ekeko [?a ?d] (NOnonSAspects ?a ?d)))
   
  ;###############################* AE: How often is adviceExecution() used? ###############################
  (defn NOAdviceexecution [?shortAspect ?advicekind ?pointcut ?arg]
-                            (l/fresh [?aspect ?advice ?args ?ar]
-                                     (NOAdvices ?aspect ?advice ?pointcut)
-                                     (equals ?shortAspect (str "Aspect {"(.getSimpleName ?aspect)"}"))
-                                     (equals ?advicekind (str "Advice {"(.toString (.getKind ?advice))"}"))
-                                     (getAdvance ?pointcut ?args)
-                                     (equals ?ar (vec (into #{} ?args)))
-                                     (contains ?ar ?arg)
-                                     (succeeds (and (= (.getPointcutKind ?arg) 1) (= "adviceexecution" (.toString (getKind ?arg)))))))
+   (l/fresh [?aspect ?advice ?args ?ar]
+            (NOAdvices ?aspect ?advice ?pointcut)
+            (equals ?shortAspect (str "Aspect {"(.getSimpleName ?aspect)"}"))
+            (equals ?advicekind (str "Advice {"(.toString (.getKind ?advice))"}"))
+            (getAdvance ?pointcut ?args)
+            (equals ?ar (vec (into #{} ?args)))
+            (contains ?ar ?arg)
+            (succeeds (and (= (.getPointcutKind ?arg) 1) 
+                           (= "adviceexecution" (.toString (getKind ?arg)))))))
  
  (inspect  (sort-by first (ekeko [?shortAspect ?nameaspect ?list ?pointdefs] (NOAdviceexecution ?shortAspect ?nameaspect ?pointdefs ?list)))) 
  (count (ekeko [?shortAspect ?nameaspect ?list ?pointdefs]  (NOAdviceexecution ?shortAspect ?nameaspect ?pointdefs ?list)))
@@ -765,42 +721,53 @@
  
  ;############################### How many before/after advice VS around advice VS after Throwing/Returning advice? ###############################
  ;NOAround Advice
- (defn countNOAround []
-   (count (ekeko [?a ?adv ?pointcut] 
-                 (NOAdvices ?a ?adv ?pointcut)
-                 (succeeds (= (.getName (.getKind ?adv)) "around")))))
- (countNOAround)
+ (defn NOAround []
+   "count the number around advices in a system"
+   (count (ekeko [?aspect ?advice ?pointcut] 
+                 (NOAdvices ?aspect ?advice ?pointcut)
+                 (succeeds (= (.getName (.getKind ?advice)) "around")))))
+ (NOAround)
  
- (defn countNOAfter []
-   (count (ekeko [?a ?adv ?pointcut] 
-                 (NOAdvices ?a ?adv ?pointcut)
-                 (succeeds (= (.getName (.getKind ?adv)) "after")))))
- (countNOAfter)
+ (defn NOAfter []
+   "count the number after advices in a system"
+   (count (ekeko [?aspect ?advice ?pointcut] 
+                 (NOAdvices ?aspect ?advice ?pointcut)
+                 (succeeds (= (.getName (.getKind ?advice)) "after")))))
+ (NOAfter)
  
- (defn countNOBefore []
-   (count (ekeko [?a ?adv ?pointcut] 
-                 (NOAdvices ?a ?adv ?pointcut)
-                 (succeeds (= (.getName (.getKind ?adv)) "before")))))
- (countNOBefore)
+ (defn NOBefore []
+   "count the number before advices in a system"
+   (count (ekeko [?aspect ?advice ?pointcut]
+                 (NOAdvices ?aspect ?advice ?pointcut)
+                 (succeeds (= (.getName (.getKind ?advice)) "before")))))
+ (NOBefore)
 
  ;Number of Before/After advices
- (+ (countNOAfter) (countNOBefore))
+ (defn NOBAAdvices []
+   "count the number before and after advices in a system"
+   (+ (NOAfter) (NOBefore)))
+ 
+ (NOBAAdvices)
  
  ;Number of after returning
- (defn countNOAReturning []
-   (count (ekeko [?a ?adv ?pointcut] 
-                 (NOAdvices ?a ?adv ?pointcut)
-                 (succeeds (= (.getName (.getKind ?adv)) "afterReturning")))))
- (countNOAReturning)
+ (defn NOAReturning []
+    "count the number before and after returning advice in a system"
+   (count (ekeko [?aspect ?advice ?pointcut] 
+                 (NOAdvices ?aspect ?advice ?pointcut)
+                 (succeeds (= (.getName (.getKind ?advice)) "afterReturning")))))
+ (NOAReturning)
  ;Number of after throwing
-  (defn countNOAThrowing []
-   (count (ekeko [?a ?adv ?pointcut] 
-                 (NOAdvices ?a ?adv ?pointcut)
-                 (succeeds (= (.getName (.getKind ?adv)) "afterThrowing")))))
- (countNOAThrowing)
+ (defn NOAThrowing []
+    "count the number after throwing advice in a system"
+   (count (ekeko [?aspect ?advice ?pointcut] 
+                 (NOAdvices ?aspet ?advice ?pointcut)
+                 (succeeds (= (.getName (.getKind ?advice)) "afterThrowing")))))
+ (NOAThrowing)
  
  ;Total number of After throwing/returning advices
- (+  (countNOAThrowing)  (countNOAReturning))
+  (defn NOAfterTRAdvices []
+     "count the number after throwing and returning advices in a system"
+    (+  (countNOAThrowing)  (countNOAReturning)))
  
  ;############################### AdC: Calculate the average of advised classes in a system? ###############################
  ;count the number of advised classes with advised subclasses
@@ -877,7 +844,8 @@
  (defn NOCall [?shortAspect ?call ?advicekind]
    (l/fresh [ ?pointdefs]
             (CallsExecutions ?shortAspect ?advicekind  ?call  ?pointdefs)
-            (succeeds (or (= "method-call" (.toString (getKind ?call))) (= "constructor-call" (.toString (getKind ?call)))))))
+            (succeeds (or (= "method-call" (.toString (getKind ?call))) 
+                          (= "constructor-call" (.toString (getKind ?call)))))))
  
  (inspect (sort-by first (ekeko [?a ?c ?ad] (NOCall ?a ?c ?ad))))
  (count (ekeko [?a ?c ?ad] (NOCall ?a ?c ?ad)))
@@ -886,7 +854,8 @@
  (defn NOExecution [?shortAspect ?execution ?advicekind]
    (l/fresh [?pointdefs]
             (CallsExecutions ?shortAspect ?advicekind  ?execution  ?pointdefs)
-            (succeeds (or (= "method-execution" (.toString (getKind ?execution))) (= "constructor-execution" (.toString (getKind ?execution)))))))
+            (succeeds (or (= "method-execution" (.toString (getKind ?execution))) 
+                          (= "constructor-execution" (.toString (getKind ?execution)))))))
  
  (inspect (sort-by first (ekeko [?a ?e ?ad] (NOExecution ?a ?e ?ad))))
  (count (ekeko [?a ?e ?ad] (NOExecution ?a ?e ?ad)))
@@ -951,7 +920,7 @@
                                                      (equals false (nil? ?from))
                                                      (equals ?methodcut (str (.getPackageName ?class)"."(.getName ?class)"."(.toString ?shadow)))
                                                      (equals ?methodname (splitmethod (clojure.string/split ?methodcut  #",")))))))))
-                                                     ;(equals false (nil? (isMethod ?methodname)))))))))
+  ;(equals false (nil? (isMethod ?methodname)))))))))
  
  (defn- splitmethod [name]
    (if (not (empty? name)) (str (first name)(if (not (empty? (rest name))) (str ", "(splitmethod (rest name))))) (str name)))
@@ -1105,7 +1074,7 @@
   (AvCsC)
  
  ;############################### Wildcards: How often are wildcards used in modules declared in method/construct-call/execution and field-get/set? ###############################
- (defn functionNOW [?shortAspect ?itemName ?advicekind ?decType ?excTypeName]
+ (defn- functionNOW [?shortAspect ?itemName ?advicekind ?decType ?excTypeName]
    (l/fresh [?callexecution  ?pointcuts ?aspect ?advice ?primPoint ?ar]
             (NOAdvices ?aspect ?advice ?pointcuts)
             (equals ?shortAspect (str "Aspect {"(.getSimpleName ?aspect)"}"))
@@ -1234,7 +1203,7 @@
             (equals ?numbers (count ?istrue))))
  
  (inspect  (sort-by first (ekeko [?return ?parameters ?arg ?unit ?istrue ?numbers] (NOAccess ?return ?parameters ?arg ?unit ?istrue ?numbers))))
- (count(ekeko [?return ?parameters ?arg ?unit ?istrue] (NOAccess ?return ?parameters ?arg ?unit ?istrue)))
+ (count(ekeko [?return ?parameters ?arg ?unit ?istrue ?numbers] (NOAccess ?return ?parameters ?arg ?unit ?istrue ?numbers)))
  
  (defn- AmountOfaccessingArgs [?numbers]
    (l/fresh [?return ?parameters ?arg ?unit ?istrue ]
