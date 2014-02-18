@@ -2,14 +2,16 @@
 
 - [The Definitions of The Metrics](#the-definitions-of-the-metrics)
 
+- [Have a look at an example](#have-a-look-at-an-example)
+
 - [Quick Access](#quick-access)
 
-- [How to run the metrics?](#how-to-run-the-metrics)
+- [How the metrics work?](#how-to-run-the-metrics)
 
 ### Master Thesis
 ---
 
-The aim of my master project is: analysing the existing **[AspectJ](http://eclipse.org/aspectj/)** applications. In order to collect proper informations, I have implemented several **[aspect-oriented programming](http://en.wikipedia.org/wiki/Aspect-oriented_programming) (AOP) Metrics**.
+The aim of my master project is to analyse the existing **[AspectJ](http://eclipse.org/aspectj/)** applications. In order to collect proper information, I have implemented several **[aspect-oriented programming](http://en.wikipedia.org/wiki/Aspect-oriented_programming) (AOP) Metrics**.
 
 ### The Definitions of The Metrics
 ---
@@ -73,8 +75,7 @@ The Metric representation of the question is: the number of inherited aspects in
                    (w/aspect-declaredsuper ?aspect ?super)
                    (equals ?aspectname (str "Aspect {"(.getSimpleName ?aspect)"}"))
                    (equals ?abstractname (str "From Abstract Aspect -> "(.getSimpleName ?super)))
-                   (succeeds (.isAbstract ?super))
-                   (succeeds (.isAspect ?super))))
+                   (succeeds (.isAbstract ?super))))
 ```
 
 ### Quick Access
@@ -82,7 +83,7 @@ The Metric representation of the question is: the number of inherited aspects in
 
 The implemented 41 metrics.. ([See them](https://github.com/ozlerhakan/AOPMetrics-EkekoAJFX/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj))
 
-### How to run the metrics?
+### How the metrics work?
 ---
 
 First of all, make sure that you have all dependencies about the Ekeko Plugin in your Eclipse IDE, if not, you have to download it with its dependencies from [here](https://github.com/cderoove/damp.ekeko/wiki/Getting-Started-with-Ekeko). 
