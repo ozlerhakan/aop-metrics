@@ -1,6 +1,6 @@
 **Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
 
-- [The Definitions of The Metrics](#the-definitions-of-the-metrics)
+- [The Hierarchy of The Research Questions ](#the-hierarchy-of-the-research-questions)
 
 - [Have a look at an example](#have-a-look-at-an-example)
 
@@ -11,7 +11,7 @@
 ### Master Thesis
 ---
 
-The aim of my master project is to analyse the existing **[AspectJ](http://eclipse.org/aspectj/)** applications. In order to collect proper information, I have implemented several metrics consisting of **[aspect-oriented programming](http://en.wikipedia.org/wiki/Aspect-oriented_programming) (AOP)** and object-oriented programming **(OOP)** features.
+The aim of my master project is to analyse the existing **[AspectJ](http://eclipse.org/aspectj/)** applications. In order to collect proper information, I have implemented several metrics consisting of **[aspect-oriented programming](http://en.wikipedia.org/wiki/Aspect-oriented_programming) (AOP)** and **[object-oriented programming](http://en.wikipedia.org/wiki/Object-oriented_programming) (OOP)** features.
 
 ### The Hierarchy of The Research Questions 
 ---
