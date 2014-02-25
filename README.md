@@ -11,56 +11,59 @@
 ### Master Thesis
 ---
 
-The aim of my master project is to analyse the existing **[AspectJ](http://eclipse.org/aspectj/)** applications. In order to collect proper information, I have implemented several **[aspect-oriented programming](http://en.wikipedia.org/wiki/Aspect-oriented_programming) (AOP) Metrics**.
+The aim of my master project is to analyse the existing **[AspectJ](http://eclipse.org/aspectj/)** applications. In order to collect proper information, I have implemented several metrics consisting of **[aspect-oriented programming](http://en.wikipedia.org/wiki/Aspect-oriented_programming) (AOP)** and object-oriented programming **(OOP)** features.
 
-### The Definitions of The Metrics
+### The Hierarchy of The Research Questions 
 ---
 
-The list shows the implemented metrics along with their abbreviations and definitions :
+1.	How large is the system?
+	*	Lines of Code (LOC) 
+	*	Vocabulary Size (VS) 
+	*	Number of Attributes (NOA) 
+	*	Number of Methods (NOM)
+2.	How often are AOP constructs used compared to OOP features?
+	*	Number of Intertype (NOI)
+	*	Number of Advices (NOAd)
+3.	Which AOP constructs are typically used?
+	*	Inherited Aspects (InA)
+	*	Singleton Aspects (SA)
+	*	Non-Singleton Aspects (nSA)
+	*	Advice-Advance Pointcut Dependence (AAP)
+	*	Advice-Basic Pointcut Dependence (ABP)
+	*	Number of Around Advice (NOAr)
+	*	Number of Before/After Advice (NOBA)
+	*	Number of After Throwing/Returning Advice (NOTR)
+	*	Number of Call (NOC)
+	*	Number of Execution (NOE)
+	*	Number of AdviceExecution (AE)
+	*	Number of Wildcards (NOW)
+	*	Number of non-Wildcards (NOnW)
+	*	Argument size of Args-Advice (ASA)
+	*	Argument size of Args-Advice-args (ASAA)
+4.	What percentage of a system is advised by AOP?
+	*	Number of Advised Classes (AdC)
+	*	Number of non-Advised Classes (nAdC)
+	*	Number of Advised Methods (AdM)
+	*   Number of non-Advised Methods (nAdM)
+	*	Classes and Subclasses (CsC)
+	*	Average of Subclasses of Classes (ACsC)
+5.	Is there a connection between the amount of coupling in an aspect, and how many shadows it advises?
+	*	Advice-Join Point Shadow Dependence (AJ)
+	*	Number of thisJoinPoint/Static (NOJPS)
+	*	Number of Modified Args (MoA)
+	*	Number of Accessed Args (AcA)
+	*	Around Advice - non-Proceed Call Dependence (AnP)
+6.	How many dependencies are there between classes and aspects?	
+	*	Attribute-Class Dependence Measure (AtC)
+	*	Advice-Class Dependence (AC)
+	*	Intertype-Class Dependence (IC) 
+	*	Method-Class Dependence (MC) 
+	*	Pointcut-Class Dependence (PC) 
+	*	Advice-Method Dependence (AM) 
+	*	IntertypeMethod-Class Dependence (IM) 
+	*	Method-Method Dependence (MM) 
+	*	Pointcut-Method Dependence (PM) 
 
-Abbreviations | Definitions
---- | --- 
- **VS**|	counts the number of classes and aspects.
- **LOC**|	counts the number of lines of code without blank lines.
- **NOA**| 	counts the number of fields declared in both aspects and classes.
-**NOM**| 	counts the number of methods declared in both aspects and classes.
-**NOAd**| 	counts the number of advices.
-**NOI**|	counts the number of intertype method declarations.
- **AM**|	counts how many times the methods of classes are called in the body of advices in aspects.
- **IM**|	counts how many times the methods of classes are called in the body of intertype method declarations in aspects.
- **MM**|	counts how many times the methods of classes are called in the body of methods in aspects.
- **AtC**|	counts the number of classes defined as the types of fields in aspects.
- **AC**|	counts the number of classes defined as the types of parameters or return types of advices in aspects.
- **IC**|	counts the number of classes defined as the types of parameters or return types of intertype method declarations in aspects.
- **MC**|	counts the number of classes defined as the types of parameters or return types of methods in aspects.
- **PC**|	counts the number of classes defined as the parameters of pointcut definitions in aspects.
- **PM**|	counts the number of methods and constructors of classes are refered by join points defined by pointcuts in aspects.
- **AA**|	counts the number of advance advices whose poincuts have at least one of the advance pointcuts such as if, adviceexecution, cflow, and cflowbelow.
- **BA**|	counts the number of basic advices whose pointcuts use more than once the basic pointcuts.
- **InA**|	counts how many aspects inherited by abstract aspects.
- **SA**|	counts how many aspects are isSingleton.
- **nSA**|	counts how many aspects are non-isSingleton.
- **AE**|	counts how many times adviceexecution pointcut is used.
- **AJPS**|	calculates the average of join point shadows per advice.
-**AgPA**|	calculates the average of size of arguments declared in args pointcuts per advice.
-**AgPAg**|	calculates the average of size of arguments declared in args pointcuts per advice that has an args pointcut.
- **nPC**|	counts how many around advice do not use a proceed call.
- **ArA**|	counts the number of the around advices in a given system.
- **ABA**|	counts the number of the before and after advices in a given system.
- **ATRA**|	counts the number of the after throwing and after returning advices in a given system.
- **AdC**|	calculates the average of advised classes have at least one join point shadow.
- **nAdC**|	calculates the average of non-advised classes have no any join point shadow.
- **NOC**|	counts how many times call pointcut is declared.
- **NOE**|	counts how many times execution pointcut is declared.
- **AdM**|	counts the number of advised methods of classes.
- **nAdM**|	counts the number of non-advised methods of classes.
- **CsC**|	counts how many classes are advised along with their subclasses.
- **ACsC**|	calculates the average of subclasses of advised classes per adviced class.
- **NOW**|	counts the amount of used wildcards in modules named in the pointcuts of aspects.
- **NOnW**|	counts the amount of non-used wildcards in modules named in the pointcuts of aspects.
- **TJPS**|	counts the amount of used thisJoinPoint and thisJoinPointStatic in the body of advices.
-**MoA**|	counts how many times the arguments of args pointcuts are modified in the body of advices.
-**AcA**|	counts how many times the arguments of args pointcuts are accessed in the body of advices.
 
 ### Have a look at an example
 ---
