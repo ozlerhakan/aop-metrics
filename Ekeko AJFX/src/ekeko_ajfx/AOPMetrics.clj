@@ -453,8 +453,8 @@
   
   ;############################### Pointcut-Method dependence (PM) ###############################
   ;if a pointcut of an aspect contains at least one join point that is related to a method/construct of a class
- (defn countPM [?calledClass ?calledMth  ?aspectName ?adviceKind ?pointcut] 
-            (l/fresh [?toLongStringmethod ?methodName ?aspect ?advice ?shadow ?shadowParent ?fullyClassName ?class]
+ (defn countPM [?calledClass ?calledMth  ?aspectName ?adviceKind ?pointcut ?shadow] 
+            (l/fresh [?toLongStringmethod ?aspect ?advice ?shadowParent ?fullyClassName ?class ?methodName]
                     (NOAdvices ?aspect ?advice ?pointcut)
                     (w/advice-shadow ?advice ?shadow);in order to reach the join point shadows, I used w/advice-shadow to pick them up along with advices' pointcut
                     (equals true (.isCode ?shadow))
@@ -470,11 +470,20 @@
                     (equals ?class (subs ?toLongStringmethod 0 (.lastIndexOf ?toLongStringmethod ".")))
                     (equals ?calledClass (str "<Class Name :" ?class ">"))
                     (equals ?methodName (subs ?toLongStringmethod (+ (.lastIndexOf ?toLongStringmethod ".") 1)))
-                    (succeeds (= ?fullyClassName ?class))))
+                    (succeeds (= ?fullyClassName ?class))
+                    (equals false (nil? (isParentsChild ?methodName ?shadowParent)))))
   
- (inspect (sort-by first  (ekeko [?CalledM  ?calledC  ?aspect ?adv ?pnt] (countPM ?calledC ?CalledM ?aspect ?adv ?pnt))))
- (count (ekeko [?CalledM  ?calledC  ?aspect ?adv ?pnt] (countPM ?calledC ?CalledM ?aspect ?adv ?pnt)))
+ (inspect (sort-by first  (ekeko [?CalledM  ?calledC  ?aspect ?adv ?pnt ?shadow ] (countPM ?calledC ?CalledM ?aspect ?adv ?pnt ?shadow ))))
+ (count (ekeko [?CalledM  ?calledC  ?aspect ?adv ?pnt ?shadow] (countPM ?calledC ?CalledM ?aspect ?adv ?pnt ?shadow)))
 
+ (defn- isParentsChild [?methodname ?parent]
+   (first (ekeko [ ?childname ]
+                 (l/fresh [?isparent  ?child ?listofchildren]
+                          (equals ?listofchildren (.getChildren ?parent))
+                          (contains ?listofchildren ?child)
+                          (succeeds (= "method" (.toString (.getKind ?child))))
+                          (equals ?childname (.getName ?child))
+                          (equals true (= ?methodname ?childname))))))
  ;output ex: mobilemedia-> 
  ;["In Class: MediaListController -> method-call(void lancs.mobilemedia.core.ui.controller.MediaListController.appendMedias(lancs.mobilemedia.core.ui.datamodel.MediaData[], lancs.mobilemedia.core.ui.screens.MediaListScreen))" 
  ; "<Class Name :lancs.mobilemedia.core.ui.controller.MediaListController>" 
@@ -535,6 +544,7 @@
  
  ;############################### SA: Number of Singleton Aspects? ###############################
   (defn NOSingletonAspects [?aspect ?association]
+    "the number of singleton aspects"
          (l/fresh  [?source]
                    (NOAspects ?aspect ?source)
                    (equals ?association (.getName (.getKind (.getPerClause (.getDelegate ?aspect)))))
@@ -643,12 +653,9 @@
              (NOAdvices ?aspect ?advice ?pointcut)
              (equals ?shortAspect (str "Aspect {"(.getSimpleName ?aspect)"}"))
              (equals ?advicekind (str "Advice {"(.toString (.getKind ?advice))"}"))
-             ;(ajsoot/advice-soot|method ?advice ?soot|method)
-             ;(succeeds (= (.getName (.getSignature ?advice)) (.getName ?soot|method)))
              (getArgs ?pointcut ?args)
              (equals false (empty? ?args))
              (equals ?arg (vec (into #{} ?args)))
-             ;(equals ?sootname  (.getName ?soot|method))
              (equals ?return (collectArguments ?arg))
              (equals ?sizelist (java.util.ArrayList. []))
              (equals ?sizeR (argumentsize (clojure.string/split ?return  #",") ?sizelist))
@@ -986,7 +993,7 @@
  
  ;############################### CsC: Do aspects often advise classes with a lot of subclasses? ###############################
  ;simply counts the number of classes along with their subclasses | calculate the everage of them both!
- (defn- declaringTypesOfcalledMethods []
+ (defn- declaringTypesMethodConstruct []
    (lazy-seq (into #{} (ekeko [?calltype]
                               (l/fresh [ ?pointdefs  ?call   ?shortAspect ?advicekind]
                                        (CallsExecutions ?shortAspect ?advicekind  ?call  ?pointdefs)
@@ -997,18 +1004,18 @@
                                                        (IndexOfText (.toString ?calltype) "+")
                                                        (IndexOfText (.toString ?calltype) "*")
                                                        (IndexOfText (.toString ?calltype) ".."))))))))
- (inspect (declaringTypesOfcalledMethods))
+ (inspect (declaringTypesMethodConstruct))
  ;Bank.getAccounts();  -> Bank -> KBC & Fortis
  
  ;Main Query!
- (defn CsC [?classes ?subclasses]
-   (l/fresh [?infos ?info ?listSub]
-            (equals ?infos (declaringTypesOfcalledMethods))
-            (contains ?infos ?info)
-            (equals ?classes (.getName (.getType (first ?info))))
-            (succeeds  (nil? (getInterface ?classes)))
-            (equals ?listSub (class|superclass ?classes))
-            (getsubclasses ?listSub ?subclasses)))
+ (defn CsC [?class ?listofsubclasses]
+   (l/fresh [?type ?types ?subclassofclass]
+            (equals ?types (declaringTypesMethodConstruct))
+            (contains ?types ?type)
+            (equals ?class (.getName (.getType (first ?type))))
+            (succeeds  (nil? (getInterface ?class)))
+            (equals ?subclassofclass (class|subclasses ?class))
+            (getsubclasses ?subclassofclass ?listofsubclasses)))
  
  (inspect (ekeko [?i ?s] (CsC ?i ?s)))
  (count (ekeko [?i ?s] (CsC ?i ?s)))
@@ -1021,13 +1028,14 @@
  
  (defn- metric [class list]
    (if (not (empty? class))
-     [(addlist list (first class)) (metric (class|superclass (first (first class))) list) (metric (rest class) list)]))
+     [(addlist list (first class)) (metric (class|subclasses (first (first class))) list) (metric (rest class) list)]))
  
- (defn- class|superclass [?isSameSuperClass]
-   (ekeko [?cn]
+ (defn- class|subclasses [?isSameSuperClass]
+   "return classes (subclasses) that extend to \"isSameSuperClass\""
+   (ekeko [?subclasses]
           (l/fresh [?class ?super]
                    (NOClasses ?class)
-                   (equals ?cn (.getName ?class))
+                   (equals ?subclasses (.getName ?class))
                    (equals ?super (.getName (.getSuperclass ?class)))
                    (equals false (= "java.lang.Object" ?super))
                    (equals true (= ?isSameSuperClass ?super)))))
@@ -1230,7 +1238,7 @@
     (reduce + (seqAcARG)))
   
   (NumberOfAccessedARGS)
- ;)
+;)
  
  (defn modifyARG [list]
    (for [x list :when (= "modify" x)] (str "true")))
@@ -1298,14 +1306,10 @@
              (equals ?mn (.getName ?m)) 
              (succeeds (.isInterface ?m))))
   
-  ;(inspect (sort-by first (ekeko [?s] (getInterfaces-soot ?s))))
-  
   (defn- getInterface-soot [?name] 
     (first (ekeko [?m]                   
                        (getInterfaces-soot ?m)
                        (equals true (= ?name ?m)))))
-  
-  ;(inspect (sort-by first (getInterface-soot "java.sql.ResultSet")))
   
   (defn- getInterface [?name]
     (first (ekeko [?i] 
