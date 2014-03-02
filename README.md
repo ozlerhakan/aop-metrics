@@ -38,15 +38,15 @@ The aim of my master project is to analyse the existing **[AspectJ](http://eclip
 	*	Number of AdviceExecution (AE)
 	*	Number of Wildcards (NOW)
 	*	Number of non-Wildcards (NOnW)
-	*	Argument size of Args-Advice (ASA)
-	*	Argument size of Args-Advice-args (ASAA)
+	*	Argument size of Args-Advice (AAd)
+	*	Argument size of Args-Advice-args (AAda)
 4.	What percentage of a system is advised by AOP?
 	*	Number of Advised Classes (AdC)
 	*	Number of non-Advised Classes (nAdC)
 	*	Number of Advised Methods (AdM)
 	*   Number of non-Advised Methods (nAdM)
 	*	Classes and Subclasses (CsC)
-	*	Average of Subclasses of Classes (ACsC)
+	*	Average of Subclasses of Classes (AScC)
 5.	Is there a connection between the amount of coupling in an aspect, and how many shadows it advises?
 	*	Advice-Join Point Shadow Dependence (AJ)
 	*	Number of thisJoinPoint/Static (NOJPS)
