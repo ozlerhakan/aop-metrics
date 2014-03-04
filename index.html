@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Aop.metrics-clj by ozlerhakan</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Aop.metrics-clj</h1>
+        <p>Measuring how AspectJ is used in practice</p>
+
+        <p class="view"><a href="https://github.com/ozlerhakan/aop.metrics-clj">View the Project on GitHub <small>ozlerhakan/aop.metrics-clj</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/ozlerhakan/aop.metrics-clj/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/ozlerhakan/aop.metrics-clj/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/ozlerhakan/aop.metrics-clj">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p><strong>Table of Contents</strong>  <em>generated with <a href="http://doctoc.herokuapp.com/">DocToc</a></em></p>
+
+<ul>
+<li><p><a href="#the-hierarchy-of-the-research-questions">The Hierarchy of The Research Questions </a></p></li>
+<li><p><a href="#have-a-look-at-an-example">Have a look at an example</a></p></li>
+<li><p><a href="#quick-access">Quick Access</a></p></li>
+<li><p><a href="#how-to-run-the-metrics">How the metrics work?</a></p></li>
+</ul><h3>
+<a name="master-thesis" class="anchor" href="#master-thesis"><span class="octicon octicon-link"></span></a>Master Thesis</h3>
+
+<hr><p>The aim of my master project is to analyse the existing <strong><a href="http://eclipse.org/aspectj/">AspectJ</a></strong> applications. In order to collect proper information, I have implemented several metrics consisting of <strong><a href="http://en.wikipedia.org/wiki/Aspect-oriented_programming">aspect-oriented programming</a> (AOP)</strong> and <strong><a href="http://en.wikipedia.org/wiki/Object-oriented_programming">object-oriented programming</a> (OOP)</strong> features.</p>
+
+<h3>
+<a name="the-hierarchy-of-the-research-questions" class="anchor" href="#the-hierarchy-of-the-research-questions"><span class="octicon octicon-link"></span></a>The Hierarchy of The Research Questions</h3>
+
+<hr><ol>
+<li> How large is the system?
+
+<ul>
+<li>  Lines of Code (LOC) </li>
+<li>  Vocabulary Size (VS) </li>
+<li>  Number of Attributes (NOA) </li>
+<li>  Number of Methods (NOM)</li>
+</ul>
+</li>
+<li> How often are AOP constructs used compared to OOP features?
+
+<ul>
+<li>  Number of Intertype (NOI)</li>
+<li>  Number of Advices (NOAd)</li>
+</ul>
+</li>
+<li> Which AOP constructs are typically used?
+
+<ul>
+<li>  Inherited Aspects (InA)</li>
+<li>  Singleton Aspects (SA)</li>
+<li>  Non-Singleton Aspects (nSA)</li>
+<li>  Advice-Advance Pointcut Dependence (AAP)</li>
+<li>  Advice-Basic Pointcut Dependence (ABP)</li>
+<li>  Number of Around Advice (NOAr)</li>
+<li>  Number of Before/After Advice (NOBA)</li>
+<li>  Number of After Throwing/Returning Advice (NOTR)</li>
+<li>  Number of Call (NOC)</li>
+<li>  Number of Execution (NOE)</li>
+<li>  Number of AdviceExecution (AE)</li>
+<li>  Number of Wildcards (NOW)</li>
+<li>  Number of non-Wildcards (NOnW)</li>
+<li>  Argument size of Args-Advice (AAd)</li>
+<li>  Argument size of Args-Advice-args (AAda)</li>
+</ul>
+</li>
+<li> What percentage of a system is advised by AOP?
+
+<ul>
+<li>  Number of Advised Classes (AdC)</li>
+<li>  Number of non-Advised Classes (nAdC)</li>
+<li>  Number of Advised Methods (AdM)</li>
+<li>  Number of non-Advised Methods (nAdM)</li>
+<li>  Classes and Subclasses (CsC)</li>
+<li>  Average of Subclasses of Classes (AScC)</li>
+</ul>
+</li>
+<li> Is there a connection between the amount of coupling in an aspect, and how many shadows it advises?
+
+<ul>
+<li>  Advice-Join Point Shadow Dependence (AJ)</li>
+<li>  Number of thisJoinPoint/Static (NOJPS)</li>
+<li>  Number of Modified Args (MoA)</li>
+<li>  Number of Accessed Args (AcA)</li>
+<li>  Around Advice - non-Proceed Call Dependence (AnP)</li>
+</ul>
+</li>
+<li> How many dependencies are there between classes and aspects?<br><ul>
+<li>  Attribute-Class Dependence Measure (AtC)</li>
+<li>  Advice-Class Dependence (AC)</li>
+<li>  Intertype-Class Dependence (IC) </li>
+<li>  Method-Class Dependence (MC) </li>
+<li>  Pointcut-Class Dependence (PC) </li>
+<li>  Advice-Method Dependence (AM) </li>
+<li>  IntertypeMethod-Class Dependence (IM) </li>
+<li>  Method-Method Dependence (MM) </li>
+<li>  Pointcut-Method Dependence (PM) </li>
+</ul>
+</li>
+</ol><h3>
+<a name="have-a-look-at-an-example" class="anchor" href="#have-a-look-at-an-example"><span class="octicon octicon-link"></span></a>Have a look at an example</h3>
+
+<hr><p>One of the questions we examine is: how many aspects extend to an abstract aspect in a given aspect-oriented project?</p>
+
+<p>The Metric representation of the question is: the number of inherited aspects in a given aspect-oriented project.</p>
+
+<div class="highlight highlight-Clojure"><pre> <span class="p">(</span><span class="kd">defn </span><span class="nv">NOInheritedAspects</span> <span class="p">[</span><span class="nv">?aspectname</span> <span class="nv">?abstractname</span><span class="p">]</span>
+         <span class="p">(</span><span class="nf">l/fresh</span> <span class="p">[</span><span class="nv">?aspect</span> <span class="nv">?source</span> <span class="nv">?super</span><span class="p">]</span>
+                   <span class="p">(</span><span class="nf">NOAspects</span> <span class="nv">?aspect</span> <span class="nv">?source</span><span class="p">)</span>
+                   <span class="p">(</span><span class="nf">w/aspect-declaredsuper</span> <span class="nv">?aspect</span> <span class="nv">?super</span><span class="p">)</span>
+                   <span class="p">(</span><span class="nf">equals</span> <span class="nv">?aspectname</span> <span class="p">(</span><span class="nb">str </span><span class="s">"Aspect {"</span><span class="p">(</span><span class="nf">.getSimpleName</span> <span class="nv">?aspect</span><span class="p">)</span><span class="s">"}"</span><span class="p">))</span>
+                   <span class="p">(</span><span class="nf">equals</span> <span class="nv">?abstractname</span> <span class="p">(</span><span class="nb">str </span><span class="s">"From Abstract Aspect -&gt; "</span><span class="p">(</span><span class="nf">.getSimpleName</span> <span class="nv">?super</span><span class="p">)))</span>
+                   <span class="p">(</span><span class="nf">succeeds</span> <span class="p">(</span><span class="nf">.isAbstract</span> <span class="nv">?super</span><span class="p">))))</span>
+</pre></div>
+
+<h3>
+<a name="quick-access" class="anchor" href="#quick-access"><span class="octicon octicon-link"></span></a>Quick Access</h3>
+
+<hr><p>The implemented 41 metrics.. (<a href="https://github.com/ozlerhakan/AOPMetrics-EkekoAJFX/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj">See them</a>)</p>
+
+<h3>
+<a name="how-the-metrics-work" class="anchor" href="#how-the-metrics-work"><span class="octicon octicon-link"></span></a>How the metrics work?</h3>
+
+<hr><p>First of all, make sure that you have all dependencies about the Ekeko Plugin in your Eclipse IDE, if not, you have to download it with its dependencies from <a href="https://github.com/cderoove/damp.ekeko/wiki/Getting-Started-with-Ekeko">here</a>. </p>
+
+<p>In addition, after importing the Ekeko as an Eclipse project, you have to import the Ekeko's AspectJ extension in order to complete all essential parts. The link of the extension is <a href="https://github.com/cderoove/damp.ekeko.aspectj">here</a>.</p>
+
+<p>Now, you can get the code of the aop.metrics-clj (Ekeko AJFX) by simply cloning the project, plus import it within the workspace of your Eclipse IDE.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/ozlerhakan">ozlerhakan</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
