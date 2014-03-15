@@ -92,9 +92,7 @@
             (contains ?modules ?module)
             (equals ?fields (.getDeclaredFields  (first ?module)))
             (contains ?fields ?field)  
-            (equals false (or 
-                           (.startsWith (.getName ?field) "ajc$")
-                           (IndexOfText (.getName ?field) "$")))))
+            (equals false (IndexOfText (.getName ?field) "$"))))
  
  (inspect (sort-by first (ekeko [?cn ?f] (l/fresh [?c] (NOA ?c ?f ) (equals ?cn (.getName (first ?c)))))))
  (count (ekeko [?c ?f] (NOA ?c ?f))) 
@@ -298,8 +296,8 @@
  
  ;############################### Advice-Class  dependence (AC) ###############################
  ; if a class is  the type of a parameter of a piece of advice of an aspect 
- (defn getAC-p1 [?aspectSN ?adviceKind ?typename ?parameter]
-   (l/fresh [?aspect ?typesofAdvice ?advice  ?isInterface  ?pointcut]
+ (defn getAC-p1 [?aspectSN ?adviceKind ?typename]
+   (l/fresh [?aspect ?typesofAdvice ?advice  ?isInterface  ?parameter ?pointcut]
             (NOAdvices ?aspect ?advice ?pointcut)
             (equals ?aspectSN (str "Aspect {"(.getSimpleName ?aspect)"}"))
             (equals   ?adviceKind (.getKind ?advice))
@@ -307,11 +305,12 @@
             (contains ?typesofAdvice ?parameter)
             (equals   ?typename  (.getName ?parameter))
             (equals false (.isPrimitiveType ?parameter))
+            (equals false (= (.getName ?parameter) "org.aspectj.runtime.internal.AroundClosure"))
             (equals   ?isInterface (getInterface ?typename));control whether a selected type is interface that was implemented in a given AspectJ app 
             (succeeds (nil? ?isInterface))
             (equals false (= "int[]" ?typename))))           
  
- (inspect  (sort-by first (ekeko [?as ?a ?r ?parameter] (getAC-p1 ?as ?a ?r ?parameter)))) 
+ (inspect  (sort-by first (ekeko [?as ?a ?r] (getAC-p1 ?as ?a ?r )))) 
  
  ; the return type of the piece of advice - around - ; "after returning" "after throwing" are being checked in the above function called -getAC-p1-
  (defn getAC-p2 [?aspectSN ?adviceKind ?returntypename] 
