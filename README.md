@@ -1,13 +1,3 @@
-**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
-
-- [The Hierarchy of The Research Questions ](#the-hierarchy-of-the-research-questions)
-
-- [Have a look at an example](#have-a-look-at-an-example)
-
-- [Quick Access](#quick-access)
-
-- [How the metrics work?](#how-to-run-the-metrics)
-
 ### Master Thesis
 ---
 
@@ -46,10 +36,10 @@ The aim of my master project is to analyse the existing **[AspectJ](http://eclip
 	*	Number of Advised Methods (AdM)
 	*   Number of non-Advised Methods (nAdM)
 	*	Classes and Subclasses (CsC)
-	*	Average of Subclasses of Classes (AScC)
+	*	Average of Subclasses of Classes (ScC)
 5.	Is there a connection between the amount of coupling in an aspect, and how many shadows it advises?
 	*	Advice-Join Point Shadow Dependence (AJ)
-	*	Number of thisJoinPoint/Static (NOJPS)
+	*	Number of thisJoinPoint/Static (tJPS)
 	*	Number of Modified Args (MoA)
 	*	Number of Accessed Args (AcA)
 	*	Around Advice - non-Proceed Call Dependence (AnP)
