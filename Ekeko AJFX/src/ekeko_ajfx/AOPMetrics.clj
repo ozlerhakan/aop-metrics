@@ -24,25 +24,52 @@
  ;############################### METRIC LOC ###############################
 
  (defn class-loc [filePath ignoredTestName]
-   "count the number of lines of java code in a given project - except blank lines (comments & javadocs are still counted)"
-  (reduce
+   "count the number of lines of java code in a given project - except blank lines"
+   (reduce
     +
-    (for [file (file-seq  filePath) :when (and (.endsWith (.toString file )".java") (false? (lastIndexOfText (.toString file) ignoredTestName)))]
+    (for [file (file-seq  filePath) :when (and 
+                                            (.endsWith (.toString file )".java") 
+                                            (false? (lastIndexOfText (.getName file) ignoredTestName)) 
+                                            (false? (or 
+                                                      (.startsWith (.toLowerCase (.getName file)) "test") 
+                                                      (.endsWith   (.toLowerCase (.getName file)) "test"))))]
       (with-open [rdr (io/reader  file)] (count  (filter #(re-find #"\S" %) (line-seq rdr)))))))
-
+ 
+ ;(class-loc (io/file"C:/Users/HAKAN/runtime-New_configuration-clojure/HealthWatcherAspectJ/src") "MainTST")
+ 
  (defn aspect-loc [filePath]
-   "count the number of lines of aspectj code in a given project - except blank lines (comments & javadocs are still counted)"
+   "count the number of lines of aspectj code in a given project - except blank lines"
    (reduce
      +
      (for [file (file-seq  filePath) :when (.endsWith (.toString file )".aj")]
        (with-open [rdr (io/reader file)] (count  (filter #(re-find #"\S" %) (line-seq rdr)))))))
  
- (defn LOC [filepath ignore]
-   (+  (class-loc (io/file filepath) ignore) (aspect-loc (io/file filepath))))
+ ;(aspect-loc (io/file"C:/Users/HAKAN/runtime-New_configuration-clojure/AJTestMetrics/src"))
  
- (LOC "C:/Users/HAKAN/runtime-New_configuration-clojure/TelestradaAspectJ/src" "MainTST")
- (LOC "C:/Users/HAKAN/Desktop/Thesis/ws/Version18/Version18/src" "MainTST")
-
+ (defn java-docs [filePath ignoredTestName]
+   "count the number of lines of comments & javadocs"
+   (reduce
+     +
+     (for [file (file-seq  filePath) :when (and 
+                                             (or (.endsWith (.toString file )".aj") (.endsWith (.toString file )".java")) 
+                                             (false? (lastIndexOfText (.getName file) ignoredTestName)) 
+                                             (false? (or 
+                                                       (.startsWith (.toLowerCase (.getName file)) "test") 
+                                                       (.endsWith   (.toLowerCase (.getName file)) "test"))))]
+       (with-open [rdr (io/reader file)] (count  (filter #(re-find #"^([\s]*((\*\/)|(\*)|(\/\*)|(\//)))" %) (line-seq rdr)))))))
+ 
+ ;(java-docs (io/file"C:/Users/HAKAN/runtime-New_configuration-clojure/HealthWatcherAspectJ/src") "MainTST")  
+   
+ (defn LOC [filepath ignore]
+     ( - 
+       (+ 
+         (class-loc (io/file filepath) ignore) 
+         (aspect-loc (io/file filepath)))
+       (java-docs (io/file filepath) ignore)))
+ 
+ ;(LOC "C:/Users/HAKAN/runtime-New_configuration-clojure/HealthWatcherAspectJ/src" "MainTST")
+ ;(LOC "C:/Users/HAKAN/runtime-New_configuration-clojure/Version18/Version18/src" "MainTST")
+ 
  ;############################### METRIC VS ############################### 
  (defn NOClasses [?classes]
    "Number of Classes in the project except enums, interfaces, their inner classes!!, and a test class."
@@ -52,7 +79,9 @@
                      (.isEnum ?classes)
                      (IndexOfText (.getName ?classes) "$");this line excludes all nested-classes!
                      (lastIndexOfText (.getName ?classes) "MainTST");our initial main to activate soot analysis, so I ignore it
-                     (IndexOfText (.getName ?classes) "lang.Object")))))
+                     (IndexOfText (.getName ?classes) "lang.Object")
+                     (.startsWith (.getSimpleName ?classes) "Test")
+                     (.endsWith (.getSimpleName ?classes) "Test")))))
  
  (inspect  (sort-by first (ekeko [?cn] (l/fresh [?c] (NOClasses ?c) (equals ?cn (.getName ?c))))))
  
@@ -1062,10 +1091,10 @@
   (defn- calculateACsC []
     (reduce + (seqCsC)))
   
-  ;total average! ScS():
-  (defn AvCsC []
+  ;total average! ScC():
+  (defn AvScC []
     (format "%.2f" (float (/ (calculateACsC) (count (collectionCsC))))))
-  (AvCsC)
+  (AvScC)
  
  ;############################### Wildcards: How often are wildcards used in modules declared in method/construct-call/execution and field-get/set? ###############################
  (defn- functionNOW [?shortAspect ?itemName ?advicekind ?decType ?excTypeName]
@@ -1160,7 +1189,7 @@
  ;############################### Args : How often are args() only accessed? How often are they modified?  ###############################
  ; amount of arguments accessed and modified in the body of advices 
  (defn NOAccessModifyArgs  [?sootname ?return ?parameters ?arg ?unit ?istrue ?soot|method]
-   (l/fresh [?units ?aspect ?advice ?pointcut ?args ?ret ?getbool ]
+   (l/fresh [?units ?aspect ?advice ?pointcut ?args ?ret ?getbool]
             (NOAdvices ?aspect ?advice ?pointcut)
             (ajsoot/advice-soot|method ?advice ?soot|method)
             (succeeds (= (.getName (.getSignature ?advice)) (.getName ?soot|method)))
