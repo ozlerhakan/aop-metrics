@@ -17,7 +17,8 @@
         [damp.ekeko]
         [clojure.inspector :exclude [inspect]])
   (:import [soot.jimple IdentityStmt]
-    [org.aspectj.lang Signature]))
+           [ekeko_ajfx CountingComments]
+           [org.aspectj.lang Signature]))
 
  (comment )
 
@@ -34,7 +35,6 @@
                                                       (.startsWith (.toLowerCase (.getName file)) "test") 
                                                       (.endsWith   (.toLowerCase (.getName file)) "test"))))]
       (with-open [rdr (io/reader  file)] (count  (filter #(re-find #"\S" %) (line-seq rdr)))))))
- 
  ;(class-loc (io/file"C:/Users/HAKAN/runtime-New_configuration-clojure/HealthWatcherAspectJ/src") "MainTST")
  
  (defn aspect-loc [filePath]
@@ -43,7 +43,6 @@
      +
      (for [file (file-seq  filePath) :when (.endsWith (.toString file )".aj")]
        (with-open [rdr (io/reader file)] (count  (filter #(re-find #"\S" %) (line-seq rdr)))))))
- 
  ;(aspect-loc (io/file"C:/Users/HAKAN/runtime-New_configuration-clojure/AJTestMetrics/src"))
  
  (defn java-docs [filePath ignoredTestName]
@@ -51,15 +50,16 @@
    (reduce
      +
      (for [file (file-seq  filePath) :when (and 
-                                             (or (.endsWith (.toString file )".aj") (.endsWith (.toString file )".java")) 
+                                             (or 
+                                               (.endsWith (.toString file )".aj") 
+                                               (.endsWith (.toString file )".java")) 
                                              (false? (lastIndexOfText (.getName file) ignoredTestName)) 
                                              (false? (or 
                                                        (.startsWith (.toLowerCase (.getName file)) "test") 
                                                        (.endsWith   (.toLowerCase (.getName file)) "test"))))]
-       (with-open [rdr (io/reader file)] (count  (filter #(re-find #"^([\s]*((\*\/)|(\*)|(\/\*)|(\//)))" %) (line-seq rdr)))))))
- 
+       (.getComments (new CountingComments)  (.toString file)))))
  ;(java-docs (io/file"C:/Users/HAKAN/runtime-New_configuration-clojure/HealthWatcherAspectJ/src") "MainTST")  
-   
+       
  (defn LOC [filepath ignore]
      ( - 
        (+ 
