@@ -617,7 +617,7 @@
 	         (equals true (= ?advicename ?advice))))) 
  
   ;visual representation!
-  (defn JPShadows-perAdvice [?aspectname ?adviceKind ?shadowSize]
+  (defn- JPShadows-perAdvice [?aspectname ?adviceKind ?shadowSize]
     (l/fresh [?aspect ?advice ?advicename ?pointcut]
              (NOAdvices ?aspect ?advice ?pointcut)
              (equals ?advicename (.getName (.getSignature ?advice)))
