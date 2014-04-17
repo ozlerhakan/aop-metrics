@@ -7,52 +7,52 @@ The aim of my master project is to analyse the existing **[AspectJ](http://eclip
 ---
 
 1.	How large is the system?
-	*	Lines of Code (LOC) 
-	*	Vocabulary Size (VS) 
-	*	Number of Attributes (NOA) 
-	*	Number of Methods (NOM)
+	*	Lines of Code [(LOC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L156)
+	*	Vocabulary Size [(VS)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L191) 
+	*	Number of Attributes [(NOA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L201) 
+	*	Number of Methods [(NOM)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L211)
 2.	How often are AOP constructs used compared to OOP features?
-	*	Number of Intertype (NOI)
-	*	Number of Advices (NOAd)
+	*	Number of Intertype [(NOI)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L238)
+	*	Number of Advices [(NOAd)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L256)
 3.	Which AOP constructs are typically used?
-	*	Inherited Aspects (InA)
-	*	Singleton Aspects (SA)
-	*	Non-Singleton Aspects (nSA)
-	*	Advice-Advance Pointcut Dependence (AAP)
-	*	Advice-Basic Pointcut Dependence (ABP)
-	*	Number of Around Advice (NOAr)
-	*	Number of Before/After Advice (NOBA)
-	*	Number of After Throwing/Returning Advice (NOTR)
-	*	Number of Call (NOC)
-	*	Number of Execution (NOE)
-	*	Number of AdviceExecution (AE)
-	*	Number of Wildcards (NOW)
-	*	Number of non-Wildcards (NOnW)
-	*	Argument size of Args-Advice (AAd)
-	*	Argument size of Args-Advice-args (AAda)
+	*	Inherited Aspects [(InA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L573)
+	*	Singleton Aspects [(SA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L580)
+	*	Non-Singleton Aspects [(nSA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L589)
+	*	Advice-Advance Pointcut Dependence [(AAP)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L557)
+	*	Advice-Basic Pointcut Dependence [(ABP)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L567)
+	*	Number of Around Advice [(NOAr)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L733)
+	*	Number of Before/After Advice [(NOBA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L752)
+	*	Number of After Throwing/Returning Advice [(NOTR)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L770)
+	*	Number of Call [(NOC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L893)
+	*	Number of Execution [(NOE)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L900)
+	*	Number of AdviceExecution [(AE)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L596)
+	*	Number of Wildcards [(NOW)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L1128)
+	*	Number of non-Wildcards [(NOnW)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L1140)
+	*	Argument size of Args-Advice [(AAd)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L722)
+	*	Argument size of Args-Advice-args [(AAda)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L727)
 4.	What percentage of a system is advised by AOP?
-	*	Number of Advised Classes (AdC)
-	*	Number of non-Advised Classes (nAdC)
-	*	Number of Advised Methods (AdM)
-	*   Number of non-Advised Methods (nAdM)
-	*	Classes and Subclasses (CsC)
-	*	Average of Subclasses of Classes (ScC)
+	*	Number of Advised Classes [(AdC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L851)
+	*	Number of non-Advised Classes [(nAdC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L922)
+	*	Number of Advised Methods [(AdM)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L987)
+	*   Number of non-Advised Methods [(nAdM)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L993)
+	*	Classes and Subclasses [(CsC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L1046)
+	*	Average of Subclasses of Classes [(ScC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L1076)
 5.	Is there a connection between the amount of coupling in an aspect, and how many shadows it advises?
-	*	Advice-Join Point Shadow Dependence (AJ)
-	*	Number of thisJoinPoint/Static (tJPS)
-	*	Number of Modified Args (MoA)
-	*	Number of Accessed Args (AcA)
-	*	Around Advice - non-Proceed Call Dependence (AnP)
+	*	Advice-Join Point Shadow Dependence [(AJ)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L655)
+	*	Number of thisJoinPoint/Static [(tJPS)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L1154)
+	*	Number of Modified Args [(MoA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L1225)
+	*	Number of Accessed Args [(AcA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L1262)
+	*	Around Advice - non-Proceed Call Dependence [(AnP)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L796)
 6.	How many dependencies are there between classes and aspects?	
-	*	Attribute-Class Dependence Measure (AtC)
-	*	Advice-Class Dependence (AC)
-	*	Intertype-Class Dependence (IC) 
-	*	Method-Class Dependence (MC) 
-	*	Pointcut-Class Dependence (PC) 
-	*	Advice-Method Dependence (AM) 
-	*	IntertypeMethod-Class Dependence (IM) 
-	*	Method-Method Dependence (MM) 
-	*	Pointcut-Method Dependence (PM) 
+	*	Attribute-Class Dependence Measure [(AtC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L366)
+	*	Advice-Class Dependence [(AC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L380)
+	*	Intertype-Class Dependence [(IC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L414)
+	*	Method-Class Dependence [(MC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L448)
+	*	Pointcut-Class Dependence [(PC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L481)
+	*	Advice-Method Dependence [(AM)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L332) 
+	*	IntertypeMethod-Class Dependence [(IM)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L340)
+	*	Method-Method Dependence [(MM)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L356)
+	*	Pointcut-Method Dependence [(PM)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L496) 
 
 
 ### Have a look at an example
@@ -70,11 +70,6 @@ The Metric representation of the question is: the number of inherited aspects in
                    (equals ?abstractname (str "From Abstract Aspect -> "(.getSimpleName ?super)))
                    (succeeds (.isAbstract ?super))))
 ```
-
-### Quick Access
----
-
-The implemented 41 metrics.. ([See them](https://github.com/ozlerhakan/AOPMetrics-EkekoAJFX/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj))
 
 ### How the metrics work
 ---
