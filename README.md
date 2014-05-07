@@ -9,7 +9,7 @@ The aim of my master project is to analyse the existing **[AspectJ](http://eclip
 1.	How large is the system?
 	*	*Lines of Code* [(LOC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L156)
 	*	*Vocabulary Size* [(VS)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L191) 
-	*	Number of Attributes* [(NOA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L201) 
+	*	*Number of Attributes* [(NOA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L201) 
 	*	*Number of Methods* [(NOM)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L211)
 2.	How often are AOP constructs used compared to OOP features?
 	*	*Number of Intertype* [(NOI)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L238)
