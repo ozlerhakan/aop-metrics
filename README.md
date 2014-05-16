@@ -13,7 +13,7 @@ The aim of my master project is to analyse the existing **[AspectJ](http://eclip
 	*	*Number of Methods* [(NOM)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L211)
 2.	How often are AOP constructs used compared to OOP features?
 	*	*Number of Intertype* [(NOI)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L238)
-	*	*Number of Advices* [(NOAd)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L256)
+	*	*Number of Advice* [(NOAd)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L256)
 3.	Which AOP constructs are typically used?
 	*	*Inherited Aspects* [(InA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L573)
 	*	*Singleton Aspects* [(SA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L580)
@@ -74,9 +74,9 @@ The Metric representation of the question is: the number of inherited aspects in
 ### How the metrics work
 ---
 
-First of all, make sure that you have all dependencies about the Ekeko Plugin in your Eclipse IDE, if not, you have to download it with its dependencies from [here](https://github.com/cderoove/damp.ekeko/wiki/Getting-Started-with-Ekeko). 
+First of all, make sure that you have all the dependencies about the Ekeko Plugin in your [Eclipse Kepler 4.3 IDE](http://www.eclipse.org/kepler), if not, you have to download it with its dependencies from [here](https://github.com/cderoove/damp.ekeko/wiki/Getting-Started-with-Ekeko). 
 
-In addition, after importing the Ekeko as an Eclipse project, you have to import the Ekeko's AspectJ extension in order to complete all essential parts. The link of the extension is [here](https://github.com/cderoove/damp.ekeko.aspectj).
+In addition, after importing the Ekeko as an Eclipse project, you have to import the Ekeko's AspectJ extension in order to complete the last essential part. The link of the extension is [here](https://github.com/cderoove/damp.ekeko.aspectj).
 
-Now, you can get the code of the aop.metrics-clj (Ekeko AJFX) by simply cloning the project, plus import it within the workspace of your Eclipse IDE.
+Now, you can get the code of the aop-metrics (Ekeko AJFX) by simply cloning the project, plus import it within the workspace of your Eclipse IDE.
 
