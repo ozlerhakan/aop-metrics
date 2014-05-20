@@ -1,7 +1,7 @@
 ### Master Thesis
 ---
 
-The aim of my master project is to analyse the existing **[AspectJ](http://eclipse.org/aspectj/)** applications. In order to collect proper information, I have implemented several metrics consisting of **[aspect-oriented programming](http://en.wikipedia.org/wiki/Aspect-oriented_programming) (AOP)** and **[object-oriented programming](http://en.wikipedia.org/wiki/Object-oriented_programming) (OOP)** features.
+The aim of the thesis  is to analyse the existing **[AspectJ](http://eclipse.org/aspectj/)** applications. In order to collect proper information, a metric framework has been implemented. The framework consists of **[aspect-oriented programming](http://en.wikipedia.org/wiki/Aspect-oriented_programming) (AOP)** and **[object-oriented programming](http://en.wikipedia.org/wiki/Object-oriented_programming) (OOP)** features.
 
 ### The Hierarchy of The Research Questions 
 ---
