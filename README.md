@@ -1,7 +1,7 @@
 ### Master Thesis
 ---
 
-The aim of the thesis  is to analyse the existing **[AspectJ](http://eclipse.org/aspectj/)** applications. In order to collect proper information, a metric framework has been implemented. The framework consists of **[aspect-oriented programming](http://en.wikipedia.org/wiki/Aspect-oriented_programming) (AOP)** and **[object-oriented programming](http://en.wikipedia.org/wiki/Object-oriented_programming) (OOP)** features.
+The aim of the thesis  is to analyse the existing **[AspectJ](http://eclipse.org/aspectj/)** applications. In order to collect proper information, a metric framework has been implemented. The framework consists of **[aspect-oriented ](http://en.wikipedia.org/wiki/Aspect-oriented_programming)** and **[object-oriented ](http://en.wikipedia.org/wiki/Object-oriented_programming)** features.
 
 ### The Hierarchy of The Research Questions 
 ---
@@ -18,21 +18,21 @@ The aim of the thesis  is to analyse the existing **[AspectJ](http://eclipse.org
 	*	*Inherited Aspects* [(InA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L573)
 	*	*Singleton Aspects* [(SA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L580)
 	*	*Non-Singleton Aspects* [(nSA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L589)
-	*	*Advice-Advance Pointcut Dependence* [(AAP)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L557)
+	*	*Advice-Advanced Pointcut Dependence* [(AAP)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L557)
 	*	*Advice-Basic Pointcut Dependence* [(ABP)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L567)
 	*	*Number of Around Advice* [(NOAr)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L733)
 	*	*Number of Before/After Advice* [(NOBA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L752)
 	*	*Number of After Throwing/Returning Advice* [(NOTR)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L770)
 	*	*Number of Call* [(NOC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L893)
 	*	*Number of Execution* [(NOE)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L900)
-	*	*Number of AdviceExecution* [(AE)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L596)
+	*	*Adviceexecution-Advice Dependence* [(AE)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L596)
 	*	*Number of Wildcards* [(NOW)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L1128)
 	*	*Number of non-Wildcards* [(NOnW)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L1140)
 	*	*Argument size of Args-Advice* [(AAd)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L722)
 	*	*Argument size of Args-Advice-args* [(AAda)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L727)
-4.	What percentage of a system is advised by AOP?
-	*	*Number of Advised Classes* [(AdC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L851)
-	*	*Number of non-Advised Classes* [(nAdC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L922)
+4.	How many types and members of a system are advised by AOP?
+	*	*Percentage of Advised Classes* [(AdC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L851)
+	*	*Percentage of non-Advised Classes* [(nAdC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L922)
 	*	*Number of Advised Methods* [(AdM)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L987)
 	*   *Number of non-Advised Methods* [(nAdM)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L993)
 	*	*Classes and Subclasses* [(CsC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L1046)
@@ -44,7 +44,7 @@ The aim of the thesis  is to analyse the existing **[AspectJ](http://eclipse.org
 	*	*Number of Accessed Args* [(AcA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L1262)
 	*	*Around Advice - non-Proceed Call Dependence* [(AnP)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L796)
 6.	How many dependencies are there between classes and aspects?	
-	*	*Attribute-Class Dependence Measure* [(AtC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L366)
+	*	*Attribute-Class Dependence* [(AtC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L366)
 	*	*Advice-Class Dependence* [(AC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L380)
 	*	*Intertype-Class Dependence* [(IC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L414)
 	*	*Method-Class Dependence* [(MC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L448)
