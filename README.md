@@ -1,9 +1,9 @@
-### Master Thesis
+#### Master Thesis  - Measuring Aspect-Oriented Software In Practice
 ---
 
 The aim of the thesis  is to analyse the existing **[AspectJ](http://eclipse.org/aspectj/)** applications. In order to collect proper information, a metric framework has been implemented. The framework consists of **[aspect-oriented ](http://en.wikipedia.org/wiki/Aspect-oriented_programming)** and **[object-oriented ](http://en.wikipedia.org/wiki/Object-oriented_programming)** features.
 
-### The Hierarchy of The Research Questions 
+#### The Hierarchy of The Research Questions 
 ---
 
 1.	How large is the system?
@@ -12,7 +12,7 @@ The aim of the thesis  is to analyse the existing **[AspectJ](http://eclipse.org
 	*	*Number of Attributes* [(NOA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L201) 
 	*	*Number of Methods* [(NOM)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L211)
 2.	How often are AOP constructs used compared to OOP features?
-	*	*Number of Intertype* [(NOI)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L238)
+	*	*Number of Intertypes* [(NOI)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L238)
 	*	*Number of Advice* [(NOAd)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L256)
 3.	Which AOP constructs are typically used?
 	*	*Inherited Aspects* [(InA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L573)
@@ -55,7 +55,7 @@ The aim of the thesis  is to analyse the existing **[AspectJ](http://eclipse.org
 	*	*Pointcut-Method Dependence* [(PM)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L496) 
 
 
-### Have a look at an example
+#### Have a look at an example
 ---
 One of the questions we examine is: how many aspects extend to an abstract aspect in a given aspect-oriented project?
 
@@ -71,7 +71,7 @@ The Metric representation of the question is: the number of inherited aspects in
                    (succeeds (.isAbstract ?super))))
 ```
 
-### How the metrics work
+#### How the metrics work
 ---
 
 First of all, make sure that you have all the dependencies about the Ekeko Plugin in your [Eclipse Kepler 4.3 IDE](http://www.eclipse.org/kepler), if not, you have to download it with its dependencies from [here](https://github.com/cderoove/damp.ekeko/wiki/Getting-Started-with-Ekeko). 
