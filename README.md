@@ -74,9 +74,12 @@ The Metric representation of the question is: the number of inherited aspects in
 #### How the metrics work
 ---
 
-First of all, make sure that you have all the dependencies about the Ekeko Plugin in your [Eclipse Kepler 4.3 IDE](http://www.eclipse.org/kepler), if not, you have to download it with its dependencies from [here](https://github.com/cderoove/damp.ekeko/wiki/Getting-Started-with-Ekeko). 
+First of all, make sure that you have all the dependencies about the Ekeko Plug-in in your [Eclipse Kepler 4.3 IDE](http://www.eclipse.org/kepler), if not, you have to download it with its dependencies from [here](https://github.com/cderoove/damp.ekeko/wiki/Getting-Started-with-Ekeko). 
 
-In addition, after importing the Ekeko as an Eclipse project, you have to import the Ekeko's AspectJ extension in order to complete the last essential part. The link of the extension is [here](https://github.com/cderoove/damp.ekeko.aspectj).
+After importing Ekeko as an Eclipse project, you have to import the Ekeko's AspectJ extension in order to complete the last essential part. The link of the extension is over [here](https://github.com/cderoove/damp.ekeko.aspectj).
 
-Now, you can get the code of the aop-metrics (Ekeko AJFX) by simply cloning the project, plus import it within the workspace of your Eclipse IDE.
+Now, you can get the code of the aop-metrics (i.e. Ekeko AJFX) by simply cloning the project, plus import it within the workspace of your Eclipse IDE.
+
+Enjoy!
+
 
