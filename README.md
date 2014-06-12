@@ -82,4 +82,6 @@ Now, you can get the code of the aop-metrics (i.e. Ekeko AJFX) by simply cloning
 
 Enjoy!
 
+#### License 
 
+Copyright © 2014 Hakan Özler
