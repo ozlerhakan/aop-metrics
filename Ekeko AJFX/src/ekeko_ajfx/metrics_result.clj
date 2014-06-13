@@ -1,5 +1,5 @@
-(ns ekeko-ajfx.metrics-result
-  (require [ekeko-ajfx.AOPMetrics :as metrics]
+(ns ekeko_ajfx.metrics-result
+  (require [ekeko_ajfx.AOPMetrics :as metrics]
            [clojure.core.logic :as l])
   (use [inspector-jay.core]
         [clojure.repl]
@@ -9,12 +9,12 @@
         [damp.ekeko]
         [clojure.inspector :exclude [inspect]]))
 
-;Disable the comment block so that the metrics can be run respectively. -line:13 to 230
+;After loading the file in REPL, disable the comment block so that the metrics can be run respectively. --line:13 to 230
 (comment 
 
 ;############################### METRIC LOC ###############################
 
-(metrics/LOC ".../AspectJProjectDirectory/src" "MainTST")
+(metrics/LOC "C:/Users/HAKAN/runtime-New_configuration-clojure/Contract4J5/contract4j5/src" "MainTST")
 
 ;############################### METRIC VS ############################### 
 
@@ -108,7 +108,7 @@
 ;############################### Pointcut-Method dependence (PM) ###############################
   
 (inspect (sort-by first  (ekeko [?CalledM  ?calledC ?aspectName ?adviceKind ?pointcut ?shadow] (metrics/PM ?calledC ?CalledM ?aspectName ?adviceKind ?pointcut ?shadow ))))
-(count (ekeko [?CalledM  ?calledC  ?aspectName ?adviceKind ?pointcut ?shadow] (metrics/PM ?calledC ?CalledM ?aspectName ?adviceKind ?pointcut ?shadow))
+(count (ekeko [?CalledM  ?calledC  ?aspectName ?adviceKind ?pointcut ?shadow] (metrics/PM ?calledC ?CalledM ?aspectName ?adviceKind ?pointcut ?shadow)))
 
 ;############################### Advice-Advance Pointcut Dependence (AAP) ###############################
 

@@ -1,5 +1,5 @@
-(ns ekeko-ajfx.AOPMetrics
-  ^{:doc "Specific Aspect-oriented programming Metrics"
+(ns ekeko_ajfx.AOPMetrics
+  ^{:doc "The metrics including object-oriented and aspect-oriented features have been implemented for the master thesis"
     :author "Hakan Ozler - ozler.hakan[at]gmail.com" }
   (:refer-clojure :exclude [== type declare class])
   (:require [clojure.core.logic :as l]
@@ -17,7 +17,6 @@
         [damp.ekeko]
         [clojure.inspector :exclude [inspect]])
   (:import [soot.jimple IdentityStmt]
-           [ekeko_ajfx CountingComments]
            [org.aspectj.lang Signature]))
 
 
@@ -139,28 +138,50 @@
       (for [file (file-seq  filePath) :when (.endsWith (.toString file )".aj")]
         (with-open [rdr (io/reader file)] (count  (filter #(re-find #"\S" %) (line-seq rdr)))))))
   
-  (defn java-docs [filePath ignoredTestName]
+ 
+  (defn- results [?collect]
+    (first (first (ekeko [?size]
+                         (l/fresh [?result ?y ?list]
+                                  (equals ?result (java.util.ArrayList. []))
+                                  (equals ?y (tracingthefile ?collect ?result))
+                                  (equals ?list ?result)
+                                  (equals ?size (.size ?result)))))))
+  
+  (defn- tracingthefile [rdr result]
+    (let [flag    (atom false)]
+      (doseq [content  rdr]
+          (if (and (.startsWith  (clojure.string/trim content) "/*") (.endsWith  (clojure.string/trim content) "*/")) (.add result 1)
+            (if (.startsWith  (clojure.string/trim content) "//") (.add result 1)
+              (if (and (.startsWith  (clojure.string/trim content) "/*") (not (.endsWith (clojure.string/trim content) "*/"))) (do (.add result 1) (reset! flag true))
+                (if (and (not (.startsWith  (clojure.string/trim content) "/*")) (.endsWith (clojure.string/trim content) "*/"))  (do (.add result 1) (reset! flag false)) 
+                  (if (true? @flag) (.add result 1)))))))))
+  
+    
+  (defn- java-docs [filePath ignoredTestName]
     "count the number of lines of comments & javadocs"
-    (reduce
+    (reduce 
       +
-      (for [file (file-seq  filePath) :when (and 
-                                              (or 
-                                                (.endsWith (.toString file )".aj") 
-                                                (.endsWith (.toString file )".java")) 
-                                              (false? (lastIndexOfText (.getName file) ignoredTestName)) 
-                                              (false? (or 
-                                                        (.startsWith (.toLowerCase (.getName file)) "test") 
-                                                        (.endsWith   (.toLowerCase (.getName file)) "test"))))]
-        (.getComments (new CountingComments)  (.toString file)))))
+      (for [file (file-seq filePath) :when (and
+                                             (or
+                                               (.endsWith (.toString file )".aj")
+                                               (.endsWith (.toString file )".java"))
+                                             (false? (lastIndexOfText (.getName file) ignoredTestName))
+                                             (false? (or
+                                                       (.startsWith (.toLowerCase (.getName file)) "test")
+                                                       (.endsWith (.toLowerCase (.getName file)) "test"))))]
+        (with-open [rdr (io/reader file)]
+          (results (doall (line-seq rdr)))))))
+    
   
   (defn LOC [filepath ignore]
-    ( - 
-      (+ 
-        (class-loc (io/file filepath) ignore) 
+    ( -
+      (+
+        (class-loc (io/file filepath) ignore)
         (aspect-loc (io/file filepath)))
-      (java-docs (io/file filepath) ignore)))
-  ;(LOC "C:/Users/HAKAN/runtime-New_configuration-clojure/TetrisAJ/src" "MainTST")
-  
+    (java-docs (io/file filepath) ignore)))
+      
+  ;(LOC "C:/Users/HAKAN/runtime-New_configuration-clojure/Contract4J5/contract4j5/src" "MainTST")
+
   ;############################### METRIC VS ############################### 
   (defn NOClasses [?classes]
     "Number of Classes in the project except enums, interfaces, their inner classes!!, and a test class."
@@ -234,6 +255,7 @@
                                (= "aspectOf" (.getName ?methods)) 
                                (= "<init>" (.getName ?methods))))))
   
+ ; (inspect (ekeko [?t ?m] (aspects-methods ?t ?m)))
   ;############################### METRIC NOIntertype methods ############################### 
   (defn NOI [?i] 
     "get the all intertype method declarations implemented in a project except abstract intertype method declarations"
@@ -357,9 +379,10 @@
     "the number of method calls per method body declared in aspects"
     (l/fresh [?aspect ?ajmethod ?soot|method]
              (aspects-methods ?aspect ?ajmethod)
-             (ajsoot/method-soot|method ?ajmethod ?soot|method);a new function has been created in the Ekeko AspectJ project -> /EkekoAspectJ/src/damp/ekeko/aspectj/soot.clj Line: 113
+             (jsoot/soot :method ?soot|method)
+             (succeeds  (= (.getName ?ajmethod) (.getName ?soot|method)))
              (NOMethodCalls ?soot|method ?aspectName ?calledmethods ?soot|methodName)))
-  
+  ;(inspect (sort-by first (ekeko [ ?aspectName  ?soot|methodName ?calledmethods]   (MM ?aspectName ?calledmethods ?soot|methodName))))
   ;############################### Attribute-Class dependence (AtC) ###############################
   ;Definition : if a class is the type of an field of an aspect 
   ;Filtering primitive types and interfaces that could be the type of a field!
@@ -649,7 +672,7 @@
   
    (defn- calculateJPS []
      (reduce + (collectionJPS)))
-  
+   ;(calculateJPS)
    ;************************;
    ;total average! AJPS:
    (defn AJ []
@@ -771,7 +794,7 @@
     "count the number after throwing and returning advices in a system"
     (+  (NOAThrowing)  (NOAReturning)))
  
-  ;############################### NOnPC: In how many around advice is it possible to (not) execute a proceed call? ###############################
+  ;############################### NOnPC: how many around advice do not include a proceed call? ###############################
   (defn- NOPC [?aspectName ?soot|methodName]
      (l/fresh [?aspect ?adv ?unit ?soot|advicemethod ?units ?pointcut]
               (NOAdvices ?aspect ?adv ?pointcut)
@@ -797,7 +820,7 @@
      (- (NOAr) (count (ekeko [?a ?s] (NOPC ?a ?s)))))
   ;(AnP)
  
-  ;############################### AdC: Calculate the average of advised classes in a system? ###############################
+  ;############################### AdC: Calculate the percentage of advised classes in a system? ###############################
   
   (defn isClass [?name]
    (first
@@ -903,7 +926,7 @@
             (succeeds (or (= "method-execution" (.toString (getKind ?execution))) 
                            (= "constructor-execution" (.toString (getKind ?execution)))))))
  
-  ;############################### nAdC: Calculate the average of non-advised classes in a system? ###############################
+  ;############################### nAdC: Calculate the percentage of non-advised classes in a system? ###############################
   ;Which parts of the system are advised? 
   (defn- NOAClasses [?advised]
     (l/fresh [?gets ?gete]
@@ -995,7 +1018,6 @@
    (- (count (allMethods)) (count (AdM))))
  
   ;############################### CsC: Do aspects often advise classes with a lot of subclasses? ###############################
-  ;simply counts the number of classes along with their subclasses | calculate the everage of them both!
   (defn- declaringTypesMethodConstruct []
     (lazy-seq (into #{} (ekeko [?calltype]
                               (l/fresh [ ?pointdefs  ?call   ?shortAspect ?advicekind]
@@ -1135,7 +1157,7 @@
    ;METRIC 
    ;(NOW)
  
-  ;############################### NOnW: How often are wildcards (not) used in modules declared in method/construct-call/execution and field-get/set? ###############################
+  ;############################### NOnW: How often are pointcuts not including any wildcard in modules declared in method/construct-call/execution and field-get/set? ###############################
   ;Main 
   (defn NOnW []
    (count (ekeko[?shortAspect ?itemName ?advicekind ?decType ?excTypeName]
@@ -1149,8 +1171,6 @@
   ;(NOnW) 
  
   ;############################### TJPS: How often are thisJoinPoint/thisJoinPointStatic used in a given AspectJ project? ###############################
-  ;count number of thisJoinPoints that are used at least once per advice body!
-  ;count the number of advices that thisJoinPoint and thisJoinPointStatic are used at least once in the body of the advices .
   (defn tJPS [?DC|advicemethod ?sootname ?soot|advicemethod]
     (l/fresh [?adv ?aspect ?units ?unit ?pointcut]
              (NOAdvices ?aspect ?adv ?pointcut)
@@ -1204,14 +1224,13 @@
              (NOAdvices ?aspect ?advice ?pointcut)
              (ajsoot/advice-soot|method ?advice ?soot|method)
              (succeeds (= (.getName (.getSignature ?advice)) (.getName ?soot|method)))
-             ;(equals true (= "OptimizedAbstractTimestampAspect" (.getSimpleName ?aspect)))
              (getArgs ?pointcut ?args)
              (equals false (empty? ?args))
              (equals ?arg (vec (into #{} ?args)))
              (equals ?sootname  (.getName ?soot|method))
              (equals ?return (collectArguments ?arg))
              (equals ?units (.getUnits (.getActiveBody ?soot|method)))
-             (localArgs ?return ?units ?parameters);?list represents  the soot version of the arguments that refers to the declared args()!
+             (localArgs ?return ?units ?parameters);
              (contains ?units ?unit)
              (equals false (= "soot.jimple.internal.JIdentityStmt" (.getName (.getClass ?unit))))
              (equals ?istrue (java.util.ArrayList. []))
@@ -1222,7 +1241,7 @@
   ;(count (ekeko [?sootname ?return ?parameters ?arg ?unit ?istrue ?soot|method] (NOAccessModifyArgs ?sootname ?return ?parameters ?arg ?unit ?istrue ?soot|method)))
 
    ;Get the number of modified arguments of declared args pointcuts.
-   (defn- NOModifying [?return ?parameters ?arg ?unit ?istrue]
+   (defn NOModifying [?return ?parameters ?arg ?unit ?istrue]
      (l/fresh [?sootname ?soot|method]
               (NOAccessModifyArgs ?sootname ?return ?parameters ?arg ?unit ?istrue ?soot|method)
               (equals false (nil? (first (modifyARG  ?istrue))))))
