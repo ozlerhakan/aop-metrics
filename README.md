@@ -74,14 +74,40 @@ The Metric representation of the question is: the number of inherited aspects in
 #### How the metrics work
 ---
 
-First of all, make sure that you have all the dependencies about the *Ekeko plug-in* in your [Eclipse Kepler 4.3 IDE](http://www.eclipse.org/kepler), if not, you have to download it with its dependencies from [here](https://github.com/cderoove/damp.ekeko/wiki/Getting-Started-with-Ekeko). 
+First of all, make sure that you have all the dependencies about the *Ekeko plug-in* in your [Eclipse Kepler 4.3 IDE](http://www.eclipse.org/kepler), if not, you first need to download the dependencies:
 
-After importing Ekeko as an Eclipse project, you have to import the Ekeko's AspectJ extension in order to complete the last essential part. The link of the extension is over [here](https://github.com/cderoove/damp.ekeko.aspectj).
+  * AST View [(i.e. org.eclipse.jdt.astview)](http://www.eclipse.org/jdt/ui/astview/index.php)
+  * [Counterclockwise](http://www.eclipse.org/jdt/ui/astview/index.php)
 
-Now, you can get the code of the aop-metrics (i.e. Ekeko AJFX) by simply cloning the project, plus import it within the workspace of your Eclipse IDE.
+Downloading the dependencies, you are now ready to install the prebuilt *Ekeko* plug-in:
 
-Enjoy!
+  * Go to: ```Help > Install New Software...``` in your Eclipse IDE.
+  * Copy and paste this url: http://soft.vub.ac.be/~cderoove/eclipse/ in the Work with text field.
+  * Hit Enter
+  * Select all plug-ins including Ekeko and GASR and the rest and install all of them.
+  * After installing both Ekeko and the Ekeko's AspectJ estension, you are ready to downdload the metrics.
+  * Import the Ekeko AJFX project (i.e. the metrics) in your Eclipse workspace.
+  * Select an AspectJ project that you want to analyse then, right-click on the project, apply these steps: ```Configure > Include in Ekeko Queries```
+  * Some metrics also need soot analysis in order to run properly. To do that, we need to configure the selected AspectJ project once as follows:
+      *  Right-click on the project : ```Properties > Ekeko properties```.
+      *  Click the Select button and now choose the class that contains the main() method of the AspectJ project. (e.g. you can find an example of a main() method in our AJTestMetrics project ([MainTST](https://github.com/ozlerhakan/aop-metrics/blob/master/AJTestMetrics/src/ua/thesis/test/MainTST.java)).
+      *  Write the following line into the "Soot arguments:" one-line text box: ```-no-bodies-for-excluded -src-prec c -f jimple -keep-line-number -app -w -p cg.cha```
+      * Click OK
+      * Finally, ```right-click the project > Configure > Enable Ekeko Soot Analyses```.
+
+  * Activate an Ekeko-hosted REPL by choosing ```Ekeko > Start nRepl``` from the main Eclipse menu. A dialog shows the port on which the nRepl server listens (e.g. ```nrepl://localhost:51721```)
+  * Connect to the Ekeko-hosted REPL: Go to: ```Window > Connect to REPL``` to connect to this port (i.e. ```nrepl://localhost:51721```). A Counterclockwise REPL view now opens.
+  * Open the ```metrics-result``` file and right-click somewhere on the file and choose ```Clojure > Load file in REPL ```
+  * You will see ```nil``` in the REPL which means that everything goes correctly and the metric framework has likewise been loaded in the REPL.
+  * After disabling the comment block, you can run the metrics (For example: ```(metrics/VSize)``` simply retrieves the vocabulary size of the project).
+
+
+
+**Note:** The AcA and MoA metrics need different soot arguments to obtain the exact data. Thus, you need to change the current arguments with the following one: ```-no-bodies-for-excluded -src-prec c -f jimple -keep-line-number -app -w -p jb use-original-names:true -p cg.cha``` and run again ```Ekeko Soot Analyses```.
+
+
+>**One Potentional Issue**: There was one encountered issue about soot analysis. You can find more impormation on it, if you >get the same problem while attempting to run the metrics especially for the AM, IM, and MM metrics >:https://github.com/ozlerhakan/aop-metrics/issues/1 
 
 #### License 
 
-Copyright © 2014 Hakan Özler
+Copyright © 2014 Hakan Özler.
