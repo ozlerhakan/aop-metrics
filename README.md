@@ -83,7 +83,7 @@ Downloading the dependencies, you are now ready to install the prebuilt *Ekeko* 
 
   * Go to: ```Help > Install New Software...``` in your Eclipse IDE.
   * Copy and paste this url: http://soft.vub.ac.be/~cderoove/eclipse/ in the Work with text field.
-  * Hit Enter
+  * Hit Enter.
   * Select all plug-ins including Ekeko and GASR and the rest and install all of them.
   * After installing both Ekeko and the Ekeko's AspectJ estension, you are ready to downdload the metrics.
   * Import the Ekeko AJFX project (i.e. the metrics) in your Eclipse workspace.
@@ -106,7 +106,7 @@ Downloading the dependencies, you are now ready to install the prebuilt *Ekeko* 
 :pushpin:**Note:** The AcA and MoA metrics need different soot arguments to obtain the exact data. Thus, you need to change the current arguments with the following one: ```-no-bodies-for-excluded -src-prec c -f jimple -keep-line-number -app -w -p jb use-original-names:true -p cg.cha``` and run again ```Ekeko Soot Analyses```.
 
 
->:exclamation:**One Potential Issue**: There was an encountered issue about soot analysis. You can find more information on it, if you get the same problem called ```RuntimeException : tried to get nonexistent method```, while attempting to run the metrics especially for the AM, IM, and MM metrics :https://github.com/ozlerhakan/aop-metrics/issues/1 
+>:exclamation:**One Potential Issue**: There was an encountered issue about soot analysis. If you get the same problem called ```RuntimeException : tried to get nonexistent method```, while attempting to run the metrics especially for the AM, IM, and MM metrics.  You can find more information on it from https://github.com/ozlerhakan/aop-metrics/issues/1 
 
 ### License 
 
