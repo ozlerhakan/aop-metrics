@@ -99,7 +99,7 @@ Downloading the dependencies, you are now ready to install the prebuilt *Ekeko* 
   * Connect to the Ekeko-hosted REPL: Go to: ```Window > Connect to REPL``` to connect to this port (i.e. ```nrepl://localhost:51721```). A Counterclockwise REPL view now opens.
   * Open the ```metrics-result``` file located in the imported project and right-click somewhere on the file and choose ```Clojure > Load file in REPL ```
   * You will see ```nil``` in the REPL which means that everything goes correctly and the metric framework has likewise been loaded in the REPL.
-  * After disabling the comment block, you can now run the metrics. For example: if we look at ```(metrics/VSize)```, the alias name of our ```AOPMetrics``` is ```metrics``` that helps in reaching the implemented metrics in a short way rather than typing the totally qualified name (i.e. ```AOPMetrics```). ```metrics/Vsize``` simply retrieves the vocabulary size of the project.
+  * After disabling the comment block, you can now run the metrics. For example, if we look at ```(metrics/VSize)```, the alias name of our ```AOPMetrics``` is ```metrics``` that helps in reaching the implemented metrics in a short way rather than typing the totally qualified name (i.e. ```AOPMetrics```). ```metrics/Vsize``` simply retrieves the vocabulary size of the project.
 
 
 
