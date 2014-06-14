@@ -1,42 +1,43 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
+
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>AOP Metrics by ozlerhakan</title>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="AOP Metrics : Measuring Aspect-Oriented Software In Practice" />
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>AOP Metrics</title>
   </head>
+
   <body>
-    <div class="wrapper">
-      <header>
-        <h1 class="header">AOP Metrics</h1>
-        <p class="header">Measuring Aspect-Oriented Software In Practice</p>
 
-        <ul>
-          <li class="download"><a class="buttons" href="https://github.com/ozlerhakan/aop-metrics/zipball/master">Download ZIP</a></li>
-          <li class="download"><a class="buttons" href="https://github.com/ozlerhakan/aop-metrics/tarball/master">Download TAR</a></li>
-          <li><a class="buttons github" href="https://github.com/ozlerhakan/aop-metrics">View On GitHub</a></li>
-        </ul>
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/ozlerhakan/aop-metrics">View on GitHub</a>
 
-        <p class="header">This project is maintained by <a class="header name" href="https://github.com/ozlerhakan">ozlerhakan</a></p>
+          <h1 id="project_title">AOP Metrics</h1>
+          <h2 id="project_tagline">Measuring Aspect-Oriented Software In Practice</h2>
 
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/ozlerhakan/aop-metrics/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/ozlerhakan/aop-metrics/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
 
-      </header>
-      <section>
-        <h4>
-<a name="master-thesis----measuring-aspect-oriented-software-in-practice" class="anchor" href="#master-thesis----measuring-aspect-oriented-software-in-practice"><span class="octicon octicon-link"></span></a>Master Thesis  - Measuring Aspect-Oriented Software In Practice</h4>
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h3>
+<a name="master-thesis----measuring-aspect-oriented-software-in-practice" class="anchor" href="#master-thesis----measuring-aspect-oriented-software-in-practice"><span class="octicon octicon-link"></span></a>Master Thesis  - Measuring Aspect-Oriented Software In Practice</h3>
 
 <hr><p>The aim of the thesis  is to analyse the existing <strong><a href="http://eclipse.org/aspectj/">AspectJ</a></strong> applications. In order to collect proper information, a metric framework has been implemented. The framework consists of <strong><a href="http://en.wikipedia.org/wiki/Aspect-oriented_programming">aspect-oriented </a></strong> and <strong><a href="http://en.wikipedia.org/wiki/Object-oriented_programming">object-oriented </a></strong> features.</p>
 
-<h4>
-<a name="the-hierarchy-of-the-research-questions" class="anchor" href="#the-hierarchy-of-the-research-questions"><span class="octicon octicon-link"></span></a>The Hierarchy of The Research Questions</h4>
+<h3>
+<a name="the-hierarchy-of-the-research-questions" class="anchor" href="#the-hierarchy-of-the-research-questions"><span class="octicon octicon-link"></span></a>The Hierarchy of The Research Questions</h3>
 
 <hr><ol>
 <li> How large is the system?
@@ -145,8 +146,8 @@
 <li>  <em>Pointcut-Method Dependence</em> <a href="https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L496">(PM)</a> </li>
 </ul>
 </li>
-</ol><h4>
-<a name="have-a-look-at-an-example" class="anchor" href="#have-a-look-at-an-example"><span class="octicon octicon-link"></span></a>Have a look at an example</h4>
+</ol><h3>
+<a name="have-a-look-at-an-example" class="anchor" href="#have-a-look-at-an-example"><span class="octicon octicon-link"></span></a>Have a look at an example</h3>
 
 <hr><p>One of the questions we examine is: how many aspects extend to an abstract aspect in a given aspect-oriented project?</p>
 
@@ -161,8 +162,8 @@
                    <span class="p">(</span><span class="nf">succeeds</span> <span class="p">(</span><span class="nf">.isAbstract</span> <span class="nv">?super</span><span class="p">))))</span>
 </pre></div>
 
-<h4>
-<a name="how-the-metrics-work" class="anchor" href="#how-the-metrics-work"><span class="octicon octicon-link"></span></a>How the metrics work</h4>
+<h3>
+<a name="how-the-metrics-work" class="anchor" href="#how-the-metrics-work"><span class="octicon octicon-link"></span></a>How the metrics work</h3>
 
 <hr><p>First of all, make sure that you have all the dependencies about the <em>Ekeko plug-in</em> in your <a href="http://www.eclipse.org/kepler">Eclipse Kepler 4.3 IDE</a>, if not, you first need to download the dependencies:</p>
 
@@ -205,16 +206,22 @@
 <p><img class="emoji" title=":exclamation:" alt=":exclamation:" src="https://assets-cdn.github.com/images/icons/emoji/exclamation.png" height="20" width="20" align="absmiddle"><strong>One Potential Issue</strong>: There was an encountered issue about soot analysis. You can find more information on it, if you get the same problem called <code>RuntimeException : tried to get nonexistent method</code>, while attempting to run the metrics especially for the AM, IM, and MM metrics :<a href="https://github.com/ozlerhakan/aop-metrics/issues/1">https://github.com/ozlerhakan/aop-metrics/issues/1</a> </p>
 </blockquote>
 
-<h4>
-<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h4>
+<h3>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h3>
 
 <p>Copyright © 2014 Hakan Özler.</p>
       </section>
-      <footer>
-        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">AOP Metrics maintained by <a href="https://github.com/ozlerhakan">ozlerhakan</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-		
+
+    
+
   </body>
 </html>
