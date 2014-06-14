@@ -1,9 +1,9 @@
-#### Master Thesis  - Measuring Aspect-Oriented Software In Practice
+### Master Thesis  - Measuring Aspect-Oriented Software In Practice
 ---
 
 The aim of the thesis  is to analyse the existing **[AspectJ](http://eclipse.org/aspectj/)** applications. In order to collect proper information, a metric framework has been implemented. The framework consists of **[aspect-oriented ](http://en.wikipedia.org/wiki/Aspect-oriented_programming)** and **[object-oriented ](http://en.wikipedia.org/wiki/Object-oriented_programming)** features.
 
-#### The Hierarchy of The Research Questions 
+### The Hierarchy of The Research Questions 
 ---
 
 1.	How large is the system?
@@ -55,7 +55,7 @@ The aim of the thesis  is to analyse the existing **[AspectJ](http://eclipse.org
 	*	*Pointcut-Method Dependence* [(PM)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L496) 
 
 
-#### Have a look at an example
+### Have a look at an example
 ---
 One of the questions we examine is: how many aspects extend to an abstract aspect in a given aspect-oriented project?
 
@@ -71,7 +71,7 @@ The Metric representation of the question is: the number of inherited aspects in
                    (succeeds (.isAbstract ?super))))
 ```
 
-#### How the metrics work
+### How the metrics work
 ---
 
 First of all, make sure that you have all the dependencies about the *Ekeko plug-in* in your [Eclipse Kepler 4.3 IDE](http://www.eclipse.org/kepler), if not, you first need to download the dependencies:
@@ -108,6 +108,6 @@ Downloading the dependencies, you are now ready to install the prebuilt *Ekeko* 
 
 >:exclamation:**One Potential Issue**: There was an encountered issue about soot analysis. You can find more information on it, if you get the same problem called ```RuntimeException : tried to get nonexistent method```, while attempting to run the metrics especially for the AM, IM, and MM metrics :https://github.com/ozlerhakan/aop-metrics/issues/1 
 
-#### License 
+### License 
 
 Copyright © 2014 Hakan Özler.
