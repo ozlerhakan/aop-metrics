@@ -95,18 +95,18 @@ Downloading the dependencies, you are now ready to install the prebuilt *Ekeko* 
       * Click OK
       * Finally, ```right-click the project > Configure > Enable Ekeko Soot Analyses```.
 
-  * Activate an Ekeko-hosted REPL by choosing ```Ekeko > Start nRepl``` from the main Eclipse menu. A dialog shows the port on which the nRepl server listens (e.g. ```nrepl://localhost:51721```)
+  * Activate an Ekeko-hosted REPL by doing ```Ekeko > Start nRepl``` from the main Eclipse menu. A dialog shows the port on which the nRepl server listens (e.g. ```nrepl://localhost:51721```)
   * Connect to the Ekeko-hosted REPL: Go to: ```Window > Connect to REPL``` to connect to this port (i.e. ```nrepl://localhost:51721```). A Counterclockwise REPL view now opens.
-  * Open the ```metrics-result``` file and right-click somewhere on the file and choose ```Clojure > Load file in REPL ```
+  * Open the ```metrics-result``` file located in the imported project and right-click somewhere on the file and choose ```Clojure > Load file in REPL ```
   * You will see ```nil``` in the REPL which means that everything goes correctly and the metric framework has likewise been loaded in the REPL.
-  * After disabling the comment block, you can run the metrics (For example: ```(metrics/VSize)``` simply retrieves the vocabulary size of the project).
+  * After disabling the comment block, you can now run the metrics. For example: if we look at ```(metrics/VSize)```, the alias name of our ```AOPMetrics``` is ```metrics``` that helps in reaching the implemented metrics in a short way rather than typing the totally qualified name (i.e. ```AOPMetrics```). ```metrics/Vsize``` simply retrieves the vocabulary size of the project.
 
 
 
 :pushpin:**Note:** The AcA and MoA metrics need different soot arguments to obtain the exact data. Thus, you need to change the current arguments with the following one: ```-no-bodies-for-excluded -src-prec c -f jimple -keep-line-number -app -w -p jb use-original-names:true -p cg.cha``` and run again ```Ekeko Soot Analyses```.
 
 
->:exclamation:**One Potentional Issue**: There was an encountered issue about soot analysis. You can find more impormation on it, if you get the same problem while attempting to run the metrics especially for the AM, IM, and MM metrics :https://github.com/ozlerhakan/aop-metrics/issues/1 
+>:exclamation:**One Potential Issue**: There was an encountered issue about soot analysis. You can find more impormation on it, if you get the same problem called ```RuntimeException : tried to get nonexistent method```, while attempting to run the metrics especially for the AM, IM, and MM metrics :https://github.com/ozlerhakan/aop-metrics/issues/1 
 
 #### License 
 
