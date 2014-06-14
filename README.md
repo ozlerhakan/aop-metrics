@@ -106,7 +106,7 @@ Downloading the dependencies, you are now ready to install the prebuilt *Ekeko* 
 :pushpin:**Note:** The AcA and MoA metrics need different soot arguments to obtain the exact data. Thus, you need to change the current arguments with the following one: ```-no-bodies-for-excluded -src-prec c -f jimple -keep-line-number -app -w -p jb use-original-names:true -p cg.cha``` and run again ```Ekeko Soot Analyses```.
 
 
->:exclamation:**One Potential Issue**: There was an encountered issue about soot analysis. You can find more impormation on it, if you get the same problem called ```RuntimeException : tried to get nonexistent method```, while attempting to run the metrics especially for the AM, IM, and MM metrics :https://github.com/ozlerhakan/aop-metrics/issues/1 
+>:exclamation:**One Potential Issue**: There was an encountered issue about soot analysis. You can find more information on it, if you get the same problem called ```RuntimeException : tried to get nonexistent method```, while attempting to run the metrics especially for the AM, IM, and MM metrics :https://github.com/ozlerhakan/aop-metrics/issues/1 
 
 #### License 
 
