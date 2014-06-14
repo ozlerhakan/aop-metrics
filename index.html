@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
     <script src="javascripts/scale.fix.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
@@ -17,14 +16,18 @@
   <body>
     <div class="wrapper">
       <header>
-        <h1>AOP Metrics</h1>
-        <p>Measuring Aspect-Oriented Software In Practice</p>
-        <p class="view"><a href="https://github.com/ozlerhakan/aop-metrics">View the Project on GitHub <small>ozlerhakan/aop-metrics</small></a></p>
+        <h1 class="header">AOP Metrics</h1>
+        <p class="header">Measuring Aspect-Oriented Software In Practice</p>
+
         <ul>
-          <li><a href="https://github.com/ozlerhakan/aop-metrics/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/ozlerhakan/aop-metrics/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/ozlerhakan/aop-metrics">View On <strong>GitHub</strong></a></li>
+          <li class="download"><a class="buttons" href="https://github.com/ozlerhakan/aop-metrics/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/ozlerhakan/aop-metrics/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/ozlerhakan/aop-metrics">View On GitHub</a></li>
         </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/ozlerhakan">ozlerhakan</a></p>
+
+
       </header>
       <section>
         <h4>
@@ -195,7 +198,7 @@
 <li>Open the <code>metrics-result</code> file located in the imported project and right-click somewhere on the file and choose <code>Clojure &gt; Load file in REPL</code>
 </li>
 <li>You will see <code>nil</code> in the REPL which means that everything goes correctly and the metric framework has likewise been loaded in the REPL.</li>
-<li>After disabling the comment block, you can now run the metrics. For example: if we look at <code>(metrics/VSize)</code>, the alias name of our <code>AOPMetrics</code> is <code>metrics</code> that helps in reaching the implemented metrics in a short way rather than typing the totally qualified name (i.e. <code>AOPMetrics</code>). <code>metrics/Vsize</code> simply retrieves the vocabulary size of the project.</li>
+<li>After disabling the comment block, you can now run the metrics. For example, if we look at <code>(metrics/VSize)</code>, the alias name of our <code>AOPMetrics</code> is <code>metrics</code> that helps in reaching the implemented metrics in a short way rather than typing the totally qualified name (i.e. <code>AOPMetrics</code>). <code>metrics/Vsize</code> simply retrieves the vocabulary size of the project.</li>
 </ul><p><img class="emoji" title=":pushpin:" alt=":pushpin:" src="https://assets-cdn.github.com/images/icons/emoji/pushpin.png" height="20" width="20" align="absmiddle"><strong>Note:</strong> The AcA and MoA metrics need different soot arguments to obtain the exact data. Thus, you need to change the current arguments with the following one: <code>-no-bodies-for-excluded -src-prec c -f jimple -keep-line-number -app -w -p jb use-original-names:true -p cg.cha</code> and run again <code>Ekeko Soot Analyses</code>.</p>
 
 <blockquote>
@@ -207,12 +210,11 @@
 
 <p>Copyright © 2014 Hakan Özler.</p>
       </section>
+      <footer>
+        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
     </div>
-    <footer>
-      <p>Project maintained by <a href="https://github.com/ozlerhakan">ozlerhakan</a></p>
-      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
-    </footer>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
+		
   </body>
 </html>
