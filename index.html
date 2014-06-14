@@ -1,58 +1,39 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="viewport" content="width=640" />
-
-    <link rel="stylesheet" href="stylesheets/core.css" media="screen"/>
-    <link rel="stylesheet" href="stylesheets/mobile.css" media="handheld, only screen and (max-device-width:640px)"/>
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
-
-    <script type="text/javascript" src="javascripts/modernizr.js"></script>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script type="text/javascript" src="javascripts/headsmart.min.js"></script>
-    <script type="text/javascript">
-      $(document).ready(function () {
-        $('#main_content').headsmart()
-      })
-    </script>
     <title>AOP Metrics by ozlerhakan</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
   </head>
-
   <body>
-    <a id="forkme_banner" href="https://github.com/ozlerhakan/aop-metrics">View on GitHub</a>
-    <div class="shell">
-
+    <div class="wrapper">
       <header>
-        <span class="ribbon-outer">
-          <span class="ribbon-inner">
-            <h1>AOP Metrics</h1>
-            <h2>Measuring Aspect-Oriented Software In Practice</h2>
-          </span>
-          <span class="left-tail"></span>
-          <span class="right-tail"></span>
-        </span>
+        <h1>AOP Metrics</h1>
+        <p>Measuring Aspect-Oriented Software In Practice</p>
+        <p class="view"><a href="https://github.com/ozlerhakan/aop-metrics">View the Project on GitHub <small>ozlerhakan/aop-metrics</small></a></p>
+        <ul>
+          <li><a href="https://github.com/ozlerhakan/aop-metrics/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/ozlerhakan/aop-metrics/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/ozlerhakan/aop-metrics">View On <strong>GitHub</strong></a></li>
+        </ul>
       </header>
-
-      <section id="downloads">
-        <span class="inner">
-          <a href="https://github.com/ozlerhakan/aop-metrics/zipball/master" class="zip"><em>download</em> .ZIP</a><a href="https://github.com/ozlerhakan/aop-metrics/tarball/master" class="tgz"><em>download</em> .TGZ</a>
-        </span>
-      </section>
-
-
-      <span class="banner-fix"></span>
-
-
-      <section id="main_content">
-        <h3>
-<a name="master-thesis" class="anchor" href="#master-thesis"><span class="octicon octicon-link"></span></a>Master Thesis</h3>
+      <section>
+        <h4>
+<a name="master-thesis----measuring-aspect-oriented-software-in-practice" class="anchor" href="#master-thesis----measuring-aspect-oriented-software-in-practice"><span class="octicon octicon-link"></span></a>Master Thesis  - Measuring Aspect-Oriented Software In Practice</h4>
 
 <hr><p>The aim of the thesis  is to analyse the existing <strong><a href="http://eclipse.org/aspectj/">AspectJ</a></strong> applications. In order to collect proper information, a metric framework has been implemented. The framework consists of <strong><a href="http://en.wikipedia.org/wiki/Aspect-oriented_programming">aspect-oriented </a></strong> and <strong><a href="http://en.wikipedia.org/wiki/Object-oriented_programming">object-oriented </a></strong> features.</p>
 
-<h3>
-<a name="the-hierarchy-of-the-research-questions" class="anchor" href="#the-hierarchy-of-the-research-questions"><span class="octicon octicon-link"></span></a>The Hierarchy of The Research Questions</h3>
+<h4>
+<a name="the-hierarchy-of-the-research-questions" class="anchor" href="#the-hierarchy-of-the-research-questions"><span class="octicon octicon-link"></span></a>The Hierarchy of The Research Questions</h4>
 
 <hr><ol>
 <li> How large is the system?
@@ -69,7 +50,7 @@
 <li> How often are AOP constructs used compared to OOP features?
 
 <ul>
-<li>  <em>Number of Intertype</em> <a href="https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L238">(NOI)</a>
+<li>  <em>Number of Intertypes</em> <a href="https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L238">(NOI)</a>
 </li>
 <li>  <em>Number of Advice</em> <a href="https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L256">(NOAd)</a>
 </li>
@@ -161,8 +142,8 @@
 <li>  <em>Pointcut-Method Dependence</em> <a href="https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L496">(PM)</a> </li>
 </ul>
 </li>
-</ol><h3>
-<a name="have-a-look-at-an-example" class="anchor" href="#have-a-look-at-an-example"><span class="octicon octicon-link"></span></a>Have a look at an example</h3>
+</ol><h4>
+<a name="have-a-look-at-an-example" class="anchor" href="#have-a-look-at-an-example"><span class="octicon octicon-link"></span></a>Have a look at an example</h4>
 
 <hr><p>One of the questions we examine is: how many aspects extend to an abstract aspect in a given aspect-oriented project?</p>
 
@@ -177,30 +158,61 @@
                    <span class="p">(</span><span class="nf">succeeds</span> <span class="p">(</span><span class="nf">.isAbstract</span> <span class="nv">?super</span><span class="p">))))</span>
 </pre></div>
 
-<h3>
-<a name="how-the-metrics-work" class="anchor" href="#how-the-metrics-work"><span class="octicon octicon-link"></span></a>How the metrics work</h3>
+<h4>
+<a name="how-the-metrics-work" class="anchor" href="#how-the-metrics-work"><span class="octicon octicon-link"></span></a>How the metrics work</h4>
 
-<hr><p>First of all, make sure that you have all the dependencies about the Ekeko Plugin in your <a href="http://www.eclipse.org/kepler">Eclipse Kepler 4.3 IDE</a>, if not, you have to download it with its dependencies from <a href="https://github.com/cderoove/damp.ekeko/wiki/Getting-Started-with-Ekeko">here</a>. </p>
+<hr><p>First of all, make sure that you have all the dependencies about the <em>Ekeko plug-in</em> in your <a href="http://www.eclipse.org/kepler">Eclipse Kepler 4.3 IDE</a>, if not, you first need to download the dependencies:</p>
 
-<p>In addition, after importing the Ekeko as an Eclipse project, you have to import the Ekeko's AspectJ extension in order to complete the last essential part. The link of the extension is <a href="https://github.com/cderoove/damp.ekeko.aspectj">here</a>.</p>
+<ul>
+<li>AST View <a href="http://www.eclipse.org/jdt/ui/astview/index.php">(i.e. org.eclipse.jdt.astview)</a>
+</li>
+<li><a href="http://www.eclipse.org/jdt/ui/astview/index.php">Counterclockwise</a></li>
+</ul><p>Downloading the dependencies, you are now ready to install the prebuilt <em>Ekeko</em> plug-in:</p>
 
-<p>Now, you can get the code of the aop-metrics (Ekeko AJFX) by simply cloning the project, plus import it within the workspace of your Eclipse IDE.</p>
+<ul>
+<li>Go to: <code>Help &gt; Install New Software...</code> in your Eclipse IDE.</li>
+<li>Copy and paste this url: <a href="http://soft.vub.ac.be/%7Ecderoove/eclipse/">http://soft.vub.ac.be/~cderoove/eclipse/</a> in the Work with text field.</li>
+<li>Hit Enter</li>
+<li>Select all plug-ins including Ekeko and GASR and the rest and install all of them.</li>
+<li>After installing both Ekeko and the Ekeko's AspectJ estension, you are ready to downdload the metrics.</li>
+<li>Import the Ekeko AJFX project (i.e. the metrics) in your Eclipse workspace.</li>
+<li>Select an AspectJ project that you want to analyse then, right-click on the project, apply these steps: <code>Configure &gt; Include in Ekeko Queries</code>
+</li>
+<li>
+<p>Some metrics also need soot analysis in order to run properly. To do that, we need to configure the selected AspectJ project once as follows:</p>
+
+<ul>
+<li> Right-click on the project : <code>Properties &gt; Ekeko properties</code>.</li>
+<li> Click the Select button and now choose the class that contains the main() method of the AspectJ project. (e.g. you can find an example of a main() method in our AJTestMetrics project (<a href="https://github.com/ozlerhakan/aop-metrics/blob/master/AJTestMetrics/src/ua/thesis/test/MainTST.java">MainTST</a>).</li>
+<li> Write the following line into the "Soot arguments:" one-line text box: <code>-no-bodies-for-excluded -src-prec c -f jimple -keep-line-number -app -w -p cg.cha</code>
+</li>
+<li>Click OK</li>
+<li>Finally, <code>right-click the project &gt; Configure &gt; Enable Ekeko Soot Analyses</code>.</li>
+</ul>
+</li>
+<li><p>Activate an Ekeko-hosted REPL by doing <code>Ekeko &gt; Start nRepl</code> from the main Eclipse menu. A dialog shows the port on which the nRepl server listens (e.g. <code>nrepl://localhost:51721</code>)</p></li>
+<li>Connect to the Ekeko-hosted REPL: Go to: <code>Window &gt; Connect to REPL</code> to connect to this port (i.e. <code>nrepl://localhost:51721</code>). A Counterclockwise REPL view now opens.</li>
+<li>Open the <code>metrics-result</code> file located in the imported project and right-click somewhere on the file and choose <code>Clojure &gt; Load file in REPL</code>
+</li>
+<li>You will see <code>nil</code> in the REPL which means that everything goes correctly and the metric framework has likewise been loaded in the REPL.</li>
+<li>After disabling the comment block, you can now run the metrics. For example: if we look at <code>(metrics/VSize)</code>, the alias name of our <code>AOPMetrics</code> is <code>metrics</code> that helps in reaching the implemented metrics in a short way rather than typing the totally qualified name (i.e. <code>AOPMetrics</code>). <code>metrics/Vsize</code> simply retrieves the vocabulary size of the project.</li>
+</ul><p><img class="emoji" title=":pushpin:" alt=":pushpin:" src="https://assets-cdn.github.com/images/icons/emoji/pushpin.png" height="20" width="20" align="absmiddle"><strong>Note:</strong> The AcA and MoA metrics need different soot arguments to obtain the exact data. Thus, you need to change the current arguments with the following one: <code>-no-bodies-for-excluded -src-prec c -f jimple -keep-line-number -app -w -p jb use-original-names:true -p cg.cha</code> and run again <code>Ekeko Soot Analyses</code>.</p>
+
+<blockquote>
+<p><img class="emoji" title=":exclamation:" alt=":exclamation:" src="https://assets-cdn.github.com/images/icons/emoji/exclamation.png" height="20" width="20" align="absmiddle"><strong>One Potential Issue</strong>: There was an encountered issue about soot analysis. You can find more information on it, if you get the same problem called <code>RuntimeException : tried to get nonexistent method</code>, while attempting to run the metrics especially for the AM, IM, and MM metrics :<a href="https://github.com/ozlerhakan/aop-metrics/issues/1">https://github.com/ozlerhakan/aop-metrics/issues/1</a> </p>
+</blockquote>
+
+<h4>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h4>
+
+<p>Copyright © 2014 Hakan Özler.</p>
       </section>
-
-      <footer>
-        <span class="ribbon-outer">
-          <span class="ribbon-inner">
-            <p>this project by <a href="https://github.com/ozlerhakan">ozlerhakan</a> can be found on <a href="https://github.com/ozlerhakan/aop-metrics">GitHub</a></p>
-          </span>
-          <span class="left-tail"></span>
-          <span class="right-tail"></span>
-        </span>
-        <p>Generated with <a href="http://pages.github.com">GitHub Pages</a> using Merlot</p>
-        <span class="octocat"></span>
-      </footer>
-
     </div>
-
+    <footer>
+      <p>Project maintained by <a href="https://github.com/ozlerhakan">ozlerhakan</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
     
   </body>
 </html>
