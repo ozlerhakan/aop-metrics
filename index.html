@@ -33,7 +33,7 @@
 <hr><p>The aim of the thesis  is to analyse the existing <strong><a href="http://eclipse.org/aspectj/">AspectJ</a></strong> applications. In order to collect proper information, a metric framework has been implemented. The framework consists of <strong><a href="http://en.wikipedia.org/wiki/Aspect-oriented_programming">aspect-oriented </a></strong> and <strong><a href="http://en.wikipedia.org/wiki/Object-oriented_programming">object-oriented </a></strong> features.</p>
 
 <h3>
-<a name="the-hierarchy-of-the-research-questions" class="anchor" href="#the-hierarchy-of-the-research-questions"><span class="octicon octicon-link"></span></a>The Hierarchy of The Research Questions</h3>
+<a name="hierarchy-of-the-research-questions" class="anchor" href="#hierarchy-of-the-research-questions"><span class="octicon octicon-link"></span></a>Hierarchy of The Research Questions</h3>
 
 <hr><ol>
 <li> How large is the system?
@@ -172,8 +172,8 @@
 <ul>
 <li>Go to: <code>Help &gt; Install New Software...</code> in your Eclipse IDE.</li>
 <li>Copy and paste this url: <a href="http://soft.vub.ac.be/%7Ecderoove/eclipse/">http://soft.vub.ac.be/~cderoove/eclipse/</a> in the Work with text field.</li>
-<li>Hit Enter</li>
-<li>Select all plug-ins including Ekeko and GASR and the rest and install all of them.</li>
+<li>Hit Enter.</li>
+<li>Select all plug-ins including <a href="https://github.com/cderoove/damp.ekeko">Ekeko</a> and <a href="https://github.com/cderoove/damp.ekeko.aspectj">GASR</a> and the rest and install all of them.</li>
 <li>After installing both Ekeko and the Ekeko's AspectJ estension, you are ready to downdload the metrics.</li>
 <li>Import the Ekeko AJFX project (i.e. the metrics) in your Eclipse workspace.</li>
 <li>Select an AspectJ project that you want to analyse then, right-click on the project, apply these steps: <code>Configure &gt; Include in Ekeko Queries</code>
@@ -199,7 +199,7 @@
 </ul><p><img class="emoji" title=":pushpin:" alt=":pushpin:" src="https://assets-cdn.github.com/images/icons/emoji/pushpin.png" height="20" width="20" align="absmiddle"><strong>Note:</strong> The AcA and MoA metrics need different soot arguments to obtain the exact data. Thus, you need to change the current arguments with the following one: <code>-no-bodies-for-excluded -src-prec c -f jimple -keep-line-number -app -w -p jb use-original-names:true -p cg.cha</code> and run again <code>Ekeko Soot Analyses</code>.</p>
 
 <blockquote>
-<p><img class="emoji" title=":exclamation:" alt=":exclamation:" src="https://assets-cdn.github.com/images/icons/emoji/exclamation.png" height="20" width="20" align="absmiddle"><strong>One Potential Issue</strong>: There was an encountered issue about soot analysis. You can find more information on it, if you get the same problem called <code>RuntimeException : tried to get nonexistent method</code>, while attempting to run the metrics especially for the AM, IM, and MM metrics :<a href="https://github.com/ozlerhakan/aop-metrics/issues/1">https://github.com/ozlerhakan/aop-metrics/issues/1</a> </p>
+<p><img class="emoji" title=":exclamation:" alt=":exclamation:" src="https://assets-cdn.github.com/images/icons/emoji/exclamation.png" height="20" width="20" align="absmiddle"><strong>One Potential Issue</strong>: There was an encountered issue about soot analysis. If you get the same problem called <code>RuntimeException : tried to get nonexistent method</code>, while attempting to run the metrics especially for the AM, IM, and MM metrics.  You can find more information on it from <a href="https://github.com/ozlerhakan/aop-metrics/issues/1">https://github.com/ozlerhakan/aop-metrics/issues/1</a> </p>
 </blockquote>
 
 <h3>
