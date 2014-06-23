@@ -3,7 +3,7 @@
 
 The aim of the thesis  is to analyse the existing **[AspectJ](http://eclipse.org/aspectj/)** applications. In order to collect proper information, a metric framework has been implemented. The framework consists of **[aspect-oriented ](http://en.wikipedia.org/wiki/Aspect-oriented_programming)** and **[object-oriented ](http://en.wikipedia.org/wiki/Object-oriented_programming)** features.
 
-### The Hierarchy of The Research Questions 
+### Hierarchy of The Research Questions 
 ---
 
 1.	How large is the system?
@@ -84,7 +84,7 @@ Downloading the dependencies, you are now ready to install the prebuilt *Ekeko* 
   * Go to: ```Help > Install New Software...``` in your Eclipse IDE.
   * Copy and paste this url: http://soft.vub.ac.be/~cderoove/eclipse/ in the Work with text field.
   * Hit Enter.
-  * Select all plug-ins including Ekeko and GASR and the rest and install all of them.
+  * Select all plug-ins including [Ekeko](https://github.com/cderoove/damp.ekeko) and [GASR](https://github.com/cderoove/damp.ekeko.aspectj) and the rest and install all of them.
   * After installing both Ekeko and the Ekeko's AspectJ estension, you are ready to downdload the metrics.
   * Import the Ekeko AJFX project (i.e. the metrics) in your Eclipse workspace.
   * Select an AspectJ project that you want to analyse then, right-click on the project, apply these steps: ```Configure > Include in Ekeko Queries```
