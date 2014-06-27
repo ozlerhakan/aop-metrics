@@ -70,6 +70,21 @@ The Metric representation of the question is: the number of inherited aspects in
                    (equals ?abstractname (str "From Abstract Aspect -> "(.getSimpleName ?super)))
                    (succeeds (.isAbstract ?super))))
 ```
+### Selected Aspect-Oriented Systems
+---
+
+1. [HealthWatcher](http://www.kevinjhoffman.com/tosem2012/)
+2. HyperCast
+3. [AJHotDraw](http://ajhotdraw.sourceforge.net/)
+4. [AJHSQLDB](http://sourceforge.net/projects/ajhsqldb/)
+5. [Contract4J5](https://github.com/deanwampler/Contract4J5)
+6. [MobileMedia](http://sourceforge.net/projects/mobilemedia/)
+7. [iBatis](sourceforge.net/projects/ibatislancaster/)
+8. [Telestrada](http://www.kevinjhoffman.com/tosem2012/)
+9. SpaceWar
+	* Comes bundled with the [AJDT](http://eclipse.org/ajdt/)
+10. [TetrisAJ](http://www.guzzzt.com/coding/aspecttetris.shtml)
+
 
 ### How the metrics work
 ---
