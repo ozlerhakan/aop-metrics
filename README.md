@@ -1,3 +1,4 @@
+<img height="550px" src="https://dl.dropboxusercontent.com/s/grmua5z1gwknbl9/cover.JPG" >
 ### Master Thesis  - Measuring Aspect-Oriented Software In Practice
 ---
 
