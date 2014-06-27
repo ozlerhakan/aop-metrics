@@ -1,9 +1,12 @@
-#### Master Thesis  - Measuring Aspect-Oriented Software In Practice
+### Master Thesis  - Measuring Aspect-Oriented Software In Practice
 ---
 
-The aim of the thesis  is to analyse the existing **[AspectJ](http://eclipse.org/aspectj/)** applications. In order to collect proper information, a metric framework has been implemented. The framework consists of **[aspect-oriented ](http://en.wikipedia.org/wiki/Aspect-oriented_programming)** and **[object-oriented ](http://en.wikipedia.org/wiki/Object-oriented_programming)** features.
+**Abstract**. Aspect-oriented programming (AOP) is a way of modularizing a software system by means of new kind of modules called aspects in software development. To this end AOP helps in alleviating crosscutting concerns of system modules by separating into several aspect modules, thereby aiming to improve separation of concerns. On the other hand, aspects can bring unexpected behaviour to a system while attempting to alter the system’s concerns. They can modify the behaviour of the base system without warning. Following to this, such impact can limit to achieve modular reasoning in an aspect-oriented system properly.
 
-#### The Hierarchy of The Research Questions 
+Obtaining the valuable data, we try to get an idea of how difficult it is to achieve modular reasoning. In this thesis, we analyse the existing ten **[AspectJ](http://eclipse.org/aspectj/)** systems by answering six research questions. These six questions were derived from our general question: *"how AspectJ is used in practice?"*. In order to answer each one of them, we have implemented
+a metrics suite including both **[aspect-oriented ](http://en.wikipedia.org/wiki/Aspect-oriented_programming)** and **[object-oriented ](http://en.wikipedia.org/wiki/Object-oriented_programming)** features using Ekeko. Next to modular reasoning, we also acquire other usefulness about AOP constructs and coupling between classes and aspects. These results can then be used to influence the design of existing or new AOP languages, or to improve existing analysis tools.
+
+### Hierarchy of The Research Questions 
 ---
 
 1.	How large is the system?
@@ -55,7 +58,7 @@ The aim of the thesis  is to analyse the existing **[AspectJ](http://eclipse.org
 	*	*Pointcut-Method Dependence* [(PM)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L496) 
 
 
-#### Have a look at an example
+### Have a look at an example
 ---
 One of the questions we examine is: how many aspects extend to an abstract aspect in a given aspect-oriented project?
 
@@ -70,18 +73,59 @@ The Metric representation of the question is: the number of inherited aspects in
                    (equals ?abstractname (str "From Abstract Aspect -> "(.getSimpleName ?super)))
                    (succeeds (.isAbstract ?super))))
 ```
-
-#### How the metrics work
+### Selected Aspect-Oriented Systems
 ---
 
-First of all, make sure that you have all the dependencies about the *Ekeko plug-in* in your [Eclipse Kepler 4.3 IDE](http://www.eclipse.org/kepler), if not, you have to download it with its dependencies from [here](https://github.com/cderoove/damp.ekeko/wiki/Getting-Started-with-Ekeko). 
+1. [HealthWatcher](http://www.kevinjhoffman.com/tosem2012/)
+2. HyperCast
+3. [AJHotDraw](http://ajhotdraw.sourceforge.net/)
+4. [AJHSQLDB](http://sourceforge.net/projects/ajhsqldb/)
+5. [Contract4J5](https://github.com/deanwampler/Contract4J5)
+6. [MobileMedia](http://sourceforge.net/projects/mobilemedia/)
+7. [iBatis](sourceforge.net/projects/ibatislancaster/)
+8. [Telestrada](http://www.kevinjhoffman.com/tosem2012/)
+9. SpaceWar
+	* Comes bundled with the [AJDT](http://eclipse.org/ajdt/)
+10. [TetrisAJ](http://www.guzzzt.com/coding/aspecttetris.shtml)
 
-After importing Ekeko as an Eclipse project, you have to import the Ekeko's AspectJ extension in order to complete the last essential part. The link of the extension is over [here](https://github.com/cderoove/damp.ekeko.aspectj).
 
-Now, you can get the code of the aop-metrics (i.e. Ekeko AJFX) by simply cloning the project, plus import it within the workspace of your Eclipse IDE.
+### How the metrics work
+---
 
-Enjoy!
+First of all, make sure that you have all the dependencies about the *Ekeko plug-in* in your [Eclipse Kepler 4.3 IDE](http://www.eclipse.org/kepler), if not, you first need to download the dependencies:
 
-#### License 
+  * AST View [(i.e. org.eclipse.jdt.astview)](http://www.eclipse.org/jdt/ui/astview/index.php)
+  * [Counterclockwise](http://www.eclipse.org/jdt/ui/astview/index.php)
 
-Copyright © 2014 Hakan Özler
+Downloading the dependencies, you are now ready to install the prebuilt *Ekeko* plug-in:
+
+  * Go to: ```Help > Install New Software...``` in your Eclipse IDE.
+  * Copy and paste this url: http://soft.vub.ac.be/~cderoove/eclipse/ in the Work with text field.
+  * Hit Enter.
+  * Select all plug-ins including [Ekeko](https://github.com/cderoove/damp.ekeko) and [GASR](https://github.com/cderoove/damp.ekeko.aspectj) and the rest and install all of them.
+  * After installing both Ekeko and the Ekeko's AspectJ estension, you are ready to downdload the metrics.
+  * Import the Ekeko AJFX project (i.e. the metrics) in your Eclipse workspace.
+  * Select an AspectJ project that you want to analyse then, right-click on the project, apply these steps: ```Configure > Include in Ekeko Queries```
+  * Some metrics also need soot analysis in order to run properly. To do that, we need to configure the selected AspectJ project once as follows:
+      *  Right-click on the project : ```Properties > Ekeko properties```.
+      *  Click the Select button and now choose the class that contains the main() method of the AspectJ project. (e.g. you can find an example of a main() method in our AJTestMetrics project ([MainTST](https://github.com/ozlerhakan/aop-metrics/blob/master/AJTestMetrics/src/ua/thesis/test/MainTST.java)).
+      *  Write the following line into the "Soot arguments:" one-line text box: ```-no-bodies-for-excluded -src-prec c -f jimple -keep-line-number -app -w -p cg.cha```
+      * Click OK
+      * Finally, ```right-click the project > Configure > Enable Ekeko Soot Analyses```.
+
+  * Activate an Ekeko-hosted REPL by doing ```Ekeko > Start nRepl``` from the main Eclipse menu. A dialog shows the port on which the nRepl server listens (e.g. ```nrepl://localhost:51721```)
+  * Connect to the Ekeko-hosted REPL: Go to: ```Window > Connect to REPL``` to connect to this port (i.e. ```nrepl://localhost:51721```). A Counterclockwise REPL view now opens.
+  * Open the ```metrics-result``` file located in the imported project and right-click somewhere on the file and choose ```Clojure > Load file in REPL ```
+  * You will see ```nil``` in the REPL which means that everything goes correctly and the metric framework has likewise been loaded in the REPL.
+  * After disabling the comment block, you can now run the metrics. For example, if we look at ```(metrics/VSize)```, the alias name of our ```AOPMetrics``` is ```metrics``` that helps in reaching the implemented metrics in a short way rather than typing the totally qualified name (i.e. ```AOPMetrics```). ```metrics/Vsize``` simply retrieves the vocabulary size of the project.
+
+
+
+:pushpin:**Note:** The AcA and MoA metrics need different soot arguments to obtain the exact data. Thus, you need to change the current arguments with the following one: ```-no-bodies-for-excluded -src-prec c -f jimple -keep-line-number -app -w -p jb use-original-names:true -p cg.cha``` and run again ```Ekeko Soot Analyses```.
+
+
+>:exclamation:**One Potential Issue**: There was an encountered issue about soot analysis. If you get the same problem called ```RuntimeException : tried to get nonexistent method```, while attempting to run the metrics especially for the AM, IM, and MM metrics.  You can find more information on it from https://github.com/ozlerhakan/aop-metrics/issues/1 
+
+### License 
+
+Copyright © 2014 Hakan Özler.
