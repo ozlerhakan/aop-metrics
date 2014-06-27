@@ -30,7 +30,10 @@
         <h3>
 <a name="master-thesis----measuring-aspect-oriented-software-in-practice" class="anchor" href="#master-thesis----measuring-aspect-oriented-software-in-practice"><span class="octicon octicon-link"></span></a>Master Thesis  - Measuring Aspect-Oriented Software In Practice</h3>
 
-<hr><p>The aim of the thesis  is to analyse the existing <strong><a href="http://eclipse.org/aspectj/">AspectJ</a></strong> applications. In order to collect proper information, a metric framework has been implemented. The framework consists of <strong><a href="http://en.wikipedia.org/wiki/Aspect-oriented_programming">aspect-oriented </a></strong> and <strong><a href="http://en.wikipedia.org/wiki/Object-oriented_programming">object-oriented </a></strong> features.</p>
+<hr><p><strong>Abstract</strong>. Aspect-oriented programming (AOP) is a way of modularizing a software system by means of new kind of modules called aspects in software development. To this end AOP helps in alleviating crosscutting concerns of system modules by separating into several aspect modules, thereby aiming to improve separation of concerns. On the other hand, aspects can bring unexpected behaviour to a system while attempting to alter the system’s concerns. They can modify the behaviour of the base system without warning. Following to this, such impact can limit to achieve modular reasoning in an aspect-oriented system properly.</p>
+
+<p>Obtaining the valuable data, we try to get an idea of how difficult it is to achieve modular reasoning. In this thesis, we analyse the existing ten <strong><a href="http://eclipse.org/aspectj/">AspectJ</a></strong> systems by answering six research questions. These six questions were derived from our general question: <em>"how AspectJ is used in practice?"</em>. In order to answer each one of them, we have implemented
+a metrics suite including both <strong><a href="http://en.wikipedia.org/wiki/Aspect-oriented_programming">aspect-oriented </a></strong> and <strong><a href="http://en.wikipedia.org/wiki/Object-oriented_programming">object-oriented </a></strong> features using <a href="https://github.com/cderoove/damp.ekeko"><strong>Ekeko</strong></a>. Next to modular reasoning, we also acquire other usefulness about AOP constructs and coupling between classes and aspects. These results can then be used to influence the design of existing or new AOP languages, or to improve existing analysis tools of AOP.</p>
 
 <h3>
 <a name="hierarchy-of-the-research-questions" class="anchor" href="#hierarchy-of-the-research-questions"><span class="octicon octicon-link"></span></a>Hierarchy of The Research Questions</h3>
@@ -159,6 +162,26 @@
 </pre></div>
 
 <h3>
+<a name="selected-aspect-oriented-systems" class="anchor" href="#selected-aspect-oriented-systems"><span class="octicon octicon-link"></span></a>Selected Aspect-Oriented Systems</h3>
+
+<hr><ol>
+<li><a href="http://www.kevinjhoffman.com/tosem2012/">HealthWatcher</a></li>
+<li>HyperCast</li>
+<li><a href="http://ajhotdraw.sourceforge.net/">AJHotDraw</a></li>
+<li><a href="http://sourceforge.net/projects/ajhsqldb/">AJHSQLDB</a></li>
+<li><a href="https://github.com/deanwampler/Contract4J5">Contract4J5</a></li>
+<li><a href="http://sourceforge.net/projects/mobilemedia/">MobileMedia</a></li>
+<li><a href="sourceforge.net/projects/ibatislancaster/">iBatis</a></li>
+<li><a href="http://www.kevinjhoffman.com/tosem2012/">Telestrada</a></li>
+<li>SpaceWar
+
+<ul>
+<li>Comes bundled with the <a href="http://eclipse.org/ajdt/">AJDT</a>
+</li>
+</ul>
+</li>
+<li><a href="http://www.guzzzt.com/coding/aspecttetris.shtml">TetrisAJ</a></li>
+</ol><h3>
 <a name="how-the-metrics-work" class="anchor" href="#how-the-metrics-work"><span class="octicon octicon-link"></span></a>How the metrics work</h3>
 
 <hr><p>First of all, make sure that you have all the dependencies about the <em>Ekeko plug-in</em> in your <a href="http://www.eclipse.org/kepler">Eclipse Kepler 4.3 IDE</a>, if not, you first need to download the dependencies:</p>
