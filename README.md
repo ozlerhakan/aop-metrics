@@ -7,7 +7,7 @@
 Obtaining the valuable data, we try to get an idea of how difficult it is to achieve modular reasoning. In this thesis, we analyse the existing ten **[AspectJ](http://eclipse.org/aspectj/)** systems by answering six research questions. These six questions were derived from our general question: *"how AspectJ is used in practice?"*. In order to answer each one of them, we have implemented
 a metrics suite including both **[aspect-oriented ](http://en.wikipedia.org/wiki/Aspect-oriented_programming)** and **[object-oriented ](http://en.wikipedia.org/wiki/Object-oriented_programming)** features using [**Ekeko**](https://github.com/cderoove/damp.ekeko). Next to modular reasoning, we also acquire other usefulness about AOP constructs and coupling between classes and aspects. These results can then be used to influence the design of existing or new AOP languages, or to improve existing analysis tools of AOP.
 
-### Hierarchy of The Research Questions 
+### Hierarchy of the research questions 
 ---
 
 1.	How large is the system?
@@ -74,7 +74,7 @@ The Metric representation of the question is: the number of inherited aspects in
                    (equals ?abstractname (str "From Abstract Aspect -> "(.getSimpleName ?super)))
                    (succeeds (.isAbstract ?super))))
 ```
-### Selected Aspect-Oriented Systems
+### Selected aspect-oriented systems
 ---
 
 1. [HealthWatcher](http://www.kevinjhoffman.com/tosem2012/)
@@ -89,7 +89,13 @@ The Metric representation of the question is: the number of inherited aspects in
 	* Comes bundled with the [AJDT](http://eclipse.org/ajdt/)
 10. [TetrisAJ](http://www.guzzzt.com/coding/aspecttetris.shtml)
 
+### Some charts mentioned in this thesis
+---
+All the related charts are available in [Thesis Text/diagrams](https://github.com/ozlerhakan/aop-metrics/tree/master/Thesis%20Text/diagrams).
 
+<img height="240px" src="https://dl.dropboxusercontent.com/s/ikz4irmck0gz9an/index4.png" title="The Percentage of Advised Classes against non-Advised Classes" > <img height="240px" src="https://dl.dropboxusercontent.com/s/69l8fndbu5abfcf/index5.png" title="AAd vs AAda" >
+
+ <img height="220px" src="https://dl.dropboxusercontent.com/s/9o65wcdnklbvkc9/index3.png" title="Advice-Advanced Pointcut Dependencies versus Advice-Basic Pointcut Dependencies per System" > <img height="220px" src="https://dl.dropboxusercontent.com/s/yzh7kv860zi5dyi/index2.png" title="The Average of Advice-Join Point Shadow Dependencie per System" >
 ### How the metrics work
 ---
 
