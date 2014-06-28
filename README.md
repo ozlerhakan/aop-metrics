@@ -95,7 +95,7 @@ All the related charts are available in [Thesis Text/diagrams](https://github.co
 
 <img height="240px" src="https://dl.dropboxusercontent.com/s/ikz4irmck0gz9an/index4.png" title="The Percentage of Advised Classes against non-Advised Classes" > <img height="240px" src="https://dl.dropboxusercontent.com/s/69l8fndbu5abfcf/index5.png" title="AAd vs AAda" >
 
- <img height="220px" src="https://dl.dropboxusercontent.com/s/9o65wcdnklbvkc9/index3.png" title="Advice-Advanced Pointcut Dependencies versus Advice-Basic Pointcut Dependencies per System" > <img height="220px" src="https://dl.dropboxusercontent.com/s/yzh7kv860zi5dyi/index2.png" title="The Average of Advice-Join Point Shadow Dependencie per System" >
+ <img height="220px" src="https://dl.dropboxusercontent.com/s/9o65wcdnklbvkc9/index3.png" title="Advice-Advanced Pointcut Dependency versus Advice-Basic Pointcut Dependency per System" > <img height="220px" src="https://dl.dropboxusercontent.com/s/yzh7kv860zi5dyi/index2.png" title="The Average of Advice-Join Point Shadow Dependency per System" >
 ### How the metrics work
 ---
 
