@@ -219,10 +219,10 @@ a metrics suite including both <strong><a href="http://en.wikipedia.org/wiki/Asp
 </li>
 <li>You will see <code>nil</code> in the REPL which means that everything goes correctly and the metric framework has likewise been loaded in the REPL.</li>
 <li>After disabling the comment block, you can now run the metrics. For example, if we look at <code>(metrics/VSize)</code>, the alias name of our <code>AOPMetrics</code> is <code>metrics</code> that helps in reaching the implemented metrics in a short way rather than typing the totally qualified name (i.e. <code>AOPMetrics</code>). <code>metrics/Vsize</code> simply retrieves the vocabulary size of the project.</li>
-</ul><p><img class="emoji" title=":pushpin:" alt=":pushpin:" src="https://assets-cdn.github.com/images/icons/emoji/pushpin.png" height="20" width="20" align="absmiddle"><strong>Note:</strong> The AcA and MoA metrics need different soot arguments to obtain the exact data. Thus, you need to change the current arguments with the following one: <code>-no-bodies-for-excluded -src-prec c -f jimple -keep-line-number -app -w -p jb use-original-names:true -p cg.cha</code> and run again <code>Ekeko Soot Analyses</code>.</p>
+</ul><p><img class="emoji" title=":pushpin:" alt=":pushpin:" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4cc.png" height="20" width="20" align="absmiddle"><strong>Note:</strong> The AcA and MoA metrics need different soot arguments to obtain the exact data. Thus, you need to change the current arguments with the following one: <code>-no-bodies-for-excluded -src-prec c -f jimple -keep-line-number -app -w -p jb use-original-names:true -p cg.cha</code> and run again <code>Ekeko Soot Analyses</code>.</p>
 
 <blockquote>
-<p><img class="emoji" title=":exclamation:" alt=":exclamation:" src="https://assets-cdn.github.com/images/icons/emoji/exclamation.png" height="20" width="20" align="absmiddle"><strong>One Potential Issue</strong>: There was an encountered issue about soot analysis. If you get the same problem called <code>RuntimeException : tried to get nonexistent method</code>, while attempting to run the metrics especially for the AM, IM, and MM metrics.  You can find more information on it from <a href="https://github.com/ozlerhakan/aop-metrics/issues/1">https://github.com/ozlerhakan/aop-metrics/issues/1</a> </p>
+<p><img class="emoji" title=":exclamation:" alt=":exclamation:" src="https://assets-cdn.github.com/images/icons/emoji/unicode/2757-fe0f.png" height="20" width="20" align="absmiddle"><strong>One Potential Issue</strong>: There was an encountered issue about soot analysis. If you get the same problem called <code>RuntimeException : tried to get nonexistent method</code>, while attempting to run the metrics especially for the AM, IM, and MM metrics.  You can find more information on it from <a href="https://github.com/ozlerhakan/aop-metrics/issues/1">https://github.com/ozlerhakan/aop-metrics/issues/1</a> </p>
 </blockquote>
 
 <h3>
@@ -236,6 +236,16 @@ a metrics suite including both <strong><a href="http://en.wikipedia.org/wiki/Asp
       <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
     </footer>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-52820059-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
   </body>
 </html>
