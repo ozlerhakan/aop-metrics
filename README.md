@@ -1,5 +1,7 @@
 <img height="550px" src="https://dl.dropboxusercontent.com/s/grmua5z1gwknbl9/cover.JPG" >
 ### Master Thesis  - Measuring Aspect-Oriented Software In Practice
+[![Analytics](https://ga-beacon.appspot.com/UA-52814996-1/chromeskel_a/readme)](https://github.com/igrigorik/ga-beacon)
+
 ---
 
 **Abstract**. Aspect-oriented programming (AOP) is a way of modularizing a software system by means of new kind of modules called aspects in software development. To this end AOP helps in alleviating crosscutting concerns of system modules by separating into several aspect modules, thereby aiming to improve separation of concerns. On the other hand, aspects can bring unexpected behaviour to a system while attempting to alter the system’s concerns. They can modify the behaviour of the base system without warning. Following to this, such impact can limit to achieve modular reasoning in an aspect-oriented system properly.
@@ -136,3 +138,4 @@ Downloading the dependencies, you are now ready to install the prebuilt *Ekeko* 
 ### License 
 
 Copyright © 2014 Hakan Özler.
+
