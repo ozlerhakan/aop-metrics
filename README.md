@@ -1,5 +1,5 @@
 <img height="550px" src="https://dl.dropboxusercontent.com/s/grmua5z1gwknbl9/cover.JPG" >
-### Master Thesis  - Measuring Aspect-Oriented Software In Practice
+### Master Thesis: Measuring Aspect-Oriented Software In Practice
 [![Analytics](https://ga-beacon.appspot.com/UA-52814996-1/chromeskel_a/readme)](https://github.com/igrigorik/ga-beacon)
 
 ---
@@ -101,32 +101,35 @@ All the related charts are available in [Thesis Text/diagrams](https://github.co
 ### How the metrics work
 ---
 
-First of all, make sure that you have all the dependencies about the *Ekeko plug-in* in your [Eclipse Kepler 4.3 IDE](http://www.eclipse.org/kepler), if not, you first need to download the dependencies:
+First of all, make sure that you have all the dependencies about the *Ekeko plug-in* in your [Eclipse Luna 4.4 IDE](https://www.eclipse.org/downloads/), if not, you first need to download the dependencies:
 
-  * AST View [(i.e. org.eclipse.jdt.astview)](http://www.eclipse.org/jdt/ui/astview/index.php)
-  * [Counterclockwise](http://www.eclipse.org/jdt/ui/astview/index.php)
+  * AST View [i.e. org.eclipse.jdt.astview](http://www.eclipse.org/jdt/ui/astview/index.php)
+  * [Counterclockwise](http://doc.ccw-ide.org/documentation.html#install-as-plugin)
 
 Downloading the dependencies, you are now ready to install the prebuilt *Ekeko* plug-in:
 
   * Go to: ```Help > Install New Software...``` in your Eclipse IDE.
   * Copy and paste this url: http://soft.vub.ac.be/~cderoove/eclipse/ in the Work with text field.
   * Hit Enter.
-  * Select all plug-ins including [Ekeko](https://github.com/cderoove/damp.ekeko) and [GASR](https://github.com/cderoove/damp.ekeko.aspectj) and the rest and install all of them.
-  * After installing both Ekeko and the Ekeko's AspectJ estension, you are ready to downdload the metrics.
-  * Import the Ekeko AJFX project (i.e. the metrics) in your Eclipse workspace.
+  * Select all plug-ins including [Ekeko](https://github.com/cderoove/damp.ekeko) and [GASR](https://github.com/cderoove/damp.ekeko.aspectj) in Ekeko-based program Analysis (*required*), the rest are (*optional*) and install all of them.
+  * After installing both Ekeko and the Ekeko's AspectJ extension, you are ready to downdload the metrics.
+  * Import the project (i.e. the aopmetrics project) in your Eclipse workspace. Eclipse Luna will automatically detect this project as a Clojure project.
   * Select an AspectJ project that you want to analyse then, right-click on the project, apply these steps: ```Configure > Include in Ekeko Queries```
-  * Some metrics also need soot analysis in order to run properly. To do that, we need to configure the selected AspectJ project once as follows:
+  * **The metrics also need soot analyses in order to run properly**. To do that, we need to configure the selected AspectJ project once as follows:
       *  Right-click on the project : ```Properties > Ekeko properties```.
       *  Click the Select button and now choose the class that contains the main() method of the AspectJ project. (e.g. you can find an example of a main() method in our AJTestMetrics project ([MainTST](https://github.com/ozlerhakan/aop-metrics/blob/master/AJTestMetrics/src/ua/thesis/test/MainTST.java)).
+		* If your AspectJ project does not have a main() method, just **create** a new one to set it as an execution point of soot analysis.
       *  Write the following line into the "Soot arguments:" one-line text box: ```-no-bodies-for-excluded -src-prec c -f jimple -keep-line-number -app -w -p cg.cha```
       * Click OK
       * Finally, ```right-click the project > Configure > Enable Ekeko Soot Analyses```.
 
   * Activate an Ekeko-hosted REPL by doing ```Ekeko > Start nRepl``` from the main Eclipse menu. A dialog shows the port on which the nRepl server listens (e.g. ```nrepl://localhost:51721```)
   * Connect to the Ekeko-hosted REPL: Go to: ```Window > Connect to REPL``` to connect to this port (i.e. ```nrepl://localhost:51721```). A Counterclockwise REPL view now opens.
-  * Open the ```metrics-result``` file located in the imported project and right-click somewhere on the file and choose ```Clojure > Load file in REPL ```
-  * You will see ```nil``` in the REPL which means that everything goes correctly and the metric framework has likewise been loaded in the REPL.
-  * After disabling the comment block, you can now run the metrics. For example, if we look at ```(metrics/VSize)```, the alias name of our ```AOPMetrics``` is ```metrics``` that helps in reaching the implemented metrics in a short way rather than typing the totally qualified name (i.e. ```AOPMetrics```). ```metrics/Vsize``` simply retrieves the vocabulary size of the project.
+  * There are 2 steps to run the metrics:
+ 	* First,  Open the ```aopmetrics/metrics.clj``` file and right-click somewhere on the file and choose ```Clojure > Load file in REPL ```. After obtaining ```#'aopmetrics.metrics/AcA``` in the REPL, follow the second step.
+  	* Second, Open the ```aopmetrics/core.clj``` file and right-click somewhere on the file and choose ```Clojure > Load file in REPL ```.
+  		* You will see ```nil``` in the REPL which means that everything goes correctly and the metric framework has likewise been loaded in the REPL.
+  		* After disabling the comment block, you can now run the metrics. For example, if we look at ```(metrics/VSize)```, the alias name of our ```AOPMetrics``` is ```metrics``` that helps in reaching the implemented metrics in a short way rather than typing the totally qualified name (i.e. ```AOPMetrics```). ```metrics/Vsize``` simply retrieves the vocabulary size of the project.
 
 
 
