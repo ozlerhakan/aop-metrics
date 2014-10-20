@@ -27,18 +27,26 @@
         </ul>
       </header>
       <section>
-        <h3>
-<a name="master-thesis----measuring-aspect-oriented-software-in-practice" class="anchor" href="#master-thesis----measuring-aspect-oriented-software-in-practice"><span class="octicon octicon-link"></span></a>Master Thesis  - Measuring Aspect-Oriented Software In Practice</h3>
+        <p><img height="550px" src="https://dl.dropboxusercontent.com/s/grmua5z1gwknbl9/cover.JPG"></p>
 
-<hr><p><strong>Abstract</strong>. Aspect-oriented programming (AOP) is a way of modularizing a software system by means of new kind of modules called aspects in software development. To this end AOP helps in alleviating crosscutting concerns of system modules by separating into several aspect modules, thereby aiming to improve separation of concerns. On the other hand, aspects can bring unexpected behaviour to a system while attempting to alter the system’s concerns. They can modify the behaviour of the base system without warning. Following to this, such impact can limit to achieve modular reasoning in an aspect-oriented system properly.</p>
+<h3>
+<a name="master-thesis-measuring-aspect-oriented-software-in-practice" class="anchor" href="#master-thesis-measuring-aspect-oriented-software-in-practice"><span class="octicon octicon-link"></span></a>Master Thesis: Measuring Aspect-Oriented Software In Practice</h3>
+
+<p><a href="https://github.com/igrigorik/ga-beacon"><img src="https://ga-beacon.appspot.com/UA-52814996-1/chromeskel_a/readme" alt="Analytics"></a></p>
+
+<hr>
+
+<p><strong>Abstract</strong>. Aspect-oriented programming (AOP) is a way of modularizing a software system by means of new kind of modules called aspects in software development. To this end AOP helps in alleviating crosscutting concerns of system modules by separating into several aspect modules, thereby aiming to improve separation of concerns. On the other hand, aspects can bring unexpected behaviour to a system while attempting to alter the system’s concerns. They can modify the behaviour of the base system without warning. Following to this, such impact can limit to achieve modular reasoning in an aspect-oriented system properly.</p>
 
 <p>Obtaining the valuable data, we try to get an idea of how difficult it is to achieve modular reasoning. In this thesis, we analyse the existing ten <strong><a href="http://eclipse.org/aspectj/">AspectJ</a></strong> systems by answering six research questions. These six questions were derived from our general question: <em>"how AspectJ is used in practice?"</em>. In order to answer each one of them, we have implemented
 a metrics suite including both <strong><a href="http://en.wikipedia.org/wiki/Aspect-oriented_programming">aspect-oriented </a></strong> and <strong><a href="http://en.wikipedia.org/wiki/Object-oriented_programming">object-oriented </a></strong> features using <a href="https://github.com/cderoove/damp.ekeko"><strong>Ekeko</strong></a>. Next to modular reasoning, we also acquire other usefulness about AOP constructs and coupling between classes and aspects. These results can then be used to influence the design of existing or new AOP languages, or to improve existing analysis tools of AOP.</p>
 
 <h3>
-<a name="hierarchy-of-the-research-questions" class="anchor" href="#hierarchy-of-the-research-questions"><span class="octicon octicon-link"></span></a>Hierarchy of The Research Questions</h3>
+<a name="hierarchy-of-the-research-questions" class="anchor" href="#hierarchy-of-the-research-questions"><span class="octicon octicon-link"></span></a>Hierarchy of the research questions</h3>
 
-<hr><ol>
+<hr>
+
+<ol>
 <li> How large is the system?
 
 <ul>
@@ -126,7 +134,9 @@ a metrics suite including both <strong><a href="http://en.wikipedia.org/wiki/Asp
 </li>
 </ul>
 </li>
-<li> How many dependencies are there between classes and aspects?<br><ul>
+<li> How many dependencies are there between classes and aspects?<br>
+
+<ul>
 <li>  <em>Attribute-Class Dependence</em> <a href="https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L366">(AtC)</a>
 </li>
 <li>  <em>Advice-Class Dependence</em> <a href="https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L380">(AC)</a>
@@ -145,10 +155,14 @@ a metrics suite including both <strong><a href="http://en.wikipedia.org/wiki/Asp
 <li>  <em>Pointcut-Method Dependence</em> <a href="https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L496">(PM)</a> </li>
 </ul>
 </li>
-</ol><h3>
+</ol>
+
+<h3>
 <a name="have-a-look-at-an-example" class="anchor" href="#have-a-look-at-an-example"><span class="octicon octicon-link"></span></a>Have a look at an example</h3>
 
-<hr><p>One of the questions we examine is: how many aspects extend to an abstract aspect in a given aspect-oriented project?</p>
+<hr>
+
+<p>One of the questions we examine is: how many aspects extend to an abstract aspect in a given aspect-oriented project?</p>
 
 <p>The Metric representation of the question is: the number of inherited aspects in a given aspect-oriented project.</p>
 
@@ -162,9 +176,11 @@ a metrics suite including both <strong><a href="http://en.wikipedia.org/wiki/Asp
 </pre></div>
 
 <h3>
-<a name="selected-aspect-oriented-systems" class="anchor" href="#selected-aspect-oriented-systems"><span class="octicon octicon-link"></span></a>Selected Aspect-Oriented Systems</h3>
+<a name="selected-aspect-oriented-systems" class="anchor" href="#selected-aspect-oriented-systems"><span class="octicon octicon-link"></span></a>Selected aspect-oriented systems</h3>
 
-<hr><ol>
+<hr>
+
+<ol>
 <li><a href="http://www.kevinjhoffman.com/tosem2012/">HealthWatcher</a></li>
 <li>HyperCast</li>
 <li><a href="http://ajhotdraw.sourceforge.net/">AJHotDraw</a></li>
@@ -181,32 +197,54 @@ a metrics suite including both <strong><a href="http://en.wikipedia.org/wiki/Asp
 </ul>
 </li>
 <li><a href="http://www.guzzzt.com/coding/aspecttetris.shtml">TetrisAJ</a></li>
-</ol><h3>
+</ol>
+
+<h3>
+<a name="some-charts-mentioned-in-this-thesis" class="anchor" href="#some-charts-mentioned-in-this-thesis"><span class="octicon octicon-link"></span></a>Some charts mentioned in this thesis</h3>
+
+<hr>
+
+<p>All the related charts are available in <a href="https://github.com/ozlerhakan/aop-metrics/tree/master/Thesis%20Text/diagrams">Thesis Text/diagrams</a>.</p>
+
+<p><img height="240px" src="https://dl.dropboxusercontent.com/s/ikz4irmck0gz9an/index4.png" title="The Percentage of Advised Classes against non-Advised Classes"> <img height="240px" src="https://dl.dropboxusercontent.com/s/69l8fndbu5abfcf/index5.png" title="AAd vs AAda"></p>
+
+<p><img height="220px" src="https://dl.dropboxusercontent.com/s/9o65wcdnklbvkc9/index3.png" title="Advice-Advanced Pointcut Dependency versus Advice-Basic Pointcut Dependency per System"> <img height="220px" src="https://dl.dropboxusercontent.com/s/yzh7kv860zi5dyi/index2.png" title="The Average of Advice-Join Point Shadow Dependency per System"></p>
+
+<h3>
 <a name="how-the-metrics-work" class="anchor" href="#how-the-metrics-work"><span class="octicon octicon-link"></span></a>How the metrics work</h3>
 
-<hr><p>First of all, make sure that you have all the dependencies about the <em>Ekeko plug-in</em> in your <a href="http://www.eclipse.org/kepler">Eclipse Kepler 4.3 IDE</a>, if not, you first need to download the dependencies:</p>
+<hr>
+
+<p>First of all, make sure that you have all the dependencies about the <em>Ekeko plug-in</em> in your <a href="https://www.eclipse.org/downloads/">Eclipse Luna 4.4 IDE</a>, if not, you first need to download the dependencies:</p>
 
 <ul>
-<li>AST View <a href="http://www.eclipse.org/jdt/ui/astview/index.php">(i.e. org.eclipse.jdt.astview)</a>
+<li>AST View <a href="http://www.eclipse.org/jdt/ui/astview/index.php">i.e. org.eclipse.jdt.astview</a>
 </li>
-<li><a href="http://www.eclipse.org/jdt/ui/astview/index.php">Counterclockwise</a></li>
-</ul><p>Downloading the dependencies, you are now ready to install the prebuilt <em>Ekeko</em> plug-in:</p>
+<li><a href="http://doc.ccw-ide.org/documentation.html#install-as-plugin">Counterclockwise</a></li>
+</ul>
+
+<p>Downloading the dependencies, you are now ready to install the prebuilt <em>Ekeko</em> plug-in:</p>
 
 <ul>
 <li>Go to: <code>Help &gt; Install New Software...</code> in your Eclipse IDE.</li>
 <li>Copy and paste this url: <a href="http://soft.vub.ac.be/%7Ecderoove/eclipse/">http://soft.vub.ac.be/~cderoove/eclipse/</a> in the Work with text field.</li>
 <li>Hit Enter.</li>
-<li>Select all plug-ins including <a href="https://github.com/cderoove/damp.ekeko">Ekeko</a> and <a href="https://github.com/cderoove/damp.ekeko.aspectj">GASR</a> and the rest and install all of them.</li>
-<li>After installing both Ekeko and the Ekeko's AspectJ estension, you are ready to downdload the metrics.</li>
-<li>Import the Ekeko AJFX project (i.e. the metrics) in your Eclipse workspace.</li>
+<li>Select all plug-ins including <a href="https://github.com/cderoove/damp.ekeko">Ekeko</a> and <a href="https://github.com/cderoove/damp.ekeko.aspectj">GASR</a> in Ekeko-based program Analysis (<em>required</em>), the rest are (<em>optional</em>) and install all of them.</li>
+<li>After installing both Ekeko and the Ekeko's AspectJ extension, you are ready to downdload the metrics.</li>
+<li>Import the project (i.e. the aopmetrics project) in your Eclipse workspace. Eclipse Luna will automatically detect this project as a Clojure project.</li>
 <li>Select an AspectJ project that you want to analyse then, right-click on the project, apply these steps: <code>Configure &gt; Include in Ekeko Queries</code>
 </li>
 <li>
-<p>Some metrics also need soot analysis in order to run properly. To do that, we need to configure the selected AspectJ project once as follows:</p>
+<p><strong>The metrics also need soot analyses in order to run properly</strong>. To do that, we need to configure the selected AspectJ project once as follows:</p>
 
 <ul>
 <li> Right-click on the project : <code>Properties &gt; Ekeko properties</code>.</li>
-<li> Click the Select button and now choose the class that contains the main() method of the AspectJ project. (e.g. you can find an example of a main() method in our AJTestMetrics project (<a href="https://github.com/ozlerhakan/aop-metrics/blob/master/AJTestMetrics/src/ua/thesis/test/MainTST.java">MainTST</a>).</li>
+<li> Click the Select button and now choose the class that contains the main() method of the AspectJ project. (e.g. you can find an example of a main() method in our AJTestMetrics project (<a href="https://github.com/ozlerhakan/aop-metrics/blob/master/AJTestMetrics/src/ua/thesis/test/MainTST.java">MainTST</a>).
+
+<ul>
+<li>If your AspectJ project does not have a main() method, just <strong>create</strong> a new one to set it as an execution point of soot analysis.</li>
+</ul>
+</li>
 <li> Write the following line into the "Soot arguments:" one-line text box: <code>-no-bodies-for-excluded -src-prec c -f jimple -keep-line-number -app -w -p cg.cha</code>
 </li>
 <li>Click OK</li>
@@ -215,14 +253,25 @@ a metrics suite including both <strong><a href="http://en.wikipedia.org/wiki/Asp
 </li>
 <li><p>Activate an Ekeko-hosted REPL by doing <code>Ekeko &gt; Start nRepl</code> from the main Eclipse menu. A dialog shows the port on which the nRepl server listens (e.g. <code>nrepl://localhost:51721</code>)</p></li>
 <li>Connect to the Ekeko-hosted REPL: Go to: <code>Window &gt; Connect to REPL</code> to connect to this port (i.e. <code>nrepl://localhost:51721</code>). A Counterclockwise REPL view now opens.</li>
-<li>Open the <code>metrics-result</code> file located in the imported project and right-click somewhere on the file and choose <code>Clojure &gt; Load file in REPL</code>
-</li>
+<li>There are 2 steps to run the metrics:
+
+<ul>
+<li>First,  Open the <code>aopmetrics/metrics.clj</code> file and right-click somewhere on the file and choose <code>Clojure &gt; Load file in REPL</code>. After obtaining <code>#'aopmetrics.metrics/AcA</code> in the REPL, follow the second step.</li>
+<li>Second, Open the <code>aopmetrics/core.clj</code> file and right-click somewhere on the file and choose <code>Clojure &gt; Load file in REPL</code>.
+
+<ul>
 <li>You will see <code>nil</code> in the REPL which means that everything goes correctly and the metric framework has likewise been loaded in the REPL.</li>
 <li>After disabling the comment block, you can now run the metrics. For example, if we look at <code>(metrics/VSize)</code>, the alias name of our <code>AOPMetrics</code> is <code>metrics</code> that helps in reaching the implemented metrics in a short way rather than typing the totally qualified name (i.e. <code>AOPMetrics</code>). <code>metrics/Vsize</code> simply retrieves the vocabulary size of the project.</li>
-</ul><p><img class="emoji" title=":pushpin:" alt=":pushpin:" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4cc.png" height="20" width="20" align="absmiddle"><strong>Note:</strong> The AcA and MoA metrics need different soot arguments to obtain the exact data. Thus, you need to change the current arguments with the following one: <code>-no-bodies-for-excluded -src-prec c -f jimple -keep-line-number -app -w -p jb use-original-names:true -p cg.cha</code> and run again <code>Ekeko Soot Analyses</code>.</p>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<p><img class="emoji" title=":pushpin:" alt=":pushpin:" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4cc.png" height="20" width="20" align="absmiddle"><strong>Note:</strong> The AcA and MoA metrics need different soot arguments to obtain the exact data. Thus, you need to change the current arguments with the following one: <code>-no-bodies-for-excluded -src-prec c -f jimple -keep-line-number -app -w -p jb use-original-names:true -p cg.cha</code> and run again <code>Ekeko Soot Analyses</code>.</p>
 
 <blockquote>
-<p><img class="emoji" title=":exclamation:" alt=":exclamation:" src="https://assets-cdn.github.com/images/icons/emoji/unicode/2757-fe0f.png" height="20" width="20" align="absmiddle"><strong>One Potential Issue</strong>: There was an encountered issue about soot analysis. If you get the same problem called <code>RuntimeException : tried to get nonexistent method</code>, while attempting to run the metrics especially for the AM, IM, and MM metrics.  You can find more information on it from <a href="https://github.com/ozlerhakan/aop-metrics/issues/1">https://github.com/ozlerhakan/aop-metrics/issues/1</a> </p>
+<p><img class="emoji" title=":exclamation:" alt=":exclamation:" src="https://assets-cdn.github.com/images/icons/emoji/unicode/2757.png" height="20" width="20" align="absmiddle"><strong>One Potential Issue</strong>: There was an encountered issue about soot analysis. If you get the same problem called <code>RuntimeException : tried to get nonexistent method</code>, while attempting to run the metrics especially for the AM, IM, and MM metrics.  You can find more information on it from <a href="https://github.com/ozlerhakan/aop-metrics/issues/1">https://github.com/ozlerhakan/aop-metrics/issues/1</a> </p>
 </blockquote>
 
 <h3>
