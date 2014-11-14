@@ -14,8 +14,7 @@
 
 ;############################### METRIC LOC ###############################
 
-; For now, LOC is not supported! TODO: Fix it!
-;(metrics/LOC "C:/Users/HAKAN/runtime-New_configuration-clojure/Contract4J5/contract4j5/src" "MainTST")
+(metrics/LOC "C:/Users/HAKAN/workspace/AJTestMetrics/src" "MainTST")
 
 ;############################### METRIC VS ############################### 
 
