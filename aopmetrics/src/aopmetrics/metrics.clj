@@ -119,6 +119,67 @@
 
 ;############################### METRIC LOC ###############################
 
+(defn class-loc [filePath ignoredTestName]
+  "count the number of lines of java code in a given project - except blank lines"
+  (reduce
+    +
+    (for [file (file-seq  filePath) :when (and 
+                                            (.endsWith (.toString file )".java") 
+                                            (false? (lastIndexOfText (.getName file) ignoredTestName)) 
+                                            (false? (or 
+                                                      (.startsWith (.toLowerCase (.getName file)) "test") 
+                                                      (.endsWith   (.toLowerCase (.getName file)) "test"))))]
+      (with-open [rdr (io/reader  file)] (count  (filter #(re-find #"\S" %) (line-seq rdr)))))))
+
+(defn aspect-loc [filePath]
+  "count the number of lines of aspectj code in a given project - except blank lines"
+  (reduce
+    +
+    (for [file (file-seq  filePath) :when (.endsWith (.toString file )".aj")]
+      (with-open [rdr (io/reader file)] (count  (filter #(re-find #"\S" %) (line-seq rdr)))))))
+
+(defn- tracingthefile [rdr result]
+  (let [flag    (atom false)]
+    (doseq [content  rdr]
+      (if (and (.startsWith  (clojure.string/trim content) "/*") (.endsWith  (clojure.string/trim content) "*/")) (.add result 1)
+        (if (.startsWith  (clojure.string/trim content) "//") (.add result 1)
+          (if (and (.startsWith  (clojure.string/trim content) "/*") (not (.endsWith (clojure.string/trim content) "*/"))) (do (.add result 1) (reset! flag true))
+            (if (and (not (.startsWith  (clojure.string/trim content) "/*")) (.endsWith (clojure.string/trim content) "*/"))  (do (.add result 1) (reset! flag false)) 
+              (if (true? @flag) (.add result 1)))))))))
+
+(defn- results [?collect]
+  (first (first (ekeko [?size]
+                       (l/fresh [?result ?y ?list]
+                                (equals ?result (java.util.ArrayList. []))
+                                (equals ?y (tracingthefile ?collect ?result))
+                                (equals ?list ?result)
+                                (equals ?size (.size ?result)))))))
+
+(defn- java-docs [filePath ignoredTestName]
+  "count the number of lines of comments & javadocs"
+  (reduce 
+    +
+    (for [file (file-seq filePath) :when (and
+                                           (or
+                                             (.endsWith (.toString file )".aj")
+                                             (.endsWith (.toString file )".java"))
+                                           (false? (lastIndexOfText (.getName file) ignoredTestName))
+                                           (false? (or
+                                                     (.startsWith (.toLowerCase (.getName file)) "test")
+                                                     (.endsWith (.toLowerCase (.getName file)) "test"))))]
+      (with-open [rdr (io/reader file)]
+        (results (doall (line-seq rdr)))))))
+
+
+(defn LOC [filepath ignore]
+  ( -
+    (+
+      (class-loc (io/file filepath) ignore)
+      (aspect-loc (io/file filepath)))
+    (java-docs (io/file filepath) ignore)))
+
+; exclude MainTST which is the execution point of the soot analyses
+;(LOC "C:/Users/HAKAN/workspace/AJTestMetrics/src" "MainTST")
 
 ;############################### METRIC VS ############################### 
 (defn NOClasses [?classes]
