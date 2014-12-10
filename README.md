@@ -4,6 +4,14 @@
 
 ---
 
+**Acknowledgements**. I have thought that the acknowledgements are a very valuable part to begin the thesis text, since all the expressed thoughts must reach to the right people before delving into it. You will only see me while reading the whole thesis, whereas there are a few invaluable people who deserve certainly my thanks –without them I would never get the fruits of my work. 
+ 
+First of all, many thanks to my supervisor, Tim Molderez for his continuous guidance, support and encouragement throughout the year that make this work possible. Also, my thanks go to my promoter, Prof. Dr. Dirk Janssens for initiating this work in order to be enlightened some missing parts of this area. I would like to thank my family for their continuous support and encouragement. Although they are far from me, I felt them next to me while working on it.
+
+Finally, I would like to dedicate this thesis to *my mother* and end up with a quote of Hz. Mevlâna (Rumi) that summarizes my one-year effort:
+ 
+> *Patience is the key to joy.*
+ 
 **Abstract**. Aspect-oriented programming (AOP) is a way of modularizing a software system by means of new kind of modules called aspects in software development. To this end AOP helps in alleviating crosscutting concerns of system modules by separating into several aspect modules, thereby aiming to improve separation of concerns. On the other hand, aspects can bring unexpected behaviour to a system while attempting to alter the system’s concerns. They can modify the behaviour of the base system without warning. Following to this, such impact can limit to achieve modular reasoning in an aspect-oriented system properly.
 
 Obtaining the valuable data, we try to get an idea of how difficult it is to achieve modular reasoning. In this thesis, we analyse the existing ten **[AspectJ](http://eclipse.org/aspectj/)** systems by answering six research questions. These six questions were derived from our general question: *"how AspectJ is used in practice?"*. In order to answer each one of them, we have implemented
@@ -13,52 +21,52 @@ a metrics suite including both **[aspect-oriented ](http://en.wikipedia.org/wiki
 ---
 
 1.	How large is the system?
-	*	*Lines of Code* [(LOC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L156)
-	*	*Vocabulary Size* [(VS)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L191) 
-	*	*Number of Attributes* [(NOA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L201) 
-	*	*Number of Methods* [(NOM)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L211)
+	*	*Lines of Code* (LOC)
+	*	*Vocabulary Size* (VS)
+	*	*Number of Attributes* (NOA) 
+	*	*Number of Methods* (NOM)
 2.	How often are AOP constructs used compared to OOP features?
-	*	*Number of Intertypes* [(NOI)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L238)
-	*	*Number of Advice* [(NOAd)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L256)
+	*	*Number of Intertypes* (NOI)
+	*	*Number of Advice* (NOAd)
 3.	Which AOP constructs are typically used?
-	*	*Inherited Aspects* [(InA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L573)
-	*	*Singleton Aspects* [(SA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L580)
-	*	*Non-Singleton Aspects* [(nSA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L589)
-	*	*Advice-Advanced Pointcut Dependence* [(AAP)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L557)
-	*	*Advice-Basic Pointcut Dependence* [(ABP)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L567)
-	*	*Number of Around Advice* [(NOAr)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L733)
-	*	*Number of Before/After Advice* [(NOBA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L752)
-	*	*Number of After Throwing/Returning Advice* [(NOTR)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L770)
-	*	*Number of Call* [(NOC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L893)
-	*	*Number of Execution* [(NOE)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L900)
-	*	*Adviceexecution-Advice Dependence* [(AE)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L596)
-	*	*Number of Wildcards* [(NOW)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L1128)
-	*	*Number of non-Wildcards* [(NOnW)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L1140)
-	*	*Argument size of Args-Advice* [(AAd)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L722)
-	*	*Argument size of Args-Advice-args* [(AAda)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L727)
+	*	*Inherited Aspects* (InA)
+	*	*Singleton Aspects* (SA)
+	*	*Non-Singleton Aspects* (nSA)
+	*	*Advice-Advanced Pointcut Dependence* (AAP)
+	*	*Advice-Basic Pointcut Dependence* (ABP)
+	*	*Number of Around Advice* (NOAr)
+	*	*Number of Before/After Advice* (NOBA)
+	*	*Number of After Throwing/Returning Advice* (NOTR)
+	*	*Number of Call* (NOC)
+	*	*Number of Execution* (NOE)
+	*	*Adviceexecution-Advice Dependence* (AE)
+	*	*Number of Wildcards* (NOW)
+	*	*Number of non-Wildcards* (NOnW)
+	*	*Argument size of Args-Advice* (AAd)
+	*	*Argument size of Args-Advice-args* (AAda)
 4.	How many types and members of a system are advised by AOP?
-	*	*Percentage of Advised Classes* [(AdC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L851)
-	*	*Percentage of non-Advised Classes* [(nAdC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L922)
-	*	*Number of Advised Methods* [(AdM)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L987)
-	*   *Number of non-Advised Methods* [(nAdM)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L993)
-	*	*Classes and Subclasses* [(CsC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L1046)
-	*	*Average of Subclasses of Classes* [(ScC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L1076)
+	*	*Percentage of Advised Classes* (AdC)
+	*	*Percentage of non-Advised Classes* (nAdC)
+	*	*Number of Advised Methods* (AdM)
+	*   *Number of non-Advised Methods* (nAdM)
+	*	*Classes and Subclasses* (CsC)
+	*	*Average of Subclasses of Classes* (ScC)
 5.	Is there a connection between the amount of coupling in an aspect, and how many shadows it advises?
-	*	*Advice-Join Point Shadow Dependence* [(AJ)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L655)
-	*	*Number of thisJoinPoint/Static* [(tJPS)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L1154)
-	*	*Number of Modified Args* [(MoA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L1225)
-	*	*Number of Accessed Args* [(AcA)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L1262)
-	*	*Around Advice - non-Proceed Call Dependence* [(AnP)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L796)
+	*	*Advice-Join Point Shadow Dependence* (AJ)
+	*	*Number of thisJoinPoint/Static* (tJPS)
+	*	*Number of Modified Args* (MoA)
+	*	*Number of Accessed Args* (AcA)
+	*	*Around Advice - non-Proceed Call Dependence* (AnP)
 6.	How many dependencies are there between classes and aspects?	
-	*	*Attribute-Class Dependence* [(AtC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L366)
-	*	*Advice-Class Dependence* [(AC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L380)
-	*	*Intertype-Class Dependence* [(IC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L414)
-	*	*Method-Class Dependence* [(MC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L448)
-	*	*Pointcut-Class Dependence* [(PC)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L481)
-	*	*Advice-Method Dependence* [(AM)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L332) 
-	*	*IntertypeMethod-Method Dependence* [(IM)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L340)
-	*	*Method-Method Dependence* [(MM)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L356)
-	*	*Pointcut-Method Dependence* [(PM)](https://github.com/ozlerhakan/aop-metrics-ekeko/blob/master/Ekeko%20AJFX/src/ekeko_ajfx/AOPMetrics.clj#L496) 
+	*	*Attribute-Class Dependence* (AtC)
+	*	*Advice-Class Dependence* (AC)
+	*	*Intertype-Class Dependence* (IC)
+	*	*Method-Class Dependence* (MC)
+	*	*Pointcut-Class Dependence* (PC)
+	*	*Advice-Method Dependence* (AM)
+	*	*IntertypeMethod-Method Dependence* (IM)
+	*	*Method-Method Dependence* (MM)
+	*	*Pointcut-Method Dependence* (PM)
 
 
 ### Have a look at an example
@@ -103,6 +111,7 @@ All the related charts are available in [Thesis Text/diagrams](https://github.co
 
 First of all, make sure that you have all the dependencies about the *Ekeko plug-in* in your [Eclipse Luna 4.4 IDE](https://www.eclipse.org/downloads/), if not, you first need to download the dependencies:
 
+  * [AspectJ Development Tools](https://eclipse.org/aspectj/)
   * AST View [i.e. org.eclipse.jdt.astview](http://www.eclipse.org/jdt/ui/astview/index.php)
   * [Counterclockwise](http://doc.ccw-ide.org/documentation.html#install-as-plugin)
 
