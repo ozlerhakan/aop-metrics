@@ -1,6 +1,4 @@
-<img height="550px" src="https://dl.dropboxusercontent.com/s/grmua5z1gwknbl9/cover.JPG" >
 ### Master Thesis: Measuring Aspect-Oriented Software In Practice
-[![Analytics](https://ga-beacon.appspot.com/UA-52814996-1/chromeskel_a/readme)](https://github.com/igrigorik/ga-beacon)
 
 ---
 
@@ -103,27 +101,27 @@ The Metric representation of the question is: the number of inherited aspects in
 ---
 All the related charts are available in [Thesis Text/diagrams](https://github.com/ozlerhakan/aop-metrics/tree/master/Thesis%20Text/diagrams).
 
-<img height="240px" src="https://dl.dropboxusercontent.com/s/ikz4irmck0gz9an/index4.png" title="The Percentage of Advised Classes against non-Advised Classes" > <img height="240px" src="https://dl.dropboxusercontent.com/s/69l8fndbu5abfcf/index5.png" title="AAd vs AAda" >
-
- <img height="220px" src="https://dl.dropboxusercontent.com/s/9o65wcdnklbvkc9/index3.png" title="Advice-Advanced Pointcut Dependency versus Advice-Basic Pointcut Dependency per System" > <img height="220px" src="https://dl.dropboxusercontent.com/s/yzh7kv860zi5dyi/index2.png" title="The Average of Advice-Join Point Shadow Dependency per System" >
 ### How the metrics work
 ---
 
-First of all, make sure that you have all the dependencies about the *Ekeko plug-in* in your [Eclipse Luna 4.4 IDE](https://www.eclipse.org/downloads/), if not, you first need to download the dependencies:
+First of all, make sure that you have all the dependencies about the *Ekeko plug-in* in your latest [Eclipse IDE](https://www.eclipse.org/downloads/) (currently it is Neon.2 4.6), if not, you first need to download the dependencies:
 
-  * [AspectJ Development Tools](https://eclipse.org/aspectj/)
+  * [AspectJ Development Tools](https://eclipse.org/ajdt/downloads/) 
+  	* Just look at the AJDT dev builds for the latest Eclipse IDE and download it via ```Help > Install New Software...``` by pasting its update site URL (e.g. http://download.eclipse.org/tools/ajdt/46/dev/update for 4.6 version)   
   * AST View [i.e. org.eclipse.jdt.astview](http://www.eclipse.org/jdt/ui/astview/index.php)
+  	* Install AST view for Eclipse 4.4 and later version via ``Install New Software``
   * [Counterclockwise](http://doc.ccw-ide.org/documentation.html#install-as-plugin)
+  	* Counterclockwise is available via the Eclipse Marketplace Client: search for Counterclockwise
 
 Downloading the dependencies, you are now ready to install the prebuilt *Ekeko* plug-in:
 
   * Go to: ```Help > Install New Software...``` in your Eclipse IDE.
   * Copy and paste this url: http://soft.vub.ac.be/~cderoove/eclipse/ in the Work with text field.
   * Hit Enter.
-  * Select all plug-ins including [Ekeko](https://github.com/cderoove/damp.ekeko) and [GASR](https://github.com/cderoove/damp.ekeko.aspectj) in Ekeko-based program Analysis (*required*), the rest are (*optional*) and install all of them.
+  * Select Ekeko-based Program Analysis including [Ekeko](https://github.com/cderoove/damp.ekeko) and [GASR](https://github.com/cderoove/damp.ekeko.aspectj) (*required*), the rest are (*optional*) and install them.
   * After installing both Ekeko and the Ekeko's AspectJ extension, you are ready to downdload the metrics.
-  * Import the project (i.e. the aopmetrics project) in your Eclipse workspace. Eclipse Luna will automatically detect this project as a Clojure project.
-  * Select an AspectJ project that you want to analyse then, right-click on the project, apply these steps: ```Configure > Include in Ekeko Queries```
+  * Import the project (i.e. the aopmetrics project) in your Eclipse workspace. Drag and drop it on the package explorer.
+  * Select an AspectJ project (e.g. SpaceWar) that you want to analyse then, right-click on the project on the package exlorer, apply these steps: ```Configure > Include in Ekeko Queries```
   * **The metrics also need soot analyses in order to run properly**. To do that, we need to configure the selected AspectJ project once as follows:
       *  Right-click on the project : ```Properties > Ekeko properties```.
       *  Click the Select button and now choose the class that contains the main() method of the AspectJ project. (e.g. you can find an example of a main() method in our AJTestMetrics project ([MainTST](https://github.com/ozlerhakan/aop-metrics/blob/master/AJTestMetrics/src/ua/thesis/test/MainTST.java)).
@@ -136,11 +134,13 @@ Downloading the dependencies, you are now ready to install the prebuilt *Ekeko* 
   * Connect to the Ekeko-hosted REPL: Go to: ```Window > Connect to REPL``` to connect to this port (i.e. ```nrepl://localhost:51721```). A Counterclockwise REPL view now opens.
   * There are 2 steps to run the metrics:
  	* First,  Open the ```aopmetrics/metrics.clj``` file and right-click somewhere on the file and choose ```Clojure > Load file in REPL ```. After obtaining ```#'aopmetrics.metrics/AcA``` in the REPL, follow the second step.
-  	* Second, Open the ```aopmetrics/core.clj``` file and right-click somewhere on the file and choose ```Clojure > Load file in REPL ```.
-  		* You will see ```nil``` in the REPL which means that everything goes correctly and the metric framework has likewise been loaded in the REPL.
-  		* After disabling the comment block, you can now run the metrics. For example, if we look at ```(metrics/VSize)```, the alias name of our ```AOPMetrics``` is ```metrics``` that helps in reaching the implemented metrics in a short way rather than typing the totally qualified name (i.e. ```AOPMetrics```). ```metrics/Vsize``` simply retrieves the vocabulary size of the project.
+	* Second, Open the ```aopmetrics/core.clj``` file and right-click somewhere on the file and choose ```Clojure > Load file in REPL ```.
+		* You will see ```nil``` in the REPL which means that everything goes correctly and the metric framework has likewise been loaded in the REPL.
+  	* Third, again right-click somewhere on the file and choose ```Clojure > Switch REPL to FILE's namespace```.
+		* You will see something similary like ``#object[clojure.lang.Namespace 0x19805029 "aopmetrics.core"]`` in the REPL.
+  		* After disabling the comment block, you can now run the metrics. For example, if we look at ```(metrics/VSize)```, the alias name of our ```AOPMetrics``` is ```metrics``` that helps in reaching the implemented metrics in a short way rather than typing the totally qualified name (i.e. ```AOPMetrics```). Type ```(metrics/Vsize)``` on the REPL and it simply retrieves the vocabulary size of the project that you enabled Ekeko Queries.
 
-
+---
 
 :pushpin:**Note:** The AcA and MoA metrics need different soot arguments to obtain the exact data. Thus, you need to change the current arguments with the following one: ```-no-bodies-for-excluded -src-prec c -f jimple -keep-line-number -app -w -p jb use-original-names:true -p cg.cha``` and run again ```Ekeko Soot Analyses```.
 
